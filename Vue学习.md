@@ -90,3 +90,60 @@ ES6语法规范、ES6模块化、包管理器、原型，原型链、数组常�
 ​		（1）if(){}
 
 ​		（2）for(){}
+
+## 1.6 模板语法
+
+### 	Vue模板语法有2大类：
+
+1. 插值语法：
+
+   功能：用于解析标签体内容
+
+   写法：`{{xxx}}`，`xxx`是js表达式，且可以直接读取到`data`中的所有属性
+
+2. 指令语法：
+
+   功能：用于解析标签（包括标签属性、标签体内容、绑定事件......）
+
+   举例：`v-bind:href='xxx'`或简写为`:href='xxx'`,`xxx`同样要写js表达式，且可以直接读取到`data`中的所有属性
+
+   备注：Vue中有很多的指令，且形式都是`v-xxx`，此处我们只是拿`v-bind`举例子
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>模板语法</title>
+    <script src="../js/vue.js"></script>
+</head>
+<body>
+    <div id="root">
+        <h1>插值语法</h1>
+        <h3>你好，{{name}}</h3>
+        <hr/>
+        <h1>指令语法</h1>
+        <a v-bind:href="school.url" v-bind:x="hello">点我去{{school.name}}1</a>
+        <a :href="url.toUpperCase()" :x="hello">点我去百度2</a>
+    </div>
+    <script>
+        new Vue({
+            el: '#root',
+            data: {
+                name: 'abcabc',
+                url: "http://www.baidu.com",
+                hello: '真的逊',
+                school: {
+                    name: '大学',
+                    url: 'http://www.4399.com'
+                }
+            }
+        })
+    </script>
+</body>
+</html>
+```
+
+![image-20230228210057056](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230228210057056.png)

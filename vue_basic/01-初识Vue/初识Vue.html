@@ -6,15 +6,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>初识Vue</title>
     <!-- 引入Vue -->
-    <script src="../01-初识Vue/js/vue.js"></script>
+    <script src="../js/vue.js"></script>
 </head>
 <body>
     <!-- 准备好一个容器 -->
-    <div id="root">
-        <h1>abc</h1>
+    <div class="root">
+        <!-- 插值语法 -->
+        <h1>Hello,{{name.toUpperCase()}}</h1>
     </div>
     <script>
         Vue.config.productionTip = false // 阻止 vue 在启动时生成生产提示
+        // 创建Vue实例
+        new Vue({
+            // element 找到id为root的容器
+            el: '.root',  //el用于指定当前Vue实例为哪个容器服务，值通常为css选择器字符串
+            data: { // data中用于存储数据，数据供el所指定的容器所使用，值我们暂时先写成一个对象
+                name: 'czq'
+            },
+        })
     </script>
 </body>
 </html>

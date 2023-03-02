@@ -147,3 +147,63 @@ ES6语法规范、ES6模块化、包管理器、原型，原型链、数组常�
 ```
 
 ![image-20230228210057056](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230228210057056.png)
+
+## 1.7 数据绑定
+
+​	Vue中有2种数据绑定的方式：
+
+​		（1）单向绑定（v-bind）：数据只能从`data`流向`页面`
+
+​		（2）双向绑定（v-model）：数据不仅能从`data`流向`页面`，还可以从`页面`流向`data`
+
+​			备注：
+
+					1. 双向绑定一般都应用在表单类元素上（如：`input`、`select`等）
+					1. `v-model:value`可以简写为`v-model`，因为`v-model`默认收集的就是`value`值
+
+```vue
+<!-- 如下代码是错误的。因为v-model只能应用在表单类元素（输入类元素）上 -->
+<h2 v-model:x="name">真的逊</h2>
+```
+
+示例代码：
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据绑定</title>
+    <script src="../js/vue.js"></script>
+</head>
+<body>
+    <div id="root">
+        <!-- 普通写法 -->
+        <!-- 单向数据绑定：<input type="text" name="" id="" v-bind:value="name">
+        <br/>
+        双向数据绑定：<input type="text" name="" id="" v-model:value="name"> -->
+        <br/>
+        <!-- 简写 -->
+        单向数据绑定：<input type="text" name="" id="" :value="name">
+        <br/>
+        双向数据绑定：<input type="text" name="" id="" v-model="name">
+
+
+        <!-- 如下代码是错误的。因为v-model只能应用在表单类元素（输入类元素）上 -->
+        <!-- <h2 v-model:x="name">真的逊</h2> -->
+    </div>
+    <script>
+        new Vue({
+            el: '#root',
+            data: {
+                name: 'czq'
+            }
+        })
+    </script>
+</body>
+</html>
+```
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230302195541061.png" alt="image-20230302195541061" style="zoom:50%;" />

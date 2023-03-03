@@ -317,4 +317,50 @@ new Vue({
 
 <img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230303143047502.png" alt="image-20230303143047502" style="zoom:50%;" />
 
-​	
+## 1.9 MVVM模型
+
+	1. M：模型（Model）：对应data中的数据
+	1. V：视图（View）：模板
+	1. VM：视图模型（ViewModel）：Vue实例对象	
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230303183500434.png" alt="image-20230303183500434" style="zoom:50%;" />
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>理解MVVM</title>
+    <script src="../js/vue.js"></script>
+</head>
+<body>
+    <div id="root">
+        <h1>学校名称:{{name}}</h1>
+        <h1>学校地址:{{address}}</h1>
+        <h1>test:{{$options}}</h1>
+        <h1>tets2:{{$emit}}</h1>
+        <h1>test4:{{_c}}</h1>
+    </div>
+
+    <script>
+        const vm = new Vue({
+            el: '#root',
+            data: {
+                name: 'fly school',
+                address: 'China'
+            }
+        })
+        console.log(vm);
+    </script>
+</body>
+</html>
+```
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230303185256955.png" alt="image-20230303185256955" style="zoom:50%;" />
+
+​	观察发现：
+
+1. data身上中所有的属性，最后都出现在了vm身上
+2. vm身上以及Vue原型上的所有属性，在Vue模板中都可以直接使用

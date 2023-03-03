@@ -207,3 +207,114 @@ ES6语法规范、ES6模块化、包管理器、原型，原型链、数组常�
 ```
 
 <img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230302195541061.png" alt="image-20230302195541061" style="zoom:50%;" />
+
+## 1.8 el与data的两种写法
+
+ 1. el有2种写法
+
+    	1. new Vue的时候配置el属性
+    	2. 先创建Vue实例，然后通过`vm.$mount('#root')`指定el的值
+
+ 2. data有2种写法
+
+    	1. 对象式
+    	2. 函数式
+
+    如何选择：目前哪种写法都可以，以后学习到组件时，data必须使用函数式，否则就会报错
+
+ 3. 一个重要的原则：
+
+​		由Vue管理的函数，一定不要写箭头函数，一旦写了箭头函数，this就不再是Vue实例了
+
+​	el的两种写法：
+
+```javascript
+        const v = new Vue({
+            // el: '#root', // 第一种写法
+            data: {
+                name: 'abc'
+            }
+        })
+        console.log(v);
+        v.$mount('#root') // 第二种写法
+```
+
+​	data的两种写法：
+
+​		对象式：
+
+```javascript
+new Vue({
+		el: '#root',
+		data: {
+				name: 'czq',
+		}
+})
+```
+
+​	函数式：
+
+```javascript
+new Vue({
+		el: '#root',
+		data: function(){ //省略写法：data(){}
+				console.log(this) //此处的this是Vue实例对象
+		// 必须要返回一个对象
+				return {
+						name: 'czq'
+				}
+		}
+})
+```
+
+​	整体程序：
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>el与data的两种写法</title>
+    <script src="../js/vue.js"></script>
+    <!-- 容器 -->
+    <div id="root">
+        <h1>你好,{{name}}</h1>
+    </div>
+</head>
+<body>
+    <script>
+        // el的两种写法
+        // const v = new Vue({
+        //     // el: '#root', // 第一种写法
+        //     data: {
+        //         name: 'abc'
+        //     }
+        // })
+        // console.log(v);
+        // v.$mount('#root') // 第二种写法
+
+        // data的两种写法
+        new Vue({
+            el: '#root',
+            // data的第一种写法：对象式
+            // data: {
+            //     name: 'czq',
+            // }
+            // data的第二种写法：函数式
+            data: function(){ //省略写法：data(){}
+                console.log(this); //此处的this是Vue实例对象
+                return {
+                    name: 'czq'
+                }
+            }
+        })
+    </script>
+</body>
+</html>
+```
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230303143047502.png" alt="image-20230303143047502" style="zoom:50%;" />
+
+​	

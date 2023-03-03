@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>回顾Object.defineProperty方法</title>
+    <script src="../js/vue.js"></script>
+</head>
+<body>
+    <script>
+        let number = 19
+        let person = {
+            name: '陈正清',
+            sex: '男',
+            // age: 21
+        }
+
+        // 使用此方法添加进对象的属性不参与枚举 在Chrome浏览器显示的key为淡色（比如无法遍历到此属性的key和value）
+        Object.defineProperty(person, 'age', {
+            // value: 18,
+            // enumerable: true, //控制属性是否可以枚举，默认值是false
+            // writable: true, //控制属性是否可以被修改，默认值是false
+            // configurable: true //控制属性是否可以被删除，默认值是false
+
+            // 当有人读取person的age属性时，get函数(getter)就会被调用，且返回值就是age的值
+            get: function(){
+                console.log('有人读取age属性了');
+                return number
+            },
+            // 当有人读取person的age属性时，set函数(setter)就会被调用，且会收到修改的具体值
+            set: function(value){
+                console.log('有人修改了age属性，且值是:' + value);
+                number = value
+            }
+        })
+        // 验证：
+        // Object.keys() 此方法传入一个对象作为参数，可以把传入对象里面所有属性的属性名提取出来变成一个数组
+        // console.log(Object.keys(person));
+
+        // forin既能遍历数组又能遍历对象
+        // for(let key in person){
+        //     // 输出person对象里面每一个属性的属性值
+        //     console.log(person[key]);
+        // }
+        console.log(person);
+    </script>
+</body>
+</html>

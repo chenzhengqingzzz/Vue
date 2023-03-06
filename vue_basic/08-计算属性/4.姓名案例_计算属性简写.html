@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>姓名案例_计算属性实现简写</title>
+    <script src="../js/vue.js"></script>
+</head>
+<body>
+    <div id="root">
+        姓：<input type="text" v-model="firstName"> <br/>
+        名：<input type="text" v-model="lastName"> <br/>
+        全名：<span>{{fullName}}</span>
+    </div>
+    <script>
+        const vm = new Vue({
+            el: '#root',
+            data: {
+                firstName: '张',
+                lastName: '三'
+            },
+            computed: {
+                // 当确定计算属性不需要修改则可触发简写形式
+                // 可直接把其当成getter来用
+                // fullName(){
+                //     console.log(this);
+                //     return this.firstName + '-' + this.lastName
+                // },
+                fullName: {
+                    // get有什么作用？当有人读取fullName时，get就会被调用且返回值就作为fullName的值
+                    // get什么时候调用？ 1.初次读取fullName时。 2.所依赖的数据发生变化时
+                    get(){
+                        console.log(this); // 此处的this是vm
+                        return this.firstName + '-' + this.lastName
+                    },
+
+                    // set什么时候调用？当fullName被修改时
+                    set(value){
+                        const arr = value.split('-')
+                        this.firstName = arr[0]
+                        this.lastName = arr[1]
+                    }
+                }
+            }
+        })
+    </script>
+</body>
+</html>

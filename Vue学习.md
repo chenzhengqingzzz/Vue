@@ -838,3 +838,152 @@ descriptor
 ```
 
 ![image-20230306185814130](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230306185814130.png)
+
+## 1.12 计算属性
+
+	1. 定义：要用的属性不存在，要通过已有的属性计算得来
+	1. 原理：底层借助了`Object.defineProperty()`方法提供的`getter`和`setter`
+ 	3. get函数什么时候执行？
+     	1. 初次读取时会执行一次
+     	2. 当依赖的数据发生改变时会被再次调用
+	1. 优势：与`methods`实现相比，内部会有缓存机制（复用），效率更高，测试方便
+ 	5. 备注：
+     	1. 计算属性最终会出现在`vm`上，直接用`this`读取使用即可
+     	2. 如果计算属性要被修改，那必须写`setter`函数去相应修改，且set中要引起计算时依赖的数据发生改变
+
+在这个说明案例中，有太多需要注意的点，我们可以发现使用计算属性更利于性能节省以及调试方便
+
+1. 插值语法实现
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>姓名案例_插值语法实现</title>
+    <script src="../js/vue.js"></script>
+</head>
+<body>
+    <div id="root">
+        姓：<input type="text" v-model="firstName"> <br/>
+        名：<input type="text" v-model="lastName"> <br/>
+        全名：<span>{{firstName.slice(0, 3) + '-' + lastName}}</span>
+    </div>
+    <script>
+        const vm = new Vue({
+            el: '#root',
+            data: {
+                firstName: '张',
+                lastName: '三'
+            }
+        })
+    </script>
+</body>
+</html>
+```
+
+![image-20230306202717232](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230306202717232.png)
+
+2. 用methods实现
+
+​	如果页面上有n个需要展示的地方，则methods对应的函数会调用n次，不利于性能节约
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>姓名案例_methods实现</title>
+    <script src="../js/vue.js"></script>
+</head>
+<body>
+    <div id="root">
+        姓：<input type="text" v-model="firstName"> <br/>
+        名：<input type="text" v-model="lastName"> <br/>
+        全名：<span>{{fullName()}}</span>
+    </div>
+    <script>
+        const vm = new Vue({
+            el: '#root',
+            data: {
+                firstName: '张',
+                lastName: '三'
+            },
+            methods: {
+                fullName(){
+                    return this.firstName + '-' + this.lastName
+                }
+            }
+        })
+    </script>
+</body>
+</html>
+```
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230306202930528.png" alt="image-20230306202930528" style="zoom:50%;" />
+
+3. 计算属性实现以及简写
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>姓名案例_计算属性实现</title>
+    <script src="../js/vue.js"></script>
+</head>
+<body>
+    <div id="root">
+        姓：<input type="text" v-model="firstName"> <br/>
+        名：<input type="text" v-model="lastName"> <br/>
+        全名：<span>{{fullName}}</span>
+    </div>
+    <script>
+        const vm = new Vue({
+            el: '#root',
+            data: {
+                firstName: '张',
+                lastName: '三'
+            },
+            computed: {
+                fullName: {
+                    // get有什么作用？当有人读取fullName时，get就会被调用且返回值就作为fullName的值
+                    // get什么时候调用？ 1.初次读取fullName时。 2.所依赖的数据发生变化时
+                    get(){
+                        console.log(this); // 此处的this是vm
+                        return this.firstName + '-' + this.lastName
+                    },
+
+                    // set什么时候调用？当fullName被修改时
+                    set(value){
+                        const arr = value.split('-')
+                        this.firstName = arr[0]
+                        this.lastName = arr[1]
+                    }
+                }
+            }
+        })
+    </script>
+</body>
+</html>
+```
+
+![image-20230306203022576](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230306203022576.png)
+
+​	**注意：当我们的计算属性不需要进行修改，而只是展示在页面上时，则可以触发简写方式，将计算属性直接当成其`getter()`使用**
+
+```javascript
+computed: {
+  fullname(){
+    console.log(this)
+    return this.firstName + '-' + 'lastName'
+  }
+}
+```
+

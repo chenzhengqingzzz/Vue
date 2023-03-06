@@ -597,3 +597,244 @@ descriptor
 ![image-20230303205747989](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230303205747989.png)
 
 ​	这可以证明我们操作的data可以被Vue的getter和setter调用
+
+## 1.11 事件处理
+
+### 1.11.1 事件的基本使用
+
+​	事件的基本使用：
+
+		1. 使用`v-on:xxx` 或 `@xxx`绑定事件，其中`xxx`为事件名
+		1. 事件的回调需要配置在`methods`对象中，最终会在`vm`上
+		1. `methods`中配置的函数，不要用箭头函数！否则`this`就不是`vm`的了
+		1. `methods`中配置的函数，都是被Vue所管理的函数，`this`的指向是`vm`或`组件实例对象`
+		1. `@click='demo'`和`@click='demo($event)'`效果一致，但后者可以传参
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>事件的基本使用</title>
+    <script src="../js/vue.js"></script>
+</head>
+<body>
+    <div id="root">
+        <h2>欢迎来到{{name}}</h2>
+        <!-- <button v-on:click="showInfo">点我提示信息</button> -->
+        <button @click="showInfo1">点我提示信息1（不传参）</button>
+        <button @click="showInfo2(66, $event)">点我提示信息2（传参）</button>
+    </div>
+    <script>
+        const vm = new Vue({
+            el: '#root',
+            data: {
+                name: 'HuBei'
+            },
+            methods: {
+                showInfo1(e){
+                    // console.log(this); //此处的this是vm
+                    console.log('同学您好');
+                },
+                showInfo2(number, e){
+                    // console.log('同学你好2');
+                    console.log(number, e);
+                }
+            }
+        })
+        console.log(vm);
+    </script>
+</body>
+</html>
+```
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230306163951680.png" alt="image-20230306163951680" style="zoom:50%;" />
+
+### 1.11.2 事件修饰符
+
+​	Vue中的事件修饰符：
+
+		1. `prevent`：复制默认事件（常用）
+		1. `stop`：阻止事件冒泡（常用）
+		1. `once`：事件只触发一次（常用）
+		1. `capture`：使用事件的捕获模式
+		1. `self`：只有`event.target`是当前操作的元素才触发事件
+		1. `passive`：事件的默认行为立即执行，无需等待事件回调执行完毕
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>事件修饰符</title>
+    <script src="../js/vue.js"></script>
+    <style>
+        * {
+            margin-top: 20px;
+        }
+
+        .demo1 {
+            height: 50px;
+            background-color: skyblue;
+        }
+
+        .box1 {
+            padding: 5px;
+            background-color: purple;
+        }
+
+        .box2 {
+            padding: 5px;
+            background-color: red;
+        }
+
+        .list {
+            height: 200px;
+            width: 200px;
+            background-color: peru;
+            overflow: auto;
+        }
+
+        li {
+            height: 100px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root">
+        <h2>欢迎来到{{name}}</h2>
+        <!-- 阻止默认事件（常用） -->
+        <a href="http://www.baidu.com" @click.prevent="showInfo">点我提示信息1</a>
+
+        <!-- 阻止事件冒泡（常用） -->
+        <div class="demo1" @click="showInfo">
+            <button @click.stop="showInfo">点我提示信息</button>
+          	<!-- 链式编程 -->
+            <!-- <button @click.stop.prevent="showInfo">点我提示信息</button> -->
+        </div>
+
+        <!-- 事件只触发一次（常用） -->
+        <button @click.once="showInfo">点我提示信息</button>
+
+        <!-- 使用事件的捕获模式 -->
+        <div class="box1" @click.capture="showMsg(1)">
+            div1
+            <div class="box2" @click="showMsg(2)">
+                div2
+            </div>
+        </div>
+
+        <!-- self:只有event.target是当前操作的元素才触发事件 一定程度上也可以阻止冒泡 -->
+        <div class="demo1" @click.self="showInfo">
+            <button @click="showInfo">点我提示信息</button>
+        </div>
+
+        <!-- 事件的默认行为立即执行，无需等待事件回调执行完毕 -->
+        <ul @scroll="demo" class="list">
+            <li>1</li>
+            <li>2</li>
+            <li>3</li>
+            <li>4</li>
+        </ul>
+    </div>
+    <script>
+        const vm = new Vue({
+            el: '#root',
+            data: {
+                name: 'HuBei'
+            },
+            methods: {
+                showInfo(e) {
+                    // e.preventDefault()
+                    alert('同学您好')
+                },
+                showMsg(msg) {
+                    console.log(msg);
+                },
+                demo(){
+                    for(let i = 0; i < 10000; i++){
+                        console.log('#');
+                    }
+                    console.log('累坏了');
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>
+```
+
+### 1.11.3 键盘事件
+
+ 1. Vue中常用的按键别名：
+
+    回车 => enter
+
+    删除 => delete（捕获“删除 delete”和“退格键 ←”）
+
+    退出 => esc
+
+    空格 => space
+
+    换行 => tab（特殊，必须配合keydown去使用）
+
+    上 => up
+
+    下 => down
+
+    左 => left
+
+    右 => right
+
+ 2. Vue未提供别名的按键，可以使用按键原始的key值去绑定，但要注意转为`kebab-case`（短横线命名）
+
+ 3. 系统修饰键（用法特殊）：`ctrl、alt、shift、meta`
+
+    	1. 配合`keyup`使用：按下修饰键的同时，再按下其他键，随后释放其他键，事件才被触发
+    	2. 配合`keydown`使用：正常触发事件
+
+ 4. 也可以使用`keyCode`去指定具体的案件（不推荐）
+
+ 5. `Vue.config.keyCodes.自定义键名 = 键码`，可以去定制按键别名
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>键盘事件</title>
+    <script src="../js/vue.js"></script>
+</head>
+<body>
+    <div id="root">
+        <h2>欢迎来到{{name}}</h2>
+        <input type="text" placeholder="按下回车提示输入" @keyup.enter="showInfo">
+    </div>
+    <script>
+        Vue.config.keyCodes.huiche = 13
+        const vm = new Vue({
+            el: '#root',
+            data: {
+                name: 'HuBei'
+            },
+            methods: {
+                showInfo(e){
+                    console.log(e.target.value);
+                }
+            }
+        })
+    </script>
+</body>
+</html>
+```
+
+![image-20230306185814130](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230306185814130.png)

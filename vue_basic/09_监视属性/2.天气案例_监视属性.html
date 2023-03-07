@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>天气案例_监视属性</title>
+    <script src="../js/vue.js"></script>
+</head>
+
+<body>
+    <div id="root">
+        <h2>今天天气很{{info}}</h2>
+        <button @click="changeWeather">切换天气</button>
+    </div>
+    <script>
+        const vm = new Vue({
+            el: '#root',
+            data: {
+                isHot: true,
+            },
+            methods: {
+                changeWeather() {
+                    this.isHot = !this.isHot
+                }
+            },
+            computed: {
+                info() {
+                    return this.isHot ? '炎热' : '凉爽'
+                }
+            },
+            watch: {
+                isHot: {
+                    // 初始化时让handler调用一下
+                    immediate: true,
+                    // handler函数什么时候调用？ 当isHot发生改变时
+                    handler(newValue, oldValue) {
+                        console.log('isHot被修改了', newValue, oldValue);
+                    },
+
+                }
+            }
+        })
+        // 也可以在配置对象外面进行监视
+        // 如果在创建Vue实例的时候就想好了监视谁，则可以用上面的写法
+        // vm.$watch('isHot', {
+        //     // 初始化时让handler调用一下
+        //     immediate: true,
+        //     // handler函数什么时候调用？ 当isHot发生改变时
+        //     handler(newValue, oldValue) {
+        //         console.log('isHot被修改了', newValue, oldValue);
+        //     },
+        // })
+    </script>
+</body>
+
+</html>

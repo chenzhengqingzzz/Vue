@@ -213,12 +213,12 @@ ES6语法规范、ES6模块化、包管理器、原型，原型链、数组常�
  1. el有2种写法
 
     	1. new Vue的时候配置el属性
-    	2. 先创建Vue实例，然后通过`vm.$mount('#root')`指定el的值
+        	2. 先创建Vue实例，然后通过`vm.$mount('#root')`指定el的值
 
  2. data有2种写法
 
     	1. 对象式
-    	2. 函数式
+        	2. 函数式
 
     如何选择：目前哪种写法都可以，以后学习到组件时，data必须使用函数式，否则就会报错
 
@@ -798,7 +798,7 @@ descriptor
  3. 系统修饰键（用法特殊）：`ctrl、alt、shift、meta`
 
     	1. 配合`keyup`使用：按下修饰键的同时，再按下其他键，随后释放其他键，事件才被触发
-    	2. 配合`keydown`使用：正常触发事件
+        	2. 配合`keydown`使用：正常触发事件
 
  4. 也可以使用`keyCode`去指定具体的案件（不推荐）
 
@@ -843,13 +843,13 @@ descriptor
 
 	1. 定义：要用的属性不存在，要通过已有的属性计算得来
 	1. 原理：底层借助了`Object.defineProperty()`方法提供的`getter`和`setter`
- 	3. get函数什么时候执行？
-     	1. 初次读取时会执行一次
-     	2. 当依赖的数据发生改变时会被再次调用
+	3. get函数什么时候执行？
+	 	1. 初次读取时会执行一次
+	 	2. 当依赖的数据发生改变时会被再次调用
 	1. 优势：与`methods`实现相比，内部会有缓存机制（复用），效率更高，测试方便
- 	5. 备注：
-     	1. 计算属性最终会出现在`vm`上，直接用`this`读取使用即可
-     	2. 如果计算属性要被修改，那必须写`setter`函数去相应修改，且set中要引起计算时依赖的数据发生改变
+	5. 备注：
+	 	1. 计算属性最终会出现在`vm`上，直接用`this`读取使用即可
+	 	2. 如果计算属性要被修改，那必须写`setter`函数去相应修改，且set中要引起计算时依赖的数据发生改变
 
 在这个说明案例中，有太多需要注意的点，我们可以发现使用计算属性更利于性能节省以及调试方便
 
@@ -1042,9 +1042,9 @@ computed: {
 
 	1. 当监视的属性变化时，回调函数自动调用，进行相关操作
 	1. 监视的属性必须存在，才能进行监视！！
- 	3. 监视的两种写法：
-     	1. `new Vue`时传入`watch`配置
-     	2. 通过`vm.$watch`监视
+	3. 监视的两种写法：
+	 	1. `new Vue`时传入`watch`配置
+	 	2. 通过`vm.$watch`监视
 
 ```html
 <!DOCTYPE html>
@@ -1347,3 +1347,195 @@ watch{
 如果我们写成箭头函数，由于箭头函数没有自己的`this`，它会往外查找`firstName`这个函数所对应的this指向，而`firstName`的指向为`vm`，我们才能在下面的`this.fullName`中拿到`data`里面的相关属性
 
 <img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230307195339204.png" alt="image-20230307195339204" style="zoom:50%;" />
+
+## 1.14 绑定样式
+
+1. class样式
+
+   写法：`class=xxx` 可以是字符串、对象、数组
+
+   ​	字符串写法适用于：类名不确定，要动态获取
+
+   ​	对象写法适用于：要绑定多个样式，个数不确定，名字也不确定
+
+   ​	数组写法适用于：要绑定多个样式，个数确定，名字也确定，但不确定用不用
+
+2. style样式
+
+   `style="{{fontSize: xxx}}"`其中xxx是动态值
+
+   `style="[a, b]"`其中a、b是样式对象
+
+### 1.14.1 绑定class样式
+
+​	绑定class样式\--共有三种写法
+
+1. 绑定class样式\--字符串写法，适用于样式的类名不确定，需要动态指定时
+
+```css
+        .basic {
+            width: 400px;
+            height: 100px;
+            border: 1px solid black;
+        }
+        .happy {
+            border: 4px solid red;
+            background-color: rgba(255, 255, 0, 0.644);
+            background: linear-gradient(30deg, yellow, pink, orange, yellow);
+        }
+        .sad {
+            border: 4px dashed rgb(2, 197, 2);
+            background-color: gray;
+        }
+        .normal {
+            background-color: skyblue;
+        }
+```
+
+<div class="basic" v-bind:class="mood" @click="changeMood">{{name}}</div>
+
+```javascript
+            data: {
+                name: 'qifei',
+                mood: 'normal',
+            },
+            methods: {
+                changeMood(){
+                    const arr = ['happy', 'sad', 'normal']
+                    this.mood = arr[Math.floor(Math.random() * 3)]
+                }
+            }
+```
+
+可以实现点击随机切换的效果
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230307205441060.png" alt="image-20230307205441060" style="zoom:50%;" />
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230307205453205.png" alt="image-20230307205453205" style="zoom:50%;" />
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230307205506528.png" alt="image-20230307205506528" style="zoom:50%;" />
+
+2. 绑定class样式--数组写法，适用于要绑定的样式个数不确定、名字也不确定时
+
+下面的三个样式随便选 个数随便排布
+
+```css
+        .basic {
+            width: 400px;
+            height: 100px;
+            border: 1px solid black;
+        }
+        .atguigu1 {
+            background-color: yellowgreen;
+        }
+        .atguigu2 {
+            font-size: 30px;
+            text-shadow: 2px 2px 10px red;
+        }
+        .atguigu3 {
+            border-radius: 20px;
+        }
+```
+
+
+
+```html
+<div class="basic" v-bind:class="classArr">{{name}}</div>
+```
+
+```javascript
+classArr: ['atguigu1', 'atguigu2', 'atguigu3'],
+```
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230307205928118.png" alt="image-20230307205928118" style="zoom:50%;" />
+
+3. 绑定class样式--对象写法，适用于要绑定的样式个数确定、名字也确定，但要动态决定用不用时
+
+​	随着属性的布尔值的改变决定用于不用
+
+```css
+        .basic {
+            width: 400px;
+            height: 100px;
+            border: 1px solid black;
+        }
+        .atguigu1 {
+            background-color: yellowgreen;
+        }
+        .atguigu2 {
+            font-size: 30px;
+            text-shadow: 2px 2px 10px red;
+        }
+```
+
+```html
+<div class="basic" v-bind:class="classObj">{{name}}</div>
+```
+
+```javascript
+                classObj: {
+                    atguigu1: false,
+                    atguigu2: true
+                }
+```
+
+​	如图发现布尔值为true的atguigu2成功应用上样式
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230307210128286.png" alt="image-20230307210128286" style="zoom:50%;" />
+
+### 1.14.2 绑定style样式
+
+1. 绑定style样式--对象写法
+
+```css
+.basic {
+            width: 400px;
+            height: 100px;
+            border: 1px solid black;
+        }
+```
+
+```html
+<div class="basic" v-bind:style="styleObj">{{name}}</div>
+```
+
+data里面的配置项：
+
+```javascript
+								styleObj: {
+                    fontSize: 40 + 'px',
+                    color: 'red',
+                },
+```
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230309185814043.png" alt="image-20230309185814043" style="zoom:50%;" />
+
+2. 绑定style样式--数组写法
+
+```css
+.basic {
+            width: 400px;
+            height: 100px;
+            border: 1px solid black;
+        }
+```
+
+```html
+<div class="basic" v-bind:style="[styleObj1, styleObj2]">{{name}}</div>
+```
+
+​	这里将多个对象存入内联样式的数组中并交给vue管理
+
+```javascript
+								styleObj: {
+                    fontSize: 40 + 'px',
+                    color: 'red',
+                },
+                styleObj2: {
+                    backgroundColor: 'orange'
+                }
+```
+
+![image-20230309185901264](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230309185901264.png)
+
+​	由此可见，两个存在data里的对象全部生效

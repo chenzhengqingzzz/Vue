@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>条件渲染</title>
+    <script src="../js/vue.js"></script>
+</head>
+
+<body>
+    <div id="root">
+        <h2>当前的n值是:{{n}}</h2>
+        <button @click="n++">点我n+1</button>
+
+        <!-- 使用v-show做条件渲染 -->
+        <h2 v-show="false">我是{{name}}</h2>
+        <!-- <h2 v-show="1 === 1">我是{{name}}</h2> -->
+
+        <!-- 用v-if做条件渲染 -->
+        <h2 v-if="false">我是{{name}}</h2>
+        <h2 v-if="1 === 1">我是{{name}}</h2>
+
+        <div v-if="n === 1">Angular</div>
+        <div v-else-if="n === 2">React</div>
+        <div>@</div>
+        <div v-else-if="n === 3">Vue</div>
+        <div v-else>哈哈</div>
+
+        <!-- v-if与template的配合 -->
+        <template v-if='n === 1'>
+            <h2>捞</h2>
+            <h2>逊</h2>
+            <h2>逆天</h2>
+        </template>
+    </div>
+    <script>
+        const vm = new Vue({
+            el: '#root',
+            data: {
+                name: 'czq',
+                n: 0
+            }
+        })
+    </script>
+</body>
+
+</html>

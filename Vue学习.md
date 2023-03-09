@@ -1539,3 +1539,304 @@ data里面的配置项：
 ![image-20230309185901264](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230309185901264.png)
 
 ​	由此可见，两个存在data里的对象全部生效
+
+**完整程序代码：**
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>绑定样式</title>
+    <script src="../js/vue.js"></script>
+    <style>
+        .basic {
+            width: 400px;
+            height: 100px;
+            border: 1px solid black;
+        }
+        .happy {
+            border: 4px solid red;
+            background-color: rgba(255, 255, 0, 0.644);
+            background: linear-gradient(30deg, yellow, pink, orange, yellow);
+        }
+        .sad {
+            border: 4px dashed rgb(2, 197, 2);
+            background-color: gray;
+        }
+        .normal {
+            background-color: skyblue;
+        }
+
+
+        .atguigu1 {
+            background-color: yellowgreen;
+        }
+        .atguigu2 {
+            font-size: 30px;
+            text-shadow: 2px 2px 10px red;
+        }
+        .atguigu3 {
+            border-radius: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root">
+        <!-- 绑定class样式--字符串写法，适用于样式的类名不确定，需要动态指定时 -->
+        <div class="basic" v-bind:class="mood" @click="changeMood">{{name}}</div>
+        <br/>
+        <br/>
+        <br/>
+
+        <!-- 绑定class样式--数组写法，适用于要绑定的样式个数不确定、名字也不确定时 -->
+        <div class="basic" v-bind:class="classArr">{{name}}</div>
+
+        <!-- 绑定class样式--对象写法，适用于要绑定的样式个数确定、名字也确定，但要动态决定用不用时 -->
+        <div class="basic" v-bind:class="classObj">{{name}}</div>
+        <br/>
+
+        <!-- 绑定style样式--对象写法 -->
+        <div class="basic" v-bind:style="styleObj">{{name}}</div>
+        <!-- 绑定style样式--数组写法 -->
+        <div class="basic" v-bind:style="[styleObj, styleObj2]">{{name}}</div>
+    </div>
+    <script>
+        new Vue({
+            el: '#root',
+            data: {
+                name: 'qifei',
+                mood: 'normal',
+                classArr: ['atguigu1', 'atguigu2', 'atguigu3'],
+                classObj: {
+                    atguigu1: false,
+                    atguigu2: true
+                },
+                styleObj: {
+                    fontSize: 40 + 'px',
+                    color: 'red',
+                },
+                styleObj2: {
+                    backgroundColor: 'orange'
+                }
+            },
+            methods: {
+                changeMood(){
+                    const arr = ['happy', 'sad', 'normal']
+                    this.mood = arr[Math.floor(Math.random() * 3)]
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>
+```
+
+## 1.15 条件渲染
+
+​	条件渲染一般有两条指令可供使用：
+
+ 1. `v-if`
+
+    ​	写法：
+
+    		1. `v-if='表达式'`
+    		1. `v-else-if='表达式`'
+    		1. `v-else='表达式'`
+
+    适用于：切换频率较低的场景
+
+    特点：不展示的DOM元素直接删除
+
+    注意：`v-if`可以和`v-else-if`、`v-else`一起使用，但要求结构不能被“打断”
+
+    
+
+​	当我们使用v-if时，如果其值直接为false，则我们可能在此页面中无法找到该元素
+
+```html
+    <div id="root">
+        <h2>当前的n值是:{{n}}</h2>
+        
+
+        <!-- 用v-if做条件渲染 -->
+        <h2 v-if="false">我是{{name}}</h2>
+        <h2 v-if="1 === 1">我是{{name}}</h2>
+
+
+    </div>
+```
+
+```javascript
+        const vm = new Vue({
+            el: '#root',
+            data: {
+                name: 'czq',
+                n: 0
+            }
+        })
+```
+
+当其值为true时：
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230309195649314.png" alt="image-20230309195649314" style="zoom:50%;" />
+
+当其值为false时：
+
+```html
+<h2 v-if="false">我是{{name}}</h2>
+```
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230309195749196.png" alt="image-20230309195749196" style="zoom:50%;" />
+
+我们则完全无法在页面中找到此元素
+
+`v-if`和`v-else`和`v-else-if`的逻辑与普通的`if`、`else`、`else-if`相同，使用时请注意思考
+
+且两个`v-if`和`v-elseif`中不能插入其他语句，否则会引起其他的`v-if`无法判断
+
+```html
+<div id="root">
+  			<h2>当前n的值是:{{n}}</h2>
+  			<button @click="n++">点我n+1</button>
+  			<div v-if="n === 1">Angular</div>
+        <div v-else-if="n === 2">React</div>
+  			<!-- 如果我们在此插入不对应的其他元素则会引起编译错误 -->
+  			<div>@</div>
+        <div v-else-if="n === 3">Vue</div>
+        <div v-else>哈哈</div>
+</div>
+```
+
+```javascript
+const vm = new Vue({
+            el: '#root',
+            data: {
+                name: 'czq',
+                n: 0
+            }
+        })
+```
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230309200443192.png" alt="image-20230309200443192" style="zoom:50%;" />
+
+**补充：当我们不得不批量操作元素时候，通常会选择将其包在一个特定的容器中，但是问题在于我们如果这样做就会导致结构被破坏，template则会为我们完美的解决这个问题，它会在我们成功进行批量操作之后，在挂载页面的时候自动消失 但是要注意只能`v-if`才能配合它**
+
+```html
+        <h2>当前的n值是:{{n}}</h2>
+        <button @click="n++">点我n+1</button>
+				<template v-if='n === 1'>
+            <h2>捞</h2>
+            <h2>逊</h2>
+            <h2>逆天</h2>
+        </template>
+```
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230309200823884.png" alt="image-20230309200823884" style="zoom:50%;" />
+
+我们会发现 在挂在页面的元素之中，三个`h2`并没有被包裹住
+
+2. `v-show`
+
+​		写法：`v-show=表达式`
+
+​		适用于：切换频率较高的场景
+
+​		特点：不展示的DOM元素未被移除，仅仅是使用样式隐藏掉
+
+​		
+
+```html
+    <div id="root">
+
+        <!-- 使用v-show做条件渲染 -->
+        <h2 v-show="true">我是{{name}}</h2>
+
+    </div>
+```
+
+```javascript
+const vm = new Vue({
+            el: '#root',
+            data: {
+                name: 'czq',
+                
+            }
+        })
+```
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230309201248223.png" alt="image-20230309201248223" style="zoom:50%;" />
+
+当其值为false时：
+
+```html
+        <h2 v-show="false">我是{{name}}</h2>
+```
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230309201340633.png" alt="image-20230309201340633" style="zoom:50%;" />
+
+​	由此可见，`v-show`底层是通过操作`display`这个属性实现的
+
+3. 备注：使用`v-if`时，元素可能无法获取到，而使用`v-show`一定可以获取到
+
+​	这在前面`v-if`值为false，`v-show`的值为false的调试结果可以印证
+
+**本节完整代码：**
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>条件渲染</title>
+    <script src="../js/vue.js"></script>
+</head>
+
+<body>
+    <div id="root">
+        <h2>当前的n值是:{{n}}</h2>
+        <button @click="n++">点我n+1</button>
+
+        <!-- 使用v-show做条件渲染 -->
+        <h2 v-show="false">我是{{name}}</h2>
+        <!-- <h2 v-show="1 === 1">我是{{name}}</h2> -->
+
+        <!-- 用v-if做条件渲染 -->
+        <h2 v-if="false">我是{{name}}</h2>
+        <h2 v-if="1 === 1">我是{{name}}</h2>
+
+        <div v-if="n === 1">Angular</div>
+        <div v-else-if="n === 2">React</div>
+        <div>@</div>
+        <div v-else-if="n === 3">Vue</div>
+        <div v-else>哈哈</div>
+
+        <!-- v-if与template的配合 -->
+        <template v-if='n === 1'>
+            <h2>捞</h2>
+            <h2>逊</h2>
+            <h2>逆天</h2>
+        </template>
+    </div>
+    <script>
+        const vm = new Vue({
+            el: '#root',
+            data: {
+                name: 'czq',
+                n: 0
+            }
+        })
+    </script>
+</body>
+
+</html>
+```
+

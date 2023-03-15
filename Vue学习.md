@@ -2646,3 +2646,190 @@ Vue监视数据的原理：
    2. `Vue.set()`或`vm.$set()`
 
 ​	特别注意：`Vue.set()`和`vm.$set()`不能给vm或vm的根数据对象添加属性！！！
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>总结Vue数据监测</title>
+    <script src="../js/vue.js"></script>
+</head>
+
+<body>
+    <div>
+        <h1>学生信息</h1>
+
+        <button @click="student.age++">年龄+1岁</button><br/>
+        <button @click="addSex">添加性别属性：默认值：男</button><br/>
+        <button @click="addFriend">在列表首位添加一个朋友</button><br/>
+        <button @click="changeFirstName">修改第一个朋友的名字为：张三</button><br/>
+        <button @click="addHobby">添加一个爱好</button><br/>
+        <button @click="changeFirstHobby">修改第一个爱好为：开车</button><br/>
+        <button @click="removeBask('跳')">过滤掉括号中的爱好</button><br/>
+
+        <h3>姓名：{{student.name}}</h3>
+        <h3 v-if="student.sex">性别：{{student.sex}}</h3>
+        <h3>年龄：{{student.age}}</h3>
+        <h3>爱好：</h3>
+        <ul>
+            <li v-for="(h, index) in student.hobby" :key="index">
+                {{h}}
+            </li>
+        </ul>
+        <h3>朋友们：</h3>
+        <ul>
+            <li v-for="(f, index) in student.friends" :key="index">
+                {{f.name}}-{{f.age}}
+            </li>
+        </ul>
+    </div>
+
+    <script>
+        const vm = new Vue({
+            el: 'div',
+            data: {
+                student: {
+                    name: 'tom',
+                    age: 18,
+                    hobby: ['唱', '跳', 'rap', '篮球'],
+                    friends: [
+                        {name: 'jerry', age: 36},
+                        {name: 'tony', age: 37}
+                    ]
+                }
+            },
+            methods: {
+                addSex(){
+                    // Vue.set(this.student, 'sex', '男')
+                    vm.$set(this.student, 'sex', '男')
+                },
+                addFriend(){
+                    vm.student.friends.unshift({name: 'czq', age: 21})
+                },
+                changeFirstName(){
+                    vm.student.friends[0].name = '张三'
+                },
+                addHobby(){
+                    vm.student.hobby.push('鸡你太美')
+                },
+                changeFirstHobby(){
+                    // vm.$set(this.student.hobby, 0, '开车')
+                    vm.student.hobby.splice(0, 1, '开车')
+                },
+                removeBask(value){
+                    vm.student.hobby = vm.student.hobby.filter((hobby) => {
+                        return hobby !== value
+                    })
+                }
+            },
+        })
+    </script>
+</body>
+
+</html>
+```
+
+## 1.17 收集表单数据
+
+收集表单数据：
+
+​	若：`<input type="text"/>`，则v-model收集的是`value`值，用户输入的就是`value`值
+
+​	若：`<input type="radio"/>`，则v-model收集的是`value`值，切要给标签配置`value`值
+
+​	若：`<input type="checkbox"/>`
+
+				1. 没有配置input的`value`属性，那么收集的就是`checked`（勾选 或 未勾选，是布尔值）
+   				2. 配置input的`value`属性：
+          				1. v-model的初始值是非数组，那么收集的就是`checked`（勾选 或 未勾选，是布尔值）
+          				2. v-model的初始值是数组，那么收集的就是`value`组成的数组
+
+备注：v-model的三个修饰符：
+
+​		`lazy`：失去焦点时收集数据
+
+​		`number`：输入字符串转为有效的数字
+
+​		`trim`：输入首尾空格过滤
+
+```HTML
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>收集表单数据</title>
+    <script src="../js/vue.js"></script>
+</head>
+
+<body>
+    <div id="root">
+        <form @submit.prevent="submit">
+            <label for="account">账号：</label>
+            <input type="text" id="account" v-model.trim="userInfo.account"> <br /><br />
+            <label for="password">密码：</label>
+            <input type="password" id="password" v-model="userInfo.password"> <br /><br />
+
+            年龄：<input type="number" v-model.number="userInfo.age"><br/><br/>
+            性别：
+            男 <input type="radio" name="sex" value="male" v-model="userInfo.sex">
+            女 <input type="radio" name="sex" value="female" v-model="userInfo.sex"> <br /><br />
+            爱好：
+            唱 <input type="checkbox" value="sing" v-model="userInfo.hobby">
+            跳 <input type="checkbox" value="dance" v-model="userInfo.hobby">
+            rap <input type="checkbox" value="rap" v-model="userInfo.hobby">
+            篮球 <input type="checkbox" value="bask" v-model="userInfo.hobby"><br /><br />
+            所属校区
+            <select v-model="userInfo.city">
+                <option value="">请选择校区</option>
+                <option value="beijing">北京</option>
+                <option value="shanghai">上海</option>
+                <option value="shenzhen">深圳</option>
+                <option value="wuhan">武汉</option>
+            </select><br /><br />
+            其他信息:
+            <textarea v-model.lazy="userInfo.other"></textarea><br /><br />
+            <input type="checkbox" v-model="userInfo.confirm">阅读并接受<a href="http://www.baidu.com">《用户协议》</a>
+            <button>提交</button>
+        </form>
+    </div>
+    <script>
+        const vm = new Vue({
+            el: '#root',
+            data: {
+                userInfo: {
+                    account: '',
+                    password: '',
+                    age: null,
+                    sex: 'female',
+                    hobby: [],
+                    city: 'beijing',
+                    other: '',
+                    confirm: false
+                }
+            },
+            methods: {
+                submit() {
+                    console.log(JSON.stringify(this.userInfo));
+                }
+            },
+        })
+    </script>
+</body>
+
+</html>
+```
+
+调试结果：
+
+![image-20230315205820436](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230315205820436.png)
+
+![image-20230315205916128](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230315205916128.png)
+
+最后使用了json里面的解析字符串方法`stringify()`

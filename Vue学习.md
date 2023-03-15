@@ -1840,3 +1840,809 @@ const vm = new Vue({
 </html>
 ```
 
+## 1.16 列表渲染
+
+### 1.16.1 基本列表
+
+需求：
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230309210631075.png" alt="image-20230309210631075" style="zoom:50%;" />
+
+​	一般我们要定义人员信息，都会将其放在li这种顺序列表中，将每个人的信息以对象的方式存入一个数组中将其遍历放到li中
+
+​	我们可以用 `v-for` 指令基于一个数组来渲染一个列表。`v-for` 指令需要使用 `item in items` 形式的特殊语法，其中 `items` 是源数据数组，而 `item` 则是被迭代的数组元素的**别名**。
+
+​	`v-for`指令
+
+	1. 用于展示列表数据
+	1. 语法：`v-for="(item, index)  in xxx" :key="yyy"`
+	1. 可遍历：数组、对象、字符串（用的很少）、指定次数遍历（用的很少）
+
+**用`v-for`遍历数组：**
+
+​	我们可以用 `v-for` 指令基于一个数组来渲染一个列表。`v-for` 指令需要使用 `item in items` 形式的特殊语法，其中 `items` 是源数据数组，而 `item` 则是被迭代的数组元素的**别名**。
+
+```html
+    <div id="root">
+        <h2>人员列表</h2>
+        <ul>
+            <!-- 遍历数组 -->
+            <li v-for="(person, index) in persons" :key="person.id">
+                {{person.name}}-{{person.age}}-{{index}}
+            </li>
+        </ul>
+     </div>
+```
+
+```javascript
+        const vm = new Vue({
+            el: '#root',
+            data: {
+                persons: [
+                    { id: 001, name: '张三', age: 18 },
+                    { id: 002, name: '李四', age: 19 },
+                    { id: 003, name: '王五', age: 18 }
+                ],
+            }
+        })
+```
+
+在这里，`key`的指定尤为重要，其将会作为遍历生成的每一个li的标识符
+
+调试结果如下：
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230309211349763.png" alt="image-20230309211349763" style="zoom:50%;" />
+
+**用`v-for`遍历对象**
+
+```html
+        <h2>汽车信息</h2>
+        <ul>
+            <!-- 遍历对象 -->
+            <ul>
+                <li v-for="(val, key, index) in carMessage" :key="key">{{key}}-{{val}}-{{index}}</li>
+            </ul>
+        </ul>
+```
+
+```javascript
+                carMessage: {
+                    name: '奥迪A8',
+                    price: 700000,
+                    color: 'black',
+                },
+```
+
+​	调试结果：
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230310193021888.png" alt="image-20230310193021888" style="zoom:50%;" />
+
+​	**用`v-for`遍历字符串：**
+
+```html
+        <h2>测试遍历字符串</h2>
+        <!-- 遍历字符串 -->
+        <ul>
+            <li v-for="(char, index) in str" :key="index">{{char}}-{{index}}</li>
+        </ul>
+```
+
+```javascript
+str: 'hello'
+```
+
+调试结果：
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230310193231151.png" alt="image-20230310193231151" style="zoom:50%;" />
+
+**用`v-for`指定次数遍历：**
+
+```html
+        <h2>测试遍历指定次数</h2>
+        <!-- 遍历制定次数 -->
+        <ul>
+            <li v-for="(number, index) in 5" :key="index">{{number}}-{{index}}</li>
+        </ul>
+```
+
+第一个参数是遍历的次数，第二个则为索引值
+
+调试结果：
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230310193404291.png" alt="image-20230310193404291" style="zoom:50%;" />
+
+### 1.16.2 key的原理和重要作用
+
+​	当我们在页面遍历数组以及其他元素的时候，通常Vue会让我们定义一个`key`，这个`key`都会当做唯一标识被Vue用`diffing算法`进行高效的工作 当我们使用`index`或者用户唯一标识`id`的时候，这两者有什么区别呢？
+
+需求：在人员列表中添加一个老刘，需要让其信息放在最前面，其他人的信息往后推，并在后面生成文本框编辑信息后再进行添加信息操作
+
+**遍历列表时以`index`作为`key`**
+
+```html
+    <div id="root">
+        <h2>人员列表</h2>
+        <button @click.once="add">添加一个老刘</button>
+        <ul>
+            <!-- 遍历数组 -->
+            <li v-for="(person, index) in persons" :key="index">
+                {{person.name}}-{{person.age}}-{{index}}
+                <input type="text">
+            </li>
+        </ul>
+    </div>
+```
+
+```javascript
+        const vm = new Vue({
+            el: '#root',
+            data: {
+                persons: [
+                    { id: 001, name: '张三', age: 18 },
+                    { id: 002, name: '李四', age: 19 },
+                    { id: 003, name: '王五', age: 18 }
+                ],
+
+            },
+            methods: {
+                add(){
+                    const person = {id: 004, name: '老刘', age: 40}
+                    this.persons.unshift(person)
+                }
+            },
+        })
+```
+
+呈现在页面上的效果：
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230310200910659.png" alt="image-20230310200910659" style="zoom:50%;" />
+
+由于用户操作的是真实DOM，当用户在页面上留下信息的时候，信息就会残留在真实DOM上，而在渲染页面的时候，Vue会在中间生成虚拟DOM，页面更新时，Vue会根据`diffing算法`对比更新前后的每个节点来决定是否复用更新前的元素用以提升效率，当我们用`index`作为Vue要使用的`key`时
+
+​	![image-20230310201259891](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230310201259891.png)
+
+​	Vue会对比两个`key`相同的元素以及里面的子节点，这里面新增的老刘`key`为0，初始的虚拟DOM中`key`也为0的是张三，根据`diffing算法`这部分需要重新生成并渲染到页面中。后面`key`为1的张三完全可以在初始虚拟DOM找到，这会导致严重的效率问题
+
+​	而后面的input框，由于`diffing算法`对比的两个虚拟DOM完全一致，Vue会复用初始虚拟DOM的input框，若用户在页面更新之前在input中输入数据，在页面更新之后，会造成无法容忍的错误：**数据混乱**
+
+页面更新前：
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230310201747085.png" alt="image-20230310201747085" style="zoom:50%;" />
+
+页面更新后：
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230310201831717.png" alt="image-20230310201831717" style="zoom:50%;" />
+
+我们发现数据已经错乱了，所以当我们添加的数据会打乱原本列表的顺序是，是不可以用`index`作为Vue所管理的`key`的
+
+但是如果是将老刘添加在后面的时候，由于三个老数据的`key`值没变，所以不会出现降低效率以及数据错乱的问题
+
+**遍历列表时以`唯一标识符（如id）`作为`key`**
+
+```html
+<!-- 遍历数组 -->
+            <li v-for="(person, index) in persons" :key="person.id">
+                {{person.name}}-{{person.age}}-{{index}}
+                <input type="text">
+            </li>
+```
+
+由于我们使用了唯一的标识符，`id`为004的老刘将会作为列表的第一个添加进原有的列表中，且其`key`为004，其他三位的`key`由于也用了唯一的`id`，则没有影响其原来的`key`值
+
+Vue会根据`key`进行新旧虚拟DOM的比较，无论我们把老刘放在哪儿，由于老数据张三李四王五的`key`没变，又因为其子节点数据完全一致，Vue会复用其节点，只会新增一个`key`为004的老刘
+
+且由于老刘是新增进页面的节点，其input框是新生成的，不会出现用户在真实DOM残留的数据错乱的情况
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230310202824166.png" alt="image-20230310202824166" style="zoom:50%;" />
+
+页面更新前：
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230310202911689.png" alt="image-20230310202911689" style="zoom:50%;" />
+
+页面更新后：
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230310202932321.png" alt="image-20230310202932321" style="zoom:50%;" />
+
+在这个案例中，以`唯一标识符`作为`key`效率得到了提升，也不会有数据错乱的问题。
+
+**小结：**
+
+​	面试题：react、vue中的key有什么作用？（key的内部原理）
+
+		1. 虚拟DOM中key的作用：
+
+​		key是虚拟DOM对象的标识，当状态中的数据发生变化时，Vue会根据【新数据】生成【新的虚拟DOM】，随后Vue进行【新虚拟DOM】与【旧虚拟DOM】的差异比较，比较规则如下：
+
+2. 对比规则：
+
+   1. 旧虚拟DOM中找到了与新虚拟DOM相同的key：
+
+      1. 若虚拟DOM中内容没变，直接使用之前的真实DOM
+      2. 若虚拟DOM中内容变了，则生成新的真实DOM，随后替换掉页面中之前的真实DOM
+
+   2. 旧虚拟DOM中未找到与新虚拟DOM相同的key：
+
+      ​	创建新的真实DOM，随后渲染到页面
+
+3. 用index作为key可能会引发的问题：
+
+   1. 若对数据进行：逆序添加、逆序删除等破坏顺序的操作时：
+
+      ​	会产生没有必要的真实DOM更新 ==> 页面效果没问题，但效率低
+
+   2. 若结构中还包含输入类的DOM：
+
+      ​	会产生错误的DOM更新 ==> 页面效果有问题
+
+4. 开发中如何选择key？
+
+   1. 最好使用每条数据的唯一标识符作为key，比如id、手机号、身份证号、学号等唯一值
+   2. 若不存在对数据的逆序添加、逆序删除等破坏顺序的操作，仅用于渲染列表用于展示，使用index作为key是没问题的
+
+### 1.16.3 列表过滤
+
+​	需求：我们会将一整个列表按照名字进行模糊搜索
+
+​	搜索前：
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230311175216882.png" alt="image-20230311175216882" style="zoom:50%;" />
+
+搜索后：
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230311175242258.png" alt="image-20230311175242258" style="zoom:50%;" />
+
+```html
+    <div id="root">
+        <h2>人员列表</h2>
+        <input type="text" placeholder="请输入名字" v-model="keyWord">
+        <ul>
+            <!-- 遍历数组 -->
+            <!-- <li v-for="(person, index) in persons" :key="person.id">
+                {{person.name}}-{{person.age}}-{{person.sex}}
+            </li> -->
+            <li v-for="(filledPerson, index) in filledPersons" :key="filledPerson.id">
+                {{filledPerson.name}}-{{filledPerson.age}}-{{filledPerson.sex}}
+            </li>
+        </ul>
+    </div>
+```
+
+在这里我们需要对原数组persons进行过滤，用`filter`方法过滤并生成符合条件的新数组，我们将其命名为filteredPersons
+
+由于我们的关注点是keyWord这个属性的变化，所以我们可以用watch和computed两个写法实现
+
+**用watch监视keyWord实现：**
+
+```javascript
+        // 用watch实现
+        const vm = new Vue({
+            el: '#root',
+            data: {
+                keyWord: '',
+                persons: [
+                    { id: 001, name: '马冬梅', age: 18, sex: '女' },
+                    { id: 002, name: '周冬雨', age: 19, sex: '女' },
+                    { id: 003, name: '周杰伦', age: 18, sex: '男' },
+                    { id: 004, name: '温兆伦', age: 18, sex: '男' }
+                ],
+                filteredPersons: []
+            },
+            watch: {
+                keyWord: {
+                    //由于任何字符串都包含了空字符串，为了让一开始显示所有列表，所以配置了立即执行一次
+                    immediate: true,
+                    handler(newVal) {
+                        this.filteredPersons = this.persons.filter((person) => {
+                            // filter的第一个参数为被过滤数组的每一项
+                            // return后面接的是筛选条件
+                            return person.name.indexOf(newVal) !== -1
+                        })
+                    }
+                }
+            }
+        })
+```
+
+为什么我们不用watch的简写？
+
+如果我们不需要配置watch的其他配置项的话，我们可以省略`handler`函数并把我们监视的属性直接写成一个函数`keyWord(){}`
+
+由于这里监视的是`keyWord`，当我们将其改变的时候，就会执行这个方法，当我们第一次刷新页面的时候，这个函数无法执行，则会引起没有`filteredPersons`数组为空，页面没有东西
+
+没有配置`immediate`属性时：
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230311180336705.png" alt="image-20230311180336705" style="zoom:50%;" />
+
+这样不符合我们的需求 所以我们需要用到`immediate`这个配置项，要其在页面挂在的时候，`handler`立即执行一次。所以我们不能简写，要写完整的watch
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230311180526348.png" alt="image-20230311180526348" style="zoom:50%;" />
+
+![image-20230311180543872](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230311180543872.png)
+
+**用computed计算keyWord实现：**
+
+```javascript
+        // 用computed实现
+        const vm = new Vue({
+            el: '#root',
+            data: {
+                keyWord: '',
+                persons: [
+                    { id: 001, name: '马冬梅', age: 18, sex: '女' },
+                    { id: 002, name: '周冬雨', age: 19, sex: '女' },
+                    { id: 003, name: '周杰伦', age: 18, sex: '男' },
+                    { id: 004, name: '温兆伦', age: 18, sex: '男' }
+                ],
+            },
+            computed: {
+                filledPersons(){ 
+                    // 第一个return是计算属性的get需要的 第二个是filter这个方法需要的过滤条件
+                    return this.persons.filter((person) => {
+                        return person.name.indexOf(this.keyWord) !== -1
+                    })
+                }
+            }
+        })
+```
+
+​	在`computed`计算属性中，里面的getter是在第一次挂在页面以及`keyWord`的每一次变化的时候执行，所以它会在页面一挂在就显示
+
+​	但是值得注意的是，`computed`中的`getter`可不像`watch`中的`handler()`可以使用`newValue`，所以我们`indexOf()`中对比的字符串则是我们每次变化的`keyWord`
+
+​	还有需要注意`getter`的`return`（返回给filteredPerson的元素）与`filter`的return（过滤条件）
+
+调试结果：
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230311181329044.png" alt="image-20230311181329044" style="zoom:50%;" />
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230311181343803.png" alt="image-20230311181343803" style="zoom:50%;" />
+
+由此更有力证明了，当watch和computed都可以实现时，用computed计算属性更简便
+
+### 1.16.4 列表排序
+
+需求：根据年龄对人员列表进行排序，过滤后的列表也可以完成排序
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230311185349446.png" alt="image-20230311185349446" style="zoom:50%;" />
+
+```html
+    <div id="root">
+        <h2>人员列表</h2>
+        <input type="text" placeholder="请输入名字" v-model="keyWord">
+        <button @click="sortType = 'up'">年龄升序</button>
+        <button @click="sortType = 'down'">年龄降序</button>
+        <button @click="sortType = 'origin'">原顺序</button>
+        <ul>
+            <li v-for="(filteredPerson, index) in filteredPersons" :key="filteredPerson.id">
+                {{filteredPerson.name}}-{{filteredPerson.age}}-{{filteredPerson.sex}}
+            </li>
+        </ul>
+    </div>
+```
+
+我们要想排序，得知道用户的点击行为，所以我们在data中新配置了一个属性`sortType`以区分升降序以及原排序
+
+```javascript
+            data: {
+                keyWord: '',
+                sortType: 'origin', //排序类型
+                persons: [
+                    { id: 001, name: '马冬梅', age: 18, sex: '女' },
+                    { id: 002, name: '周冬雨', age: 19, sex: '女' },
+                    { id: 003, name: '周杰伦', age: 23, sex: '男' },
+                    { id: 004, name: '温兆伦', age: 22, sex: '男' }
+                ],
+            },
+```
+
+我们需要先过滤，再排序 所以我们不着急返回，我们可以拿一个变量接住过滤后的数组，再将这个数组进行排序， 需要用到排序数组的`sort`方法 。由于`sort`方法会改变原数组，所以我们可以直接将排序后的数组当成返回值放给`filteredPersons` 
+
+```javascript
+            computed: {
+                filteredPersons() {
+                    // 第一个return是计算属性的get需要的 第二个是filter这个方法需要的过滤条件
+                    const arr = this.persons.filter((person) => {
+                        return person.name.indexOf(this.keyWord) !== -1
+                    })
+                    // 判断一下是否需要排序
+                    if (this.sortType !== 'origin') {
+                        if (this.sortType !== 'down') {
+                            arr.sort((a, b) => {
+                                return a.age - b.age
+                            })
+                        } else {
+                            arr.sort((a, b) => {
+                                return b.age - a.age
+                            })
+                        }
+                    }
+                    return arr
+                }
+            }
+```
+
+**扩展：简略了解排序数组的sort方法：**
+
+```javascript
+// 箭头函数
+sort((a, b) => { /* … */ } )
+```
+
+参数：
+
+`a`：第一个用于比较的元素。
+
+`b`：第二个用于比较的元素。
+
+返回值为排序后的数组。请注意，数组已原地排序，并且不进行复制。
+
+`retrun a - b`则是升序 `return b - a`则是降序
+
+```javascript
+const numbers = [4, 2, 5, 1, 3];
+numbers.sort(function (a, b) {
+  return a - b;
+});
+console.log(numbers);
+// [1, 2, 3, 4, 5]
+
+// 或者
+
+const numbers2 = [4, 2, 5, 1, 3];
+numbers2.sort((a, b) => a - b);
+console.log(numbers2);
+// [1, 2, 3, 4, 5]
+
+```
+
+
+
+列表排序案例调试结果：
+
+​	升序：
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230311190336552.png" alt="image-20230311190336552" style="zoom:50%;" />
+
+降序：
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230311190403232.png" alt="image-20230311190403232" style="zoom:50%;" />
+
+搜索后降序：
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230311190437509.png" alt="image-20230311190437509" style="zoom:50%;" />
+
+原顺序则为开头的场景
+
+### 1.16.5 Vue监测data中的数据
+
+先来个案例引入一下：
+
+```html
+<!-- 准备好一个容器-->
+<div id="root">
+    <h2>人员列表</h2>
+    <button @click="updateMei">更新马冬梅的信息</button>
+    <ul>
+        <li v-for="(p,index) of persons" :key="p.id">
+            {{p.name}}-{{p.age}}-{{p.sex}}
+        </li>
+    </ul> 
+</div>
+
+<script type="text/javascript">
+    Vue.config.productionTip = false
+
+    const vm = new Vue({
+        el:'#root',
+        data:{
+            persons:[
+                {id:'001',name:'马冬梅',age:30,sex:'女'},
+                {id:'002',name:'周冬雨',age:31,sex:'女'},
+                {id:'003',name:'周杰伦',age:18,sex:'男'},
+                {id:'004',name:'温兆伦',age:19,sex:'男'}
+            ]
+        },
+        methods: {
+            updateMei(){
+                // this.persons[0].name = '马老师' //奏效
+                // this.persons[0].age = 50 //奏效
+                // this.persons[0].sex = '男' //奏效
+                this.persons[0] = {id:'001',name:'马老师',age:50,sex:'男'} //不奏效
+                // this.persons.splice(0,1,{id:'001',name:'马老师',age:50,sex:'男'})
+            }
+        }
+    }) 
+
+</script>
+
+```
+
+点击更新马冬梅的信息，马冬梅的数据并没有发生改变。
+
+![image-20230313152729229](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230313152729229.png)
+
+我们来看看控制台：
+
+![image-20230313152813061](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230313152813061.png)
+
+控制台上的数据发生了改变，说明，这个更改的数据并没有被 vue 监测到。
+
+所以我们来研究一下 Vue 监测的原理。
+
+我们先研究**Vue 如何监测对象里的数据**
+
+```html
+<!-- 准备好一个容器-->
+<div id="root">
+    <h2>学校名称：{{name}}</h2>
+    <h2>学校地址：{{address}}</h2>
+</div>
+
+<script type="text/javascript">
+    Vue.config.productionTip = false //阻止 vue 在启动时生成生产提示。
+
+    const vm = new Vue({
+        el:'#root',
+        data:{
+            name:'浙江师范大学',
+            address:'金华',
+            student:{
+                name:'tom',
+                age:{
+                    rAge:40,
+                    sAge:29,
+                },
+                friends:[
+                    {name:'jerry',age:35}
+                ]
+            }
+        }
+    })
+</script>
+
+```
+
+![image-20230313152845241](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230313152845241.png)
+
+```
+讲一下解析模板后面的操作→ 调用 set 方法时，就会去解析模板----->生成新的虚拟 DOM----->新旧DOM 对比 -----> 更新页面
+```
+
+```html
+<script type="text/javascript" >
+
+    let data = {
+        name:'尚硅谷',
+        address:'北京',
+    }
+
+    //创建一个监视的实例对象，用于监视data中属性的变化
+    const obs = new Observer(data)		
+    console.log(obs)	
+
+    //准备一个vm实例对象
+    let vm = {}
+    vm._data = data = obs
+
+    function Observer(obj){
+        //汇总对象中所有的属性形成一个数组
+        const keys = Object.keys(obj)
+        //遍历
+        keys.forEach((k) => {
+            Object.defineProperty(this, k, {
+                get() {
+                    return obj[k]
+                },
+                set(val) {
+                    console.log(`${k}被改了，我要去解析模板，生成虚拟DOM.....我要开始忙了`)
+                    obj[k] = val
+                }
+            })
+        })
+    }
+</script>
+
+```
+
+![image-20230313152909619](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230313152909619.png)
+
+### 1.16.6 Vue.set的使用
+
+```javascript
+Vue.set(target, propertyName/index, value) 或
+vm.$set(target, propertyName/index, value)
+```
+
+**用法：**
+
+​	向响应式对象中添加一个`property`，并确保这个新`property`同样是响应式的，且触发视图更新。它必须用于向响应式对象上添加新`property`，因为Vue无法探测普通的新增`property`（比如`vm.myObject.newProperty = 'hi'`）
+
+代码：
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue.set的使用</title>
+    <script src="../js/vue.js"></script>
+</head>
+<body>
+    <div id="root">
+        <h1>学生信息</h1>
+        <button @click="addSex">添加一个性别属性，默认为男</button>
+        <h2>学生姓名：{{student.name}}</h2>
+        <h2 v-if="student.sex">学生性别：{{student.sex}}</h2>
+        <h2>学生年龄：真实{{student.age.rAge}}，对外{{student.age.sAge}}</h2>
+        <h2>朋友们</h2>
+        <ul>
+            <li v-for="(friend, index) in student.friends" :key="index">
+                {{friend.name}}-{{friend.age}}
+            </li>
+        </ul>
+    </div>
+    <script>
+        const vm = new Vue({
+            el: '#root',
+            data: {
+                student: {
+                    name: 'tom',
+                    // sex: '男',
+                    age: {
+                        rAge: 40,
+                        sAge: 29,
+                    },
+                    friends: [
+                        {name: 'jerry', age: 35},
+                        {name: 'tony', age: 36}  
+                    ]
+                }
+            },
+            methods: {
+                addSex(){
+                        // Vue.set(this.student, 'sex', '男')
+                        this.$set(this.student, 'sex', '男')
+                }
+            }
+        })
+    </script>
+</body>
+</html>
+```
+
+调试结果：
+
+点击前：
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230313162109221.png" alt="image-20230313162109221" style="zoom:50%;" />
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230313162121578.png" alt="image-20230313162121578" style="zoom:50%;" />
+
+但是`Vue.set()`或vm.$set()有缺陷：
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230313162325848.png" alt="image-20230313162325848" style="zoom:50%;" />
+
+意思就是 不能在vm和_data里面直接添加数据对象
+
+
+
+再研究**Vue如何监测数组里的数据**
+
+代码：
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue监测数据改变的原理_数组</title>
+    <script src="../js/vue.js"></script>
+</head>
+
+<body>
+    <div id="root">
+        <h2>爱好</h2>
+        <ul>
+            <li v-for="(item, index) in student.hobby" :key="index">
+                {{item}}
+            </li>
+        </ul>
+        <h2>朋友们</h2>
+        <ul>
+            <li v-for="(friend, index) in student.friends" :key="index">
+                {{friend.name}}-{{friend.age}}
+            </li>
+        </ul>
+    </div>
+    <script>
+        const vm = new Vue({
+            el: '#root',
+            data: {
+                student: {
+                    name: 'tom',
+                    // sex: '男',
+                    hobby: ['唱', '跳', 'rap', '篮球'],
+                    friends: [
+                        { name: 'jerry', age: 35 },
+                        { name: 'tony', age: 36 }
+                    ]
+                }
+            },
+            methods: {
+            }
+        })
+    </script>
+</body>
+
+</html>
+```
+
+我们通过`vm._data.student.hobby[0] = '起飞'`尝试往数组里添加元素是不行的，页面并没有更新我们的信息，这跟前面提出来的问题是一个性质
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230313193900640.png" alt="image-20230313193900640" style="zoom:50%;" />
+
+​	而且查看Vue对象发现，数组中并没有为各个数组元素服务的getter和settter
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230313194007563.png" alt="image-20230313194007563" style="zoom:50%;" />
+
+​	那么Vue是如何监测到数组中数据改变的呢？
+
+​	答：Vue对数组的监测是通过 包装数组上常用的用于修改数组的方法来实现的。
+
+官网解释：
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230313194143623.png" alt="image-20230313194143623" style="zoom:50%;" />
+
+​	所谓包裹，就是Vue对原生的数组方法进行了重写，当我们在Vue所接管的数组里面调用数组相关方法，会发现我们在Vue中调用和原生调用是不同的
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230313194454159.png" alt="image-20230313194454159" style="zoom:50%;" />
+
+​	被包裹的方法中主要有这几个操作：
+
+		1. Vue会老老实实的在里面调用原生的方法
+		1. 解析模板，生成虚拟DOM，对比前后的虚拟DOM.....
+
+所以我们要想在Vue接管的数组中更新数据，得用被Vue重写的数组方法 注意图中的数据代理 和_data一样
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230313194729745.png" alt="image-20230313194729745" style="zoom:50%;" />
+
+另外，还可以用到我们上面提到的set方法来操作被Vue管理的数组（`Vue.set()和vm.$set()`都可以）
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230313195011043.png" alt="image-20230313195011043" style="zoom:50%;" />
+
+### 1.16.7 总结Vue数据监测 
+
+Vue监视数据的原理：
+
+1. Vue会监视data中所有层次的数据
+
+2. 如何监测对象中的数据？
+
+   通过setter实现监视，切要在`new Vue`时就传入要监测的数据
+
+   1. 对象中后追加的属性，Vue不做响应式处理
+
+   2. 如需给后添加的属性做响应式，请使用如下API:
+
+      ​	`Vue.set(target, propertyName/index, value)`或
+
+      ​	`vm.$set(target, propertyName/index, value)`
+
+3. 如何监测数组中的数据？
+
+   通过包裹数组更新元素的方法实现，本质就是做了两件事：
+
+   1. 调用原生对应的方法对数组进行更新
+   2. 重新解析模板，进而更新页面
+
+4. 在Vue修改数组中的某个元素一定要用到如下方法：
+
+   1. 使用这些API:`push()、pop()、shift()、unshift()、splice()、sort()、reverse()`
+   2. `Vue.set()`或`vm.$set()`
+
+​	特别注意：`Vue.set()`和`vm.$set()`不能给vm或vm的根数据对象添加属性！！！

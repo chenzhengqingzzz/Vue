@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue监测数据改变的原理_数组</title>
+    <script src="../js/vue.js"></script>
+</head>
+
+<body>
+    <div id="root">
+        <h2>爱好</h2>
+        <ul>
+            <li v-for="(item, index) in student.hobby" :key="index">
+                {{item}}
+            </li>
+        </ul>
+        <h2>朋友们</h2>
+        <ul>
+            <li v-for="(friend, index) in student.friends" :key="index">
+                {{friend.name}}-{{friend.age}}
+            </li>
+        </ul>
+    </div>
+    <script>
+        const vm = new Vue({
+            el: '#root',
+            data: {
+                student: {
+                    name: 'tom',
+                    // sex: '男',
+                    hobby: ['唱', '跳', 'rap', '篮球'],
+                    friends: [
+                        { name: 'jerry', age: 35 },
+                        { name: 'tony', age: 36 }
+                    ]
+                }
+            },
+            methods: {
+            }
+        })
+    </script>
+</body>
+
+</html>

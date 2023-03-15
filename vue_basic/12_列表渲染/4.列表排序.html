@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>列表排序</title>
+    <script src="../js/vue.js"></script>
+</head>
+
+<body>
+    <div id="root">
+        <h2>人员列表</h2>
+        <input type="text" placeholder="请输入名字" v-model="keyWord">
+        <button @click="sortType = 'up'">年龄升序</button>
+        <button @click="sortType = 'down'">年龄降序</button>
+        <button @click="sortType = 'origin'">原顺序</button>
+        <ul>
+            <li v-for="(filteredPerson, index) in filteredPersons" :key="filteredPerson.id">
+                {{filteredPerson.name}}-{{filteredPerson.age}}-{{filteredPerson.sex}}
+            </li>
+        </ul>
+    </div>
+    <script>
+        // 用computed实现
+        const vm = new Vue({
+            el: '#root',
+            data: {
+                keyWord: '',
+                sortType: 'origin', //排序类型
+                persons: [
+                    { id: 001, name: '马冬梅', age: 18, sex: '女' },
+                    { id: 002, name: '周冬雨', age: 19, sex: '女' },
+                    { id: 003, name: '周杰伦', age: 23, sex: '男' },
+                    { id: 004, name: '温兆伦', age: 22, sex: '男' }
+                ],
+            },
+            computed: {
+                filteredPersons() {
+                    // 第一个return是计算属性的get需要的 第二个是filter这个方法需要的过滤条件
+                    const arr = this.persons.filter((person) => {
+                        return person.name.indexOf(this.keyWord) !== -1
+                    })
+                    // 判断一下是否需要排序
+                    if (this.sortType !== 'origin') {
+                        if (this.sortType !== 'down') {
+                            arr.sort((a, b) => {
+                                return a.age - b.age
+                            })
+                        } else {
+                            arr.sort((a, b) => {
+                                return b.age - a.age
+                            })
+                        }
+                    }
+                    return arr
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>

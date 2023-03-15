@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>列表过滤</title>
+    <script src="../js/vue.js"></script>
+</head>
+
+<body>
+    <div id="root">
+        <h2>人员列表</h2>
+        <input type="text" placeholder="请输入名字" v-model="keyWord">
+        <ul>
+            <!-- 遍历数组 -->
+            <!-- <li v-for="(person, index) in persons" :key="person.id">
+                {{person.name}}-{{person.age}}-{{person.sex}}
+            </li> -->
+            <li v-for="(filteredPerson, index) in filteredPersons" :key="filteredPerson.id">
+                {{filteredPerson.name}}-{{filteredPerson.age}}-{{filteredPerson.sex}}
+            </li>
+        </ul>
+    </div>
+    <script>
+        // // 用watch实现
+        // const vm = new Vue({
+        //     el: '#root',
+        //     data: {
+        //         keyWord: '',
+        //         persons: [
+        //             { id: 001, name: '马冬梅', age: 18, sex: '女' },
+        //             { id: 002, name: '周冬雨', age: 19, sex: '女' },
+        //             { id: 003, name: '周杰伦', age: 18, sex: '男' },
+        //             { id: 004, name: '温兆伦', age: 18, sex: '男' }
+        //         ],
+        //         filteredPersons: []
+        //     },
+        //     watch: {
+        //         keyWord: {
+        //             //由于任何字符串都包含了空字符串，为了让一开始显示所有列表，所以配置了立即执行一次
+        //             immediate: true,
+        //             handler(newVal) {
+        //                 this.filteredPersons = this.persons.filter((person) => {
+        //                     // filter的第一个参数为被过滤数组的每一项
+        //                     // return后面接的是筛选条件
+        //                     return person.name.indexOf(newVal) !== -1
+        //                 })
+        //             }
+        //         }
+        //     }
+        // })
+
+        // 用computed实现
+        const vm = new Vue({
+            el: '#root',
+            data: {
+                keyWord: '',
+                persons: [
+                    { id: 001, name: '马冬梅', age: 18, sex: '女' },
+                    { id: 002, name: '周冬雨', age: 19, sex: '女' },
+                    { id: 003, name: '周杰伦', age: 18, sex: '男' },
+                    { id: 004, name: '温兆伦', age: 18, sex: '男' }
+                ],
+            },
+            computed: {
+                filteredPersons(){ 
+                    // 第一个return是计算属性的get需要的 第二个是filter这个方法需要的过滤条件
+                    return this.persons.filter((person) => {
+                        return person.name.indexOf(this.keyWord) !== -1
+                    })
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>

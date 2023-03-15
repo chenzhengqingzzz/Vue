@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>总结Vue数据监测</title>
+    <script src="../js/vue.js"></script>
+</head>
+
+<body>
+    <div>
+        <h1>学生信息</h1>
+
+        <button @click="student.age++">年龄+1岁</button><br/>
+        <button @click="addSex">添加性别属性：默认值：男</button><br/>
+        <button @click="addFriend">在列表首位添加一个朋友</button><br/>
+        <button @click="changeFirstName">修改第一个朋友的名字为：张三</button><br/>
+        <button @click="addHobby">添加一个爱好</button><br/>
+        <button @click="changeFirstHobby">修改第一个爱好为：开车</button><br/>
+        <button @click="removeBask('跳')">过滤掉括号中的爱好</button><br/>
+
+        <h3>姓名：{{student.name}}</h3>
+        <h3 v-if="student.sex">性别：{{student.sex}}</h3>
+        <h3>年龄：{{student.age}}</h3>
+        <h3>爱好：</h3>
+        <ul>
+            <li v-for="(h, index) in student.hobby" :key="index">
+                {{h}}
+            </li>
+        </ul>
+        <h3>朋友们：</h3>
+        <ul>
+            <li v-for="(f, index) in student.friends" :key="index">
+                {{f.name}}-{{f.age}}
+            </li>
+        </ul>
+    </div>
+
+    <script>
+        const vm = new Vue({
+            el: 'div',
+            data: {
+                student: {
+                    name: 'tom',
+                    age: 18,
+                    hobby: ['唱', '跳', 'rap', '篮球'],
+                    friends: [
+                        {name: 'jerry', age: 36},
+                        {name: 'tony', age: 37}
+                    ]
+                }
+            },
+            methods: {
+                addSex(){
+                    // Vue.set(this.student, 'sex', '男')
+                    vm.$set(this.student, 'sex', '男')
+                },
+                addFriend(){
+                    vm.student.friends.unshift({name: 'czq', age: 21})
+                },
+                changeFirstName(){
+                    vm.student.friends[0].name = '张三'
+                },
+                addHobby(){
+                    vm.student.hobby.push('鸡你太美')
+                },
+                changeFirstHobby(){
+                    // vm.$set(this.student.hobby, 0, '开车')
+                    vm.student.hobby.splice(0, 1, '开车')
+                },
+                removeBask(value){
+                    vm.student.hobby = vm.student.hobby.filter((hobby) => {
+                        return hobby !== value
+                    })
+                }
+            },
+        })
+    </script>
+</body>
+
+</html>

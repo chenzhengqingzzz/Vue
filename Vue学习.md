@@ -3161,3 +3161,149 @@ Vue监视数据的原理：
 ![image-20230316201859628](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230316201859628.png)
 
 由此可见，加入了v-pre指令的标签将不会被Vue解析
+
+## 1.20 自定义指令
+
+自定义指令有两种写法：函数式和对象式
+
+函数式适合实现简单的业务逻辑（例如需求1），其缺点就是不可以解决细节上的问题
+
+对象式适合实现有很多细节的业务逻辑（例如需求2），其缺点就是 写起来麻烦
+
+
+
+​	需求1：定义一个`v-big`指令，和`v-text`功能类似，但会把绑定的数值放大10倍
+
+​	在Vue中，指令的实质就是 操作了DOM元素，我们要想定义自定义指令，就意味着我们要在具体操作的过程中操作DOM元素来实现我们自定义指令的目的
+
+​	我们需要借助`directives`这个配置项来实现我们的自定义指令：
+
+```html
+    <div id="root">
+        <h2>当前的n值是：<span v-text="n"></span></h2>
+        <h2>放大10倍后的n值是：<span v-big="n"></span></h2>
+        <button @click="n++">点我n + 1</button>
+    </div>
+```
+
+函数式传入两个参数
+
+	1. 真实DOM节点
+	1. 绑定标签的相关信息（以对象的方式呈现）
+
+例如：
+
+```javascript
+            directives: {
+                // 函数式 写起来简单，但是解决不了细节上的问题
+                // big函数何时会被调用？ 1. 指令与元素成功绑定时（一上来） 2. 指令所在的模板被重新解析时
+                big(element, binding){
+                    // element.innerText = binding.value * 10
+                    console.log(element, binding);
+                }
+            }
+```
+
+![image-20230316205012372](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230316205012372.png)
+
+​	我们要想实现这个需求，主要重点关注value 由于我们在html使用这个指令的的时候 v-big="n"，这里读取的value就是1
+
+实现业务1逻辑的代码：
+
+```javascript
+    new Vue({
+        el: '#root',
+        data: {
+            n: 1
+        },
+        directives: {
+            // 函数式 写起来简单，但是解决不了细节上的问题
+            // big函数何时会被调用？ 1. 指令与元素成功绑定时（一上来） 2. 指令所在的模板被重新解析时
+            big(element, binding){
+                element.innerText = binding.value * 10
+            }
+        }
+    })
+```
+
+![image-20230316205223278](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230316205223278.png)
+
+​	需求2：定义一个`v-fbnd`指令，和`v-bind`功能类似，但可以让其所绑定的input元素默认获取焦点
+
+```html
+<input type="text" v-fbind:value="n">
+```
+
+​	这里将n当值赋给input框
+
+```js
+// 对象式可以解决细节上的问题（用了钩子，对调的时机都做了详细分割）
+                fbind: {
+                    // 当指令与元素成功绑定时（一上来）
+                    bind(element, binding) {
+                        element.value = binding.value
+                    },
+                    // 指令所在的元素被插入页面时
+                    inserted(element, binding) {
+                        element.focus()
+                    },
+                    // 指令所在的模板被重新解析时
+                    update(element, binding) {
+                        element.value = binding.value
+                    }
+                }
+```
+
+调试结果：
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230317164622139.png" alt="image-20230317164622139" style="zoom:50%;" />
+
+1. 定义语法：
+
+   1. 局部指令：
+
+   ```
+   newVue({
+   	directives: {指令名: 配置对象}
+   })
+   或者
+   new Vue({
+   	directives{指令名, 回调函数}
+   })
+   ```
+
+   2. 全局指令：
+
+   ```
+   Vue.directive(指令名, 配置对象) 或 Vue.directive(指令名, 回调函数)
+   ```
+
+   
+
+2. 配置对象中常用当3个回调函数：
+
+* bind(element, binding) 指令与元素成功绑定时调用
+
+* inserted(element, binding) 指令所在元素被插入页面时调用
+
+* update(element, binding) 指令所在模板结构被重新解析时调用 其逻辑往往和第一个一样
+
+`element`就是DOM元素,`binding`就是要绑定当对象，它包含以下属性：`name` `value` `oldValue` `expression` `arg` `modifiers`
+
+​	备注：
+
+* 指令定义时不加`v-`，但使用时要加`v-`
+
+* 指令名如果是多个单词，要使用`kekab-case`命名方式，不要用驼峰命名法
+
+另提一点：在`directives`这个属性中，我们写的this为`window`
+
+```javascript
+                big(element, binding){
+                    console.log('big', this); //注意，directives里面的this都是window
+                    element.innerText = binding.value * 10
+                    // console.log(element, binding);
+                },
+```
+
+![image-20230317164657544](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230317164657544.png)

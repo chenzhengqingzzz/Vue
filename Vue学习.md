@@ -3307,3 +3307,250 @@ Vue监视数据的原理：
 ```
 
 ![image-20230317164657544](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230317164657544.png)
+
+## 1.21 生命周期
+
+### 1.21.1 引出生命周期
+
+​	需求：周期性地改变页面中文字当透明度，并要求在页面一挂载的时候就改变
+
+​	我们可以有很多种方法，例如`Window.onload()`，然后拿到Vue实例将其改变，但是我们如何在Vue实例里面写呢？
+
+​	这里需要用到生命周期钩子`mounted()`，它和method等配置项同级，本质是一个函数
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>引出生命周期</title>
+    <script src="../js/vue.js"></script>
+</head>
+<body>
+    <div id="root">
+        <h2 :style="{opacity: opacity}">起飞起飞起飞</h2>
+    </div>
+    <script>
+        const vm = new Vue({
+            el: '#root',
+            data: {
+                opacity: 1
+            },
+            methods: {
+                
+            },
+            // Vue完成模板当解析并把初始的真实DOM元素放入页面后（挂载完毕）调用mounted
+            mounted() {
+                setInterval(() => {
+                    this.opacity -= 0.01
+                    if(this.opacity <= 0) this.opacity = 1
+                }, 16);
+            },
+        })
+
+        // 通过外部的定时器实现（不推荐）
+        // setInterval(() => {
+        //     vm.opacity -= 0.01
+        //     if(vm.opacity <= 0) vm.opacity = 1
+        // }, 16);
+    </script>
+</body>
+</html>
+```
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230317172449126.png" alt="image-20230317172449126" style="zoom:50%;" />
+
+**生命周期：**
+
+1. 又名：生命周期回调函数、生命周期函数、生命周期钩子
+
+2. 是什么？Vue在关键时刻帮我们调用的一些特殊名称的函数
+
+3. 生命周期函数的名字不可更改，但函数的具体内容是程序员根据要求编写的
+
+   ​	生命周期函数中的this指向是vm或组件实例对象
+
+### 1.21.2 分析生命周期
+
+要想知道生命周期的作用以及具体发生的事情，必须知道这个图：
+
+![生命周期](/Users/chenzhengqing/Desktop/尚硅谷vue/资料（含课件）/02_原理图/生命周期.png)
+
+```html
+    <div id="root">
+        <h2>当前的n值是：{{n}}</h2>
+        <button @click="add">点我n+1</button>
+        <button @click="bye">点我销毁vm</button>
+    </div>
+```
+
+```js
+       const vm = new Vue({
+            el: '#root',
+            data: {
+                n: 1
+            },
+            methods: {
+                add(){
+                    console.log('add');
+                    this.n++
+                },
+                bye(){
+					console.log('bye')
+					this.$destroy()
+				}
+            },
+            watch: {
+                n(){
+                    console.log('n变了');
+                }
+            },
+       })
+```
+
+
+
+ * **beforeCreate钩子：**
+
+​	这里的create指的是创建数据监测以及数据代理
+
+​	此时无法通过vm访问到data中的数据、method中的方法
+
+```javascript
+						beforeCreate() {
+                console.log('beforeCreate');
+                 console.log(this);
+                 debugger
+            },
+```
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230317195539475.png" alt="image-20230317195539475" style="zoom:50%;" />
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230317195554858.png" alt="image-20230317195554858" style="zoom:50%;" />
+
+此时我们无法在vm中发现数据代理所用到的`_data`，method中所提到的方法以及数据监测所用到的getter和setter
+
+* **created钩子：**
+
+```js
+						created() {
+                console.log('created');
+                console.log(this);
+                debugger
+            },
+```
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230317200028953.png" alt="image-20230317200028953" style="zoom:50%;" />
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230317200049347.png" alt="image-20230317200049347" style="zoom:50%;" />
+
+在create钩子调用的时候，vm出现了数据代理和监测需要的相关配置项，证明此刻数据代理和监测已经开始工作，但是页面还没有更新
+
+* **beforeMount钩子：**
+
+```js
+            beforeMount() {
+                console.log('beforeMount');
+                console.log(this);
+                debugger
+            },
+```
+
+此时页面呈现的是**未经Vue编译**DOM结构，所有对DOM的操作，**最终**都不奏效
+
+怎么理解？如果我在此时此刻对页面的元素进行操作，虽然在debugger时期，代码停到这里的时期可以相应，但是一旦我将程序放行，Vue将会接管这个页面，将真实DOM重新放在页面上。
+
+操作DOM之前：
+
+![image-20230317200754378](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230317200754378.png)
+
+操作DOM之后：
+
+![image-20230317200821603](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230317200821603.png)
+
+放行程序之后：
+
+![image-20230317200849324](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230317200849324.png)
+
+​	所以我们在这里操作DOM是徒劳无功的（其实用了Vue本来就不提倡我们操作真实DOM）
+
+* **mount钩子：**
+
+​	此时页面中呈现的都是**经过Vue编译**的DOM，我们对DOM的操作均有效（但是我们应当避免操作真实DOM）。至此初始化过程结束，一般在此进行：开启定时器、发送网络请求、订阅消息、绑定自定义事件等**初始化操作**
+
+![image-20230317201150265](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230317201150265.png)
+
+此时发现Vue已经将真实DOM成功挂载到了页面中
+
+* **beforeUpdate钩子：**
+
+在我们这个钩子调用时，数据是新的，但是页面是旧的，页面尚未和数据保持同步
+
+```js
+						beforeUpdate() {
+                console.log('beforeUpdate');
+                console.log(this.n);
+                debugger
+            },
+```
+
+![image-20230317201625448](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230317201625448.png)
+
+当我们点n+1时，数据会进行更新，但页面中的数据不会变
+
+在更新的前后，Vue就会进行我们喜闻乐见的根据新数据生产新的虚拟DOM，，随后与旧的虚拟DOM进行比较，最终完成页面的更新
+
+* **updated钩子：**
+
+此时，数据是新的，页面也是新的，页面与数据保持同步
+
+```javascript
+						updated() {
+                console.log('updated');
+                console.log(this.n);
+                debugger
+            },
+```
+
+![image-20230317201955000](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230317201955000.png)
+
+可以看到，此时数据和页面中的数据一致。
+
+* **beforeDestory钩子：**
+
+我们需要调用`vm.destroy()`这个函数来执行vm销毁
+
+这个钩子调用时，vm中所有的：data、methods、指令等都处于可用状态，马上要执行销毁的过程，一般在此阶段：关闭定时器、取消订阅消息、解绑自定义事件等**收尾操作**
+
+​	要注意的是：虽然这个销毁之前我们的data、methods都是可用的，但是我们如果在这里通过代码进行修改数据等一系列的操作时，Vue不会帮我们进行页面的更新，正所谓将死之时应该妥善安排后事（关闭定时器、取消订阅等），其他操作是无意义的
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230317202512084.png" alt="image-20230317202512084" style="zoom:50%;" />
+
+由此可见，页面没有更新
+
+* **destroyed钩子：**
+
+这里已经将vm摧毁了，但是页面还遗留着vm生前帮我们工作所留下来的真实DOM，当我们点击进行操作的时候页面当然不会进行更新
+
+```javascript
+						destroyed() {
+                console.log('destoryed');
+            },
+```
+
+![image-20230317203206059](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230317203206059.png)
+
+### 1.21.3 总结生命周期
+
+常用的生命周期钩子：
+
+	1. ` mounted`：发送ajax请求、启动定时器、绑定自定义事件、订阅消息等【初始化操作】
+	1. `beforeDestroy`：清除定时器、解绑自定义事件、取消订阅消息等【收尾工作】
+
+关于销毁Vue实例
+
+1. 销毁后借助Vue开发者工具看不到任何消息
+2. 销毁后自定义会失效，但是原生DOM事件依然有效
+3. 一般不会在`beforeDestroy`操作数据，因为即使操作了，也不会再触发更新流程了

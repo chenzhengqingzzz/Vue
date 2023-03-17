@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>总结生命周期</title>
+    <script src="../js/vue.js"></script>
+</head>
+<body>
+    <div id="root">
+        <h2 :style="{opacity: opacity}">起飞起飞起飞</h2>
+        <button @click="{opacity = 1}">透明度设置为1</button>
+        <button @click="stop">停止变换</button>
+    </div>
+    <script>
+        const vm = new Vue({
+            el: '#root',
+            data: {
+                opacity: 1
+            },
+            methods: {
+                stop(){
+                    this.$destroy()
+                }
+            },
+            // Vue完成模板当解析并把初始的真实DOM元素放入页面后（挂载完毕）调用mounted
+            mounted() {
+                this.timer = setInterval(() => {
+                    this.opacity -= 0.01
+                    if(this.opacity <= 0) this.opacity = 1
+                }, 16);
+            },
+            beforeDestroy() {
+                console.log('vm驾鹤西游了');
+                clearInterval(this.timer)
+            },
+        })
+    </script>
+</body>
+</html>

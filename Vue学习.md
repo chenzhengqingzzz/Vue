@@ -4295,3 +4295,137 @@ Vue.prototype.x = 100
 <img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230320182057067.png" alt="image-20230320182057067" style="zoom:50%;" />
 
 ​	成功读出我们放在Vue原型对象中的x，验证了那条线
+
+## 2.3 单文件组件
+
+​	我们编写的xxx.vue就是一个组件
+
+	* School.vue
+
+```vue
+<template>
+    <!-- 组件的结构 -->
+    <div class="demo">
+        <h2>学校名称：{{ name }}</h2>
+        <h2>学校地址：{{ address }}</h2>
+        <button @click="showName">点我提示学校名</button>
+    </div>
+</template>
+
+<script>
+    // 组件的交互相关的代码（数据、方法等）
+     export default {
+        name: 'School',
+        data() {
+            return {
+                name: 'xx大学',
+                address: 'Hubei'
+            }
+        },
+        methods: {
+            showName(){
+                alert(this.name)
+            }
+        },
+    }
+</script>
+
+<style>
+    /* 组件的样式 */
+    .demo {
+        background-color: orange;
+    }
+</style>
+```
+
+* Student.vue
+
+```vue
+<template>
+    <div>
+        <h2>学生姓名：{{ name }}</h2>
+        <h2>学生年龄：{{ age }}</h2>
+    </div>
+</template>
+
+<script>
+    export default {
+        name: 'Student',
+        data() {
+            return {
+                name: 'czq',
+                age: 21
+            }
+        },
+    }
+</script>
+```
+
+* 统领全局的App.vue
+
+```vue
+<template>
+  <div>
+    <School></School>
+    <Student></Student>
+  </div>
+</template>
+
+<script>
+    // 引入组件
+    import School from './School.vue'
+    import Student from './Student.vue'
+    export default {
+        name: 'App',
+        components: {
+            School,
+            Student
+        }
+    }
+</script>
+
+<style>
+
+</style>
+```
+
+
+
+* 入口文件main.js（react里面是app.js）
+
+```javascript
+import App from './App.vue'
+
+const vm = new Vue({
+    el: '#root',
+    template: `<App></App>`,
+    components: {
+        App
+    }
+})
+```
+
+* 结构文件index.html
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>练习一下单文件的语法</title>
+</head>
+<body>
+    <!-- 准备一个容器 -->
+    <div id="root"></div>
+    <script src="../js/vue.js"></script>
+    <script src="./main.js"></script>
+</body>
+</html>
+```
+
+​	当我们在html文件中点击运行的时候，会发现浏览器报错指向了main.js中，是因为浏览器不认识es6中的暴露和引入语法，我们在脚手架写这些就不会出现类似的问题
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230320193458336.png" alt="image-20230320193458336" style="zoom:50%;" />
+

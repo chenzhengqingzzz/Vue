@@ -4429,3 +4429,216 @@ const vm = new Vue({
 
 <img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230320193458336.png" alt="image-20230320193458336" style="zoom:50%;" />
 
+# 3. 使用Vue脚手架
+
+### 3.1 初始化脚手架
+
+#### 3.1.1 说明
+
+	1. Vue脚手架是Vue官方提供的标准化开发工具（开发平台）
+	1. 最新的版本是4.x
+	1. 文档：https://cli.vuejs.org/zh/
+
+#### 3.1.2 具体步骤
+
+1. 如果下载缓慢请配置npm淘宝镜像`npm config set registry http://registry.npm.taoba.org`
+2. 全局安装@vue/cli：`npm install -g @vue/cli`
+3. 切换到创建项目的目录，使用命令创建项目`vue create xxx`
+4. 选择使用Vue的版本
+5. 启动项目`npm run serve`
+6. 打包项目`npm run build`
+7. 暂停项目`Ctrl+C`或`Command+C`
+
+Vue脚手架隐藏了所有`webpack`相关的配置，若想要查看具体的`webpack`配置，请执行：`vue inspect > output.js`
+
+#### 3.1.3 脚手架文件结构
+
+```markdown
+.项目文件
+├─public
+|   ├─favicon.ico //页签图标
+|   └index.html //主页面
+├─src
+|  ├─assets //存放静态资源
+|  |   └logo.png
+|  ├─components //存放组件
+|  |     ├─School.vue
+|  |     └Student.vue
+|  ├─App.vue //汇总所有文件
+|  ├─main.js //入口文件
+├─.gitignore //git版本管制忽略的配置
+├─README.md //应用描述王文件
+├─babel.config.js //babel的配置文件（es6转成es5）
+├─jsconfig.json 
+├─package-lock.json //包版本控制文件
+├─package.json //应用包配置文件
+├─vue.config.js //vue的配置文件
+
+```
+
+`src/compnents/School.vue`
+
+```vue
+<template>
+    <!-- 组件的结构 -->
+    <div class="demo">
+        <h2>学校名称：{{ name }}</h2>
+        <h2>学校地址：{{ address }}</h2>
+        <button @click="showName">点我提示学校名</button>
+    </div>
+</template>
+
+<script>
+    // 组件的交互相关的代码（数据、方法等）
+     export default {
+        name: 'School',
+        data() {
+            return {
+                name: 'xx大学',
+                address: 'Hubei'
+            }
+        },
+        methods: {
+            showName(){
+                alert(this.name)
+            }
+        },
+    }
+</script>
+
+<style>
+    /* 组件的样式 */
+    .demo {
+        background-color: orange;
+    }
+</style>
+```
+
+`src/components/Student.vue`
+
+```vue
+<template>
+    <div>
+        <h2>学生姓名：{{ name }}</h2>
+        <h2>学生年龄：{{ age }}</h2>
+    </div>
+</template>
+
+<script>
+    export default {
+        name: 'Student',
+        data() {
+            return {
+                name: 'czq',
+                age: 21
+            }
+        },
+    }
+</script>
+```
+
+`src/App.vue`
+
+```vue
+<template>
+  <div>
+    <img src="./assets/logo.png" alt="logo">
+    <School></School>
+    <Student></Student>
+  </div>
+</template>
+
+<script>
+    // 引入组件
+    import School from './components/School.vue'
+    import Student from './components/Student.vue'
+    export default {
+        name: 'App',
+        components: {
+            School,
+            Student
+        }
+    }
+</script>
+
+<style>
+
+</style>
+```
+
+`src/main.js`
+
+```javascript
+// 2023脚手架文件：
+import { createApp } from 'vue'
+import App from './App.vue'
+
+createApp(App).mount('#app')
+
+// -----------------------------------------------------
+
+// // 2021尚硅谷：
+// /* 
+// 	该文件是整个项目的入口文件
+// */
+// //引入Vue
+// import Vue from 'vue'
+// //引入App组件，它是所有组件的父组件
+// import App from './App.vue'
+// //关闭vue的生产提示
+// Vue.config.productionTip = false
+
+// /* 
+// 	关于不同版本的Vue：
+	
+// 		1.vue.js与vue.runtime.xxx.js的区别：
+// 				(1).vue.js是完整版的Vue，包含：核心功能+模板解析器。
+// 				(2).vue.runtime.xxx.js是运行版的Vue，只包含：核心功能；没有模板解析器。
+
+// 		2.因为vue.runtime.xxx.js没有模板解析器，所以不能使用template配置项，需要使用
+// 			render函数接收到的createElement函数去指定具体内容。
+// */
+
+// //创建Vue实例对象---vm
+// new Vue({
+// 	el:'#app',
+// 	//render函数完成了这个功能：将App组件放入容器中
+//   render: h => h(App),
+// 	// render:q=> q('h1','你好啊')
+
+// 	// template:`<h1>你好啊</h1>`,
+// 	// components:{App},
+// })
+
+```
+
+`pubic/index.html`
+
+```html
+<!DOCTYPE html>
+<html lang="">
+  <head>
+    <meta charset="utf-8">
+    <!-- 针对IE浏览器的一个特殊配置，含义是让IE浏览器以最高的渲染级别渲染页面 -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- 开启移动端的理想视口 -->
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!-- 配置页签图标 -->
+    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
+    <!-- 配置网页的标题 -->
+    <title><%= htmlWebpackPlugin.options.title %></title>
+  </head>
+  <body>
+    <!-- 当浏览器不支持JavaScript时，noscript中的元素就会被渲染 -->
+    <noscript>
+      <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+    </noscript>
+    <!-- 容器 -->
+    <div id="app"></div>
+    <!-- built files will be auto injected -->
+  </body>
+</html>
+
+```
+
+![image-20230320211103034](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230320211103034.png)

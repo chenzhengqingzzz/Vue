@@ -3542,6 +3542,88 @@ Vue监视数据的原理：
 
 ![image-20230317203206059](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230317203206059.png)
 
+完整代码：
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>分析生命周期</title>
+    <script src="../js/vue.js"></script>
+</head>
+<body>
+    <div id="root">
+        <h2>当前的n值是：{{n}}</h2>
+        <button @click="add">点我n+1</button>
+        <button @click="bye">点我销毁vm</button>
+    </div>
+    <script>
+        const vm = new Vue({
+            el: '#root',
+            data: {
+                n: 1
+            },
+            methods: {
+                add(){
+                    console.log('add');
+                    this.n++
+                },
+                bye(){
+					console.log('bye')
+					this.$destroy()
+				}
+            },
+            watch: {
+                n(){
+                    console.log('n变了');
+                }
+            },
+            beforeCreate() {
+                console.log('beforeCreate');
+                // console.log(this);
+                // debugger
+            },
+            created() {
+                console.log('created');
+                // console.log(this);
+                // debugger
+            },
+            beforeMount() {
+                console.log('beforeMount');
+                // console.log(this);
+                // debugger
+            },
+            mounted() {
+                console.log('mounted');
+                // debugger
+            },
+            beforeUpdate() {
+                console.log('beforeUpdate');
+                // console.log(this.n);
+                // debugger
+            },
+            updated() {
+                console.log('updated');
+                // console.log(this.n);
+                // debugger
+            },
+            beforeDestroy() {
+                console.log('beforeDestory');
+                // console.log(this.n);
+                // debugger
+            },
+            destroyed() {
+                console.log('destoryed');
+            },
+        })
+    </script>
+</body>
+</html>
+```
+
 ### 1.21.3 总结生命周期
 
 常用的生命周期钩子：
@@ -3554,3 +3636,662 @@ Vue监视数据的原理：
 1. 销毁后借助Vue开发者工具看不到任何消息
 2. 销毁后自定义会失效，但是原生DOM事件依然有效
 3. 一般不会在`beforeDestroy`操作数据，因为即使操作了，也不会再触发更新流程了
+
+# 2. Vue组件化编程
+
+## 2.1 模块与组件、模块化与组件化
+
+![image-20230318155127288](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230318155127288.png)
+
+![image-20230318155222336](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230318155222336.png)
+
+**模块**
+
+	* 理解：向外提供特定功能的js程序，一般就是一个js文件
+	* 为什么：js文件很多很复杂
+	* 作用：复用、简化js 的编写，提高js运行效率
+
+**组件**
+
+* 定义：**用来实现应用中局部功能的代码和资源的集合**（html/css/image.....）
+* 为什么：一个页面的功能很复杂
+* 作用：复用编码，简化项目编码，提高运行效率
+
+**模块化**
+
+​	当引用中的js都以模块来编写的，那么这个应用就是一个模块化应用
+
+**组件化**
+
+​	当应用中的功能都是多组件的方式来编写的，那这个应用就是一个组件化的应用
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230318155753942.png" alt="image-20230318155753942" style="zoom:50%;" />
+
+## 2.2 非单文件组件
+
+​	**非单文件组件：**一个文件中包含有n个组件
+
+​	**单文件组件：**一个文件中只包含由1个组件
+
+### 2.2.1 基本使用
+
+​	Vue中使用组件的三大步骤：
+
+		1. 定义组件（创建组件）
+		1. 注册组件
+		1. 使用组件（写组件标签）
+
+
+
+1. 如何定义一个组件？
+
+   使用`Vue.extend(options)`创建，其中`options`和`new Vue(options)`时传入的那个`options`**几乎一样**（都是传入一组一组的配置对象），但区别如下：
+
+   * `el`不要写！为什么？ ——最终所有的组件都要经过一个`vm`的管理，由`vm`中的`el`决定服务哪个容器
+   * `data`必须写成函数，为什么？ ——避免组件被复用时，数据存在引用关系
+
+   备注：使用`template`这个配置项可以配置组件的结构（非单文件组件在vscode用的很难受，我们用到单文件组件时会改善这个情况）
+
+2. 如何注册组件？
+
+   * 局部注册：靠`new Vue`的时候传入`components`选项
+   * 全局注册：靠`Vue.component('组件名', 组件)`
+
+3. 编写组件标签：
+
+   ```html
+   <school><school>
+   ```
+
+代码示例：
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>基本使用</title>
+    <script src="../js/vue.js"></script>
+</head>
+<body>
+    <div id="root">
+        <hello></hello>
+        <hr/>
+        <!-- 第三步：编写组件标签 -->
+        <school></school>
+        <hr/>
+        <!-- 第三步：编写组件标签 -->
+        <student></student>
+    </div>
+    
+    <div id="root2">
+        <hello></hello>
+    </div>
+    <script>
+        // 第一步：创建school组件
+        const school = Vue.extend({
+            template: `
+                <div>
+                    <h2>学校名字：{{schoolName}}</h2>
+                    <h2>学校地址：{{address}}</h2>
+                    <button @click="showName">点我提示学校名</button>
+                </div>
+            `,
+            // el: '#root', //一定不要写el配置项，因为最终所有的㢟都要被一个vm管理，由vm决定服务于谁
+            data() {
+                return {
+                    schoolName: 'xx大学',
+                    address: 'HuBei'
+                }
+            },
+            methods: {
+                showName(){
+                    alert(this.schoolName)
+                }
+            },
+        })
+
+        // 第一步：创建student组件
+        const student = Vue.extend({
+            template: `
+                <div>
+                    <h2>学生姓名：{{studentName}}</h2>
+                    <h2>学生年龄：{{age}}</h2>
+                </div>
+            `,
+            data() {
+                return {
+                    studentName: 'czq',
+                    age: 21
+                }
+            },
+        })
+
+        // 第一步：创建一个名为hello的全局组件
+        const hello = Vue.extend({
+            template: `
+                <div>
+                    <h2>你好啊！{{name}}</h2>
+                </div>
+            `,
+            data() {
+                return {
+                    name: 'Tom'
+                }
+            },
+        })
+
+        // 第二步：全局注册组件
+        Vue.component('hello', hello)
+
+        // 创建vm
+        const vm1 = new Vue({
+            el: '#root',
+            // 第二步：注册组件（局部注册）
+            components: {
+                school: school,
+                student: student
+            }
+            // data: {
+            //         schoolName: 'xx大学',
+            //         address: 'HuBei',
+            //         studentName: 'czq',
+            //         age: 21
+            // }
+        })
+
+        const vm2 = new Vue({
+            el: '#root2',
+            components: {
+                student,
+            }
+        })
+    </script>
+</body>
+</html>
+```
+
+​	其中school和stduent组件是隶属于于vm1的局部组件，应用于vm1。hello是全局组件，应用于vm1和vm2。整个文件包含多个组件，我们称为非单文件组件
+
+![image-20230318171133185](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230318171133185.png)
+
+![image-20230318171152112](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230318171152112.png)
+
+**思考：为什么我们在使用组件的时候配置的data只能定义为一个返回值为对象的回调函数，而不直接是对象？**
+
+​	我们使用组件的一大原因是它想一块砖一样，哪里用到就可以往哪搬，我们需要的是用到同一个组件的两个地方**数据互不干扰**，它们只是文件集合类型相同，数据不能共享，我们做的是一个浅拷贝。
+
+​	当我们简单地定义成对象时，如果用到此组件的一个地方的数据改动，那么用到此组件的另外几个地方的数据都会变，动一个地方数据，如果另外一个地方做出不应该做出的改变，那就不符合我们的预期需求了。
+
+定义成简单的对象时：
+
+```javascript
+        const data = {
+            a: 1,
+            b: 2
+        }
+        const component1 = data
+        const component2 = data
+```
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230318172530695.png" alt="image-20230318172530695" style="zoom:50%;" />
+
+​	而当我们定义成一个回调函数时，由于这个回调函数在我们每次调用它的时候会返回一个全新的对象，这样的数据可以做到互不干扰。
+
+```javascript
+        const data = function(){
+            return {
+                a: 1, 
+                b: 2
+            }
+        }
+        const component1 = data()
+        const component2 = data()
+```
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230318172357057.png" alt="image-20230318172357057" style="zoom:50%;" />
+
+​	这样才符合我们复用组件时候的场景，用的一样的东西，但是各司其职，互不干扰。
+
+### 2.2.2 组件注意事项
+
+**关于组件名**
+
+ * 一个单词组成
+   * 第一种写法（首字母小写）：`school`
+   * 第二种写法（首字母大写）：`School`
+ * 多个单词组成
+   * 第一种写法（kebab-case命名）：`my-school`
+   * 第二种写法（CamelCase命名）：`MySchool`（需要Vue脚手架支持）
+ * 备注：
+   * 组件名尽可能回避`HTML`中已有的元素名称，例如：h2、H2都不行
+   * 可以使用`name`配置项制定组件在**开发者工具**中呈现的名字（但是在结构和脚本中的名字仍需要对应，相当于真名在代码中，绰号在开发者工具中）
+
+**关于组件标签**
+
+	* 第一种写法：`<school></school>`
+	* 第二种写法：`<school/>`（需要Vue脚手架支持）
+	* 备注：当用第二种写法并且没有使用Vue脚手架的时候，如果我们写多个`<school/>`标签，会导致后续的组件无法渲染
+
+**一个简写方式（语法糖）：**
+
+​	`const school = Vue.extend(options)`可简写为`const school = options`
+
+​	可以直接在里面写配置项，因为父组件`components`引入的时候会自动调用`Vue.extends()`
+
+​	我们可以使用简写，但是要知道有这个`Vue.extends()`
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>几个注意点</title>
+    <script src="../js/vue.js"></script>
+</head>
+<body>
+    <div id="root">
+        <h1>{{msg}}</h1>
+        <school></school>
+    </div>
+    <script>
+        const school = Vue.extend({
+            name: 'changjiangdaxue',
+            template: `
+                <div>
+                    <h2>学校名称：{{name}}</h2>
+                    <h2>学校地址：{{address}}</h2>
+                </div>
+            `,
+            data() {
+                return {
+                    name: 'xx大学',
+                    address: 'HuBei'
+                }
+            },
+        })
+        const vm = new Vue({
+            el: '#root',
+            data: {
+                msg: '起飞'
+            },
+            components: {
+                school,
+            }
+        })
+    </script>
+</body>
+</html>
+```
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230318184918388.png" alt="image-20230318184918388" style="zoom:50%;" />
+
+### 2.2.3 组件的嵌套
+
+​	组件的嵌套就是我们刚开始的那个图
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230318155753942.png" alt="image-20230318155753942" style="zoom:50%;" />
+
+​	像react一样，我们在开发的时候都会用定义一个App来管理其他所有的组件，vm只管理App一个组件
+
+需求：定义一个三个组件: school、stduent、hello，其中school是student的父组件，这两个组件发生了嵌套，hello组件则是和school组件平级，这几个组件的父组件为app，app由vm直接管理
+
+**hello组件（它与school组件平级，是app的子组件）:**
+
+```javascript
+        // 定义hello组件，其与school组件平级
+        const hello = {
+            template: `<h1>{{msg}}</h1>`,
+            data() {
+                return {
+                    msg: '你好'
+                }
+            }
+
+        }
+```
+
+**student组件（它是school的子组件）：**
+
+```javascript
+        const student = {
+            template: `
+                <div>
+                    <h2>学生姓名：{{name}}</h2>
+                    <h2>学生年龄：{{age}}</h2>
+                </div>
+            `,
+            data() {
+                return {
+                    name: 'czq',
+                    age: 21
+                }
+            }
+        }
+```
+
+**school组件（它是student的父组件，是app的子组件，与hello组件平级）：**
+
+```javascript
+        // 定义school组件
+        const school = Vue.extend({
+            template: `
+                <div>
+                    <h2>学校名称：{{name}}</h2>
+                    <h2>学校地址：{{address}}</h2>
+                    <student></student>
+                    </div>
+            `,
+            data() {
+                return {
+                    name: 'xx大学',
+                    address: 'HuBei'
+                }
+            },
+            components: {
+                // 注册组件（局部）
+                student,
+            }
+        })
+```
+
+**app组件（它被vm直接管理，它管理所有的其他组件，是所有组件的父组件）：**
+
+```javascript
+        // 定义app组件，vm只管理它，它用于管理所有的其他组件
+        const app = Vue.extend({
+            template: `
+                <div>
+                    <school></school>
+                    <hello></hello>
+                </div>
+            `,
+            components: {
+                hello,
+                school
+            }
+        })
+```
+
+按上面的嵌套关系，我们的vm以及html结构可以这么写：
+
+```javascript
+        // 创建vm
+        const vm = new Vue({
+            el: '#root',
+            // 注册组件(局部)
+            components: {
+                app
+            },
+        })
+```
+
+```html
+    <div id="root">
+        <app></app>
+    </div>
+```
+
+​	vm直接管理app，app管理所有组件更符合真是的开发情况。
+
+调试结果：
+
+![image-20230318192917687](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230318192917687.png)
+
+![image-20230318192948534](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230318192948534.png)
+
+### 2.2.4 VueComponent构造函数
+
+```javascript
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VueComponent</title>
+    <script src="../js/vue.js"></script>
+</head>
+
+<body>
+    <div id="root">
+        <school></school>
+        <hello></hello>
+    </div>
+    <script>
+        // 定义school组件
+        const school = Vue.extend({
+            template: `
+                <div>
+                    <h2>学校名称：{{name}}</h2>
+                    <h2>学校地址：{{address}}</h2>
+                    <button @click="showName">点我提示学校名</button>
+                </div>
+            `,
+            data() {
+                return {
+                    name: 'xx大学',
+                    address: 'HuBei'
+                }
+            },
+            methods: {
+                showName() {
+                    console.log(this)
+                }
+            },
+
+        })
+
+        const test = Vue.extend({
+            template: `<span>起大飞</span>`
+        })
+
+        // 定义hello组件
+        const hello = Vue.extend({
+            template: `
+                <div>
+                    <h2>{{msg}}</h2>
+                    <test></test>
+                </div>
+            `,
+            data() {
+                return {
+                    msg: '你好'
+                }
+            },
+            components: {
+                test
+            }
+
+        })
+
+        // 创建vm
+        new Vue({
+            el: '#root',
+            components: {
+                school,
+                hello
+            }
+        })
+    </script>
+</body>
+
+</html>
+```
+
+​	关于VueComponent:
+
+  1. school组件本质是第一个名为`VueComponent`的构造函数，且不是程序员定义的，是`Vue.extend`生成的
+
+  2. 我们只需要写`<school></school>`或`<school/>`，Vue解析时会帮我们创建school组件的实例对象，即Vue帮我们执行的`new VueComponent(options)`
+
+  3. 特别注意：每次调用`Vue.extend`，返回的都是一个全新的VueComponent！！！
+
+  4. this指向：
+
+     1. 组件配置中：
+
+        data函数、methods中的函数、watch中的函数、computed中的函数，它们的this均是**【VueComponent实例对象】**
+
+     2. `new Vue(options)`配置中：
+
+        data函数、methods中的函数、watch中的函数、computed中的函数，它们的this均是**【Vue实例对象】**
+
+  5. VueComponent的实例对象，以后简称vc（也可以称之为：**组件实例对象**）
+
+​		Vue的实例对象，以后简称vm
+
+​	可以这么理解：一个组件就是一个VueComponent，多个组件虽然其本质相同，但是是不同的VueComponent，它们会创建出自己的组件实例对象
+
+​	当我们在vm的`components`里面注册组件的时候，Vue实例对象里面会有相应的子组件信息
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230320162134968.png" alt="image-20230320162134968" style="zoom:50%;" />
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230320162156159.png" alt="image-20230320162156159" style="zoom:50%;" />
+
+### 2.2.5 Vue实例与组件实例的内置关系
+
+**补充：关于原型链的相关知识：**
+
+```javascript
+        // 定义一个构造函数
+        function Demo() {
+            this.a = 1,
+            this.b = 2
+        }
+        // 创建一个Demo实例对象
+        const d = new Demo()
+        console.log(Demo.prototype);  //显式原型属性
+        console.log(d.__proto__); //隐式原型属性
+        console.log(Demo.prototype === d.__proto__);
+
+        // 程序员通过显式原型属性操作原型对象，追加一个x属性，x为99
+        Demo.prototype.x = 99
+
+        console.log(d.__proto__.x);
+```
+
+Demo的显式原型属性与Demo的实例对象d的隐式原型属性指向都是相同的
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230320175450087.png" alt="image-20230320175450087" style="zoom:50%;" />
+
+**实例的隐式原型属性，永远指向自己缔造者的原型对象**
+
+Vue构造函数缔造了**vm**，VueComponent构造函数缔造了**vc**，所以构造函数（Vue构造函数、VueComponent构造函数）的显式原型和实例对象（vm、vc）的隐式原型都会指向同一组
+
+所以按理来说，所有的原型对象最终的原型链都会指向Object的原型对象，就像下面的图一样
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230320172125349.png" alt="image-20230320172125349" style="zoom:50%;" />
+
+​	但是Vue做了一件事：让**VueComponent的原型对象的隐式原型属性**指向了**Vue的原型对象**，没有直接指向Object原型对象
+
+![image-20230320172546242](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230320172546242.png)
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>一个重要的内置关系</title>
+    <script src="../js/vue.js"></script>
+</head>
+<body>
+    <div id="root">
+        <school></school>
+    </div>
+    <script>
+        Vue.prototype.x = 100
+        // 定义一个组件
+        const school = Vue.extend({
+            template: `
+                <div>
+                    <h2>学校名称：{{name}}</h2>
+                    <h2>学校地址：{{address}}</h2>
+                    <button @click='showInstance'>点我输出VueComponent实例对象</button>
+                </div>
+            `,
+            data(){
+                return {
+                    name: 'xx大学',
+                    address: 'HuBei'
+                }
+            },
+            methods: {
+                showInstance(){
+                    console.log(this);
+                }
+            },
+        })
+        // 创建一个vm
+        const vm = new Vue({
+            el: '#root',
+            components: {
+                school
+            }
+        })
+    </script>
+</body>
+</html>
+```
+
+在这里，我们最开始在Vue的原型对象中追加了一个属性x，并且后面使用了一个按钮来让控制台打印出VueComponent的实例对象vc,当我们尝试读取vc身上的x属性时，js根据原型链查找的关系，最终走的那一条被Vue强制更改的重要路线，在Vue实例对象上找到了x这个属性并成功让我们读取出来
+
+```javascript
+Vue.prototype.x = 100
+```
+
+```javascript
+        const school = Vue.extend({
+            template: `
+                <div>
+                    <button @click='showInstance'>点我输出VueComponent实例对象</button>
+                </div>
+            `,
+            methods: {
+                showInstance(){
+                    console.log(this);
+                }
+            },
+        })
+```
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230320180515150.png" alt="image-20230320180515150" style="zoom:50%;" />
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230320180608923.png" alt="image-20230320180608923" style="zoom:50%;" />
+
+![image-20230320181403557](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230320181403557.png)
+
+我们读取到了被Vue更改的那条原型链，如果在vc上读取x，将也会读出x的值
+
+```javascript
+        const school = Vue.extend({
+            template: `
+                <div>
+                    <button @click='showX'>点我读取组件实例对象（vc）上的x的值</button>
+                </div>
+            `,
+            data(){
+                return {
+                    name: 'xx大学',
+                    address: 'HuBei'
+                }
+            },
+            methods: {
+                showX(){
+                    console.log(this.x);
+                }
+            },
+
+        })
+```
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230320182057067.png" alt="image-20230320182057067" style="zoom:50%;" />
+
+​	成功读出我们放在Vue原型对象中的x，验证了那条线

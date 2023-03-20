@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>一个重要的内置关系</title>
+    <script src="../js/vue.js"></script>
+</head>
+<body>
+    <div id="root">
+        <school></school>
+    </div>
+    <script>
+        Vue.prototype.x = 100
+        // 定义一个组件
+        const school = Vue.extend({
+            template: `
+                <div>
+                    <h2>学校名称：{{name}}</h2>
+                    <h2>学校地址：{{address}}</h2>
+                    <button @click='showInstance'>点我输出VueComponent实例对象</button>
+                    <br/>
+                    <button @click='showX'>点我读取组件实例对象（vc）上的x的值</button>
+                </div>
+            `,
+            data(){
+                return {
+                    name: 'xx大学',
+                    address: 'HuBei'
+                }
+            },
+            methods: {
+                showInstance(){
+                    console.log(this);
+                },
+                showX(){
+                    console.log(this.x);
+                }
+            },
+
+        })
+        // 创建一个vm
+        const vm = new Vue({
+            el: '#root',
+            components: {
+                school
+            }
+        })
+
+        // 定义一个构造函数
+        function Demo() {
+            this.a = 1,
+            this.b = 2
+        }
+        // 创建一个Demo实例对象
+        const d = new Demo()
+        console.log(Demo.prototype);  //显式原型属性
+        console.log(d.__proto__); //隐式原型属性
+        console.log(Demo.prototype === d.__proto__);
+
+        // 程序员通过显式原型属性操作原型对象，追加一个x属性，x为99
+        Demo.prototype.x = 99
+
+        console.log(d.__proto__.x);
+    </script>
+</body>
+</html>

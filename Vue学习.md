@@ -4642,3 +4642,56 @@ createApp(App).mount('#app')
 ```
 
 ![image-20230320211103034](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230320211103034.png)
+
+#### 3.1.4 main.js中的render函数
+
+​	为什么会用render不用template？ 因为 默认引入的Vue => `import Vue from 'vue'` 是残缺版的，完整版在vue/dist/vue这个里面包含模板解析器。
+
+​	默认脚手架生成的main.js入口文件：
+
+```javascript
+import Vue from "vue";
+import App from "./App.vue";
+
+// 创建vm
+new Vue({
+  // 完成这样的功能：将App组件挂载到容器中。类似于 template：‘<App></App>’ 的作用，但这里不能使用template。
+  render: (h) => h(App)
+}).$mount("#app");
+
+// 关闭Vue生产提示
+// Vue.config.productionTip = false
+
+```
+
+​	因为vue考虑到了开发完成之后，模板编译器会占用到用户不必要的空间，所以为我们默认引入的是阉割版的vue，如果我们引入的是完整版的vue，实际上等同于下列写法
+
+```javascript
+import Vue from "vue";
+import App from "./App.vue";
+
+
+new Vue({
+  el: "#app",
+  // createElement是一个形参
+  render(createElement) {
+    return createElement(App);
+  },
+});
+
+// Vue.config.productionTip = false
+
+```
+
+​	关于不同版本的Vue：
+
+1. vue.js与vue.runtime.xxx.js的区别：
+   1. vue.js是完整版的Vue，包含：核心功能+模板解析器
+   2. vue.runtime.xxx.js是运行版的Vue，只包含：核心功能，没有模板解析器
+2. 因为vue.runtime.xxx.js没有模板解析器，所以不能使用template配置项，需要使用render函数接收到createElement函数去指定具体内容
+
+#### 3.1.5 vue.config.js配置文件
+
+​	使用·vue inspect > output.js可以**查看到**Vue脚手架的默认配置
+
+​	使用`vue.config.js`可以对脚手架进行个性化定制，详情见https://cli.vuejs.org/zh/config/

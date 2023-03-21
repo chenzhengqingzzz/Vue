@@ -4431,15 +4431,15 @@ const vm = new Vue({
 
 # 3. 使用Vue脚手架
 
-### 3.1 初始化脚手架
+## 3.1 初始化脚手架
 
-#### 3.1.1 说明
+### 3.1.1 说明
 
 	1. Vue脚手架是Vue官方提供的标准化开发工具（开发平台）
 	1. 最新的版本是4.x
 	1. 文档：https://cli.vuejs.org/zh/
 
-#### 3.1.2 具体步骤
+### 3.1.2 具体步骤
 
 1. 如果下载缓慢请配置npm淘宝镜像`npm config set registry http://registry.npm.taoba.org`
 2. 全局安装@vue/cli：`npm install -g @vue/cli`
@@ -4451,7 +4451,7 @@ const vm = new Vue({
 
 Vue脚手架隐藏了所有`webpack`相关的配置，若想要查看具体的`webpack`配置，请执行：`vue inspect > output.js`
 
-#### 3.1.3 脚手架文件结构
+### 3.1.3 脚手架文件结构
 
 ```markdown
 .项目文件
@@ -4643,7 +4643,7 @@ createApp(App).mount('#app')
 
 ![image-20230320211103034](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230320211103034.png)
 
-#### 3.1.4 main.js中的render函数
+### 3.1.4 main.js中的render函数
 
 ​	为什么会用render不用template？ 因为 默认引入的Vue => `import Vue from 'vue'` 是残缺版的，完整版在vue/dist/vue这个里面包含模板解析器。
 
@@ -4690,13 +4690,13 @@ new Vue({
    2. vue.runtime.xxx.js是运行版的Vue，只包含：核心功能，没有模板解析器
 2. 因为vue.runtime.xxx.js没有模板解析器，所以不能使用template配置项，需要使用render函数接收到createElement函数去指定具体内容
 
-#### 3.1.5 vue.config.js配置文件
+### 3.1.5 vue.config.js配置文件
 
 ​	使用·vue inspect > output.js可以**查看到**Vue脚手架的默认配置
 
 ​	使用`vue.config.js`可以对脚手架进行个性化定制，详情见https://cli.vuejs.org/zh/config/
 
-### 3.2 ref属性
+## 3.2 ref属性
 
 ​	ref是Vue提供的操作DOM的属性，相比于js中给标签添加id，在通过`doucument.getElementById()`获取DOM，**可以直接获取子组件标签的实例对象**。作用如下
 
@@ -4777,3 +4777,96 @@ export default {
 ```
 
 <img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230321192724389.png" alt="image-20230321192724389" style="zoom:50%;" />
+
+## 3.3 props配置项
+
+​	props功能是为了让组件接收外部传来的数据。**props是只读的**，Vue底层会监测你对pros的修改，如果你进行了修改，就会发出警告。注意：由于props的渲染登记高于data，若业务需求确实需要修改，那么请复制一份props的内容放到data中，然后再去修改data中的数据
+
+props适用于：
+
+	1. 父组件 ==> 子组件 通信
+	1. 子组件 ==> 父组件 通信（要求父先给子一个函数） 后面的TodoList案例会学到
+
+注意：
+
+1. 使用`v-model`时要切记：`v-model`绑定的值不鞥是props传过来的值，因为props是不可以被修改的！
+2. props传过来的若是对象类型的值，修改对象中的属性时Vue不会报错，但不推荐这样做
+
+父组件App
+
+```vue
+<template>
+  <div>
+    <Student name="李四" sex="female" :age="18"/>
+    <Student name="王老五" sex="male" :age="19"/>
+  </div>
+</template>
+```
+
+子组件Student
+
+```vue
+<template>
+  <div>
+    <h1>{{msg}}</h1>
+    <h2>学生姓名：{{name}}</h2>
+    <h2>学生性别：{{sex}}</h2>
+    <h2>学生年龄：{{ageFromProps + 1}}</h2>
+    <button @click="updateAge">尝试修改收到的年龄</button>
+  </div>
+</template>
+
+<script>
+export default {
+    name: 'Student',
+    data() {
+      console.log(this);
+        return {
+            msg: '我是一个学生',
+            ageFromProps: this.age
+        }
+    },
+    //简单声明接收
+    // props: ['name', 'sex', 'age']
+
+    // 接收的同时对数据进行类型限制
+    // props: {
+    //   name: String,
+    //   sex: String,
+    //   age: Number
+    // }
+
+    // 接收的同时对数据进行类型限制+默认值的指定+必要性的限制
+    props: {
+      name: {
+        type: String, //name的类型是字符串
+        required: true //name是必传的
+      },
+      age: {
+        type: Number, //age的类型是字符串
+        default: 99 //不传的话设置一个默认值
+      },
+      sex: {
+        type: String,
+        required: true
+      }
+    },
+    methods: {
+      updateAge(){
+        this.ageFromProps = 22
+      }
+    }
+}
+</script>
+
+```
+
+​	子组件接收props有三种接收方法：**简单声明**、**限定类型**以及**限定类型、默认值、必要性**
+
+​	我们对子组件传入的props中的age进行了加工：1. 在App中将其变成一个JS表达式，将其变成了Number类型，让我们直接在标签进行运算；2. 将props中的age复制了一份放入了data（与msg同级），它就有了可以被我们修改的功能，另外，传入的prop都会保存在Student的vc（组件实例对象）中
+
+调试结果：
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230321204422096.png" alt="image-20230321204422096" style="zoom:50%;" />
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230321204446648.png" alt="image-20230321204446648" style="zoom:50%;" />

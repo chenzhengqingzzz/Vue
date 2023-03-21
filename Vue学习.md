@@ -1,4 +1,4 @@
-# 1. Vue基础知识和原理
+# j1. Vue基础知识和原理
 
 ## 1.1 初识Vue
 
@@ -4695,3 +4695,85 @@ new Vue({
 ​	使用·vue inspect > output.js可以**查看到**Vue脚手架的默认配置
 
 ​	使用`vue.config.js`可以对脚手架进行个性化定制，详情见https://cli.vuejs.org/zh/config/
+
+### 3.2 ref属性
+
+​	ref是Vue提供的操作DOM的属性，相比于js中给标签添加id，在通过`doucument.getElementById()`获取DOM，**可以直接获取子组件标签的实例对象**。作用如下
+
+1. 被用来给元素或子组件注册引用信息（id的替代者）
+2. 应用在HTML标签上获取的是真实DOM元素,应用在组件标签上获取的是组件实例对象（vc）
+3. 使用方式：
+   * 打标识：`<h1 ref="xxx">...</h1>`或`<School ref="xxx"></School>`
+   * 获取：`this.$refs.xxx`
+
+App.vue
+
+​	当我们想组件标签打上标识的时候，如果使用的是原生的id，则获取的是一个真实DOM节点
+
+```html
+ <School id="sch"/>
+```
+
+```javascript
+    methods: {
+      showDOM(){
+        console.log(document.getElementById('sch'));
+      }
+    },
+```
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230321192345157.png" alt="image-20230321192345157" style="zoom:50%;" />
+
+​	当用Vue为我们提供的ref给标签打标识的时候，返回的是组件实例对象（School的vc）
+
+```html
+<School ref="sch"/>
+```
+
+```javascript
+    methods: {
+      showDOM(){
+        console.log(this.$refs.sch);
+      }
+    },
+```
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230321192521741.png" alt="image-20230321192521741" style="zoom:50%;" />
+
+​	在用到父子组件互相传参的时候，获取的这个vc将非常有用。
+
+App.vue
+
+```vue
+<template>
+  <div>
+    <h1 v-text="msg" ref="title"></h1>
+    <button ref="btn" @click="showDOM">点我输出打上ref标识的标签</button>
+    <School ref="sch"/>
+  </div>
+</template>
+
+<script>
+// 引入School组件
+import School from './components/School.vue'
+
+export default {
+    name: 'App',
+    components: {
+        School,
+    },
+    data() {
+      return {
+        msg:'欢迎学习Vue！'
+      }
+    },
+    methods: {
+      showDOM(){
+        console.log(this.$refs);
+      }
+    },
+}
+</script>
+```
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230321192724389.png" alt="image-20230321192724389" style="zoom:50%;" />

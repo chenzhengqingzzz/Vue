@@ -5074,3 +5074,39 @@ new Vue({
 <img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230322190858909.png" alt="image-20230322190858909" style="zoom:50%;" />
 
 <img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230322190954274.png" alt="image-20230322190954274" style="zoom:50%;" />
+
+## 3.6 scoped样式
+
+​	我们在给每个组件写样式的时候，Vue会在编译过程中将我们写的所有样式全部汇总起来，而我们在每个组件写的样式标识很有可能会重复，scoped的作用就是	让样式在局部生效，防止冲突。
+
+​	写法：`<style scoped></style>`，它编译时会打包成一个文件，可以解决类名一致样式冲突问题
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230322202354923.png" alt="image-20230322202354923" style="zoom:50%;" />
+
+​	`<style lang="less" scoped></style>` less相比css，支持嵌套语句。使用less需要安装less-loader
+
+```shell
+// 两条语句学习一下
+// 查看目前发布的版本
+npm view xxxx versions
+
+// 安装指定版本的工具
+npm install xxxx@版本号
+
+```
+
+Student.vue中的样式：	
+
+实现的效果：
+
+```less
+<style lang="less" scoped>
+.demo {
+  background-color: orange;
+  .qifeiqifei {
+    font-size: 40px;
+  }
+}
+</style>
+```
+

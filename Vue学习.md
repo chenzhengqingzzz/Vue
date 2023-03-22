@@ -4989,3 +4989,88 @@ new Vue({
 <img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230322182223501.png" alt="image-20230322182223501" style="zoom:50%;" />
 
 ​	这里可以体现出全局的混合，以及我们的Student组件中自己配置的data会覆盖mixin中的配置
+
+## 3.5 插件
+
+​	功能：用于增强Vue
+
+​	本质：包含install方法的一个对象，install的第一个参数是Vue，第二个以后的参数是插件使用者传递的数据
+
+​	plugin.js
+
+```javascript
+export default {
+    install(Vue){
+        // 全局过滤器
+        // 过滤出索引为0~4的字符
+        Vue.filter('mySlice', function(value) {
+            return value.slice(0, 4)
+        })
+
+        // 全局指令
+        // 实现v-bind并默认获取焦点
+        Vue.directive('fbind', {
+            // 当指令与元素成功绑定时（一上来）
+            bind(element, binding){
+                element.value = binding.value
+            },
+            // 指令所在的元素被插入页面时
+            inserted(element, binding){
+                element.focus()
+            },
+            // 指令所在的模板被重新解析时
+            update(element, binding){
+               element.value = binding.value
+            }
+        })
+
+        // 混入
+        Vue.mixin({
+            data(){
+                return {
+                    x: 100,
+                    y: 200
+                }
+            }
+        })
+
+        // 给Vue原型上添加一个方法（vm和vc就都能用了）
+        Vue.prototype.hello = () => {
+            alert('你好啊')
+        }
+
+        // 给Vue原型上添加一个属性（vm和vc就都能用了）
+        Vue.prototype.x = 100
+    }
+}
+```
+
+​	install函数里面就可以写我们前面学过的全局过滤器、全局自定义指令和全局的混入等等，由于install函数传入的是Vue实例对象（vm的缔造者），我们就可以在全局用上我们所定义的所有过滤器、自定义指令和混入，拿来就可以用。
+
+main.js
+
+```javascript
+// 引入Vue
+import Vue from 'vue';
+// 引入App
+import App from './App'
+// 引入插件
+import plugins from './plugins';
+// 关闭Vue的生产提示
+Vue.config.productionTip = false
+
+// 应用（使用）插件
+Vue.use(plugins)
+
+// 创建vm
+new Vue({
+    el: '#app',
+    render(h) {
+        return h(App)
+    },
+})
+```
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230322190858909.png" alt="image-20230322190858909" style="zoom:50%;" />
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230322190954274.png" alt="image-20230322190954274" style="zoom:50%;" />

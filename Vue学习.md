@@ -4870,3 +4870,122 @@ export default {
 <img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230321204422096.png" alt="image-20230321204422096" style="zoom:50%;" />
 
 <img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230321204446648.png" alt="image-20230321204446648" style="zoom:50%;" />
+
+## 3.4 mixin混入
+
+​	mixin有混合的意思，mixin用于抽取**公共的配置项**为混入对象。通过`improt xxx from '...'`导入，与`mixins: [xxx, ...]`将抽取出来的配置与自身配置进行整合
+
+​	当配置出现冲突时，**生命周期来者不拒**，混合在前自身在后。除生命周期函数之外的配置**以自身配置为主**，覆盖掉混合配置
+
+​	因为School和Sudent这俩组件都有公共的showName()方法，我们则可以把它提取出来放在mixin.js中
+
+mixin.js
+
+```javascript
+// mixin.js
+export const mixin = {
+  // 	除了methods,还可以配置data、 mounted等等诸多配置。
+  methods: {
+    showName() {
+      alert(this.name);
+    },
+  },
+  export const mixin2 = {
+    data() {
+        return {
+            x: 100,
+            y: 200
+        }
+    },
+};
+
+```
+
+School.vue
+
+```vue
+<template>
+  <div>
+    <h2 @click="showName">学校名称：{{name}}</h2>
+    <h2>学校地址：{{address}}</h2>
+  </div>
+</template>
+
+<script>
+// 引入一个混合
+import {mixin, mixin2} from '../mixin'
+export default {
+    name: 'School',
+    data() {
+        return {
+            name: 'xx大学',
+            address: 'HuBei'
+        }
+    },
+  	// 通过mixins配置
+    mixins: [mixin]
+}
+</script>
+
+```
+
+Student.vue
+
+```vue
+<template>
+  <div>
+    <h2 @click="showName">学生姓名：{{name}}</h2>
+    <h2>学生性别：{{sex}}</h2>
+  </div>
+</template>
+
+<script>
+// 引入一个混合
+import {mixin, mixin2} from '../mixin'
+
+export default {
+    name: 'Student',
+    data() {
+      console.log(this);
+        return {
+            name: '张三',
+            sex: '男',
+            x: 666
+        }
+    },
+  	// 通过mixins配置
+    mixins: [mixin]
+}
+</script>
+
+```
+
+上述引用方式属于局部引用，下列配置属于全局引用，作用在main.js，全局混入会给vm下的所有vc添加响应的配置。
+
+main.js
+
+```vue
+// 引入Vue
+import Vue from 'vue';
+// 引入App
+import App from './App'
+import { mixin, mixin2 } from "./mixin";
+// 关闭Vue的生产提示
+Vue.config.productionTip = false
+Vue.mixin(mixin)
+Vue.mixin(mixin2)
+
+// 创建vm
+new Vue({
+    el: '#app',
+    render(h) {
+        return h(App)
+    },
+})
+```
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230322182200835.png" alt="image-20230322182200835" style="zoom:50%;" />
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230322182223501.png" alt="image-20230322182223501" style="zoom:50%;" />
+
+​	这里可以体现出全局的混合，以及我们的Student组件中自己配置的data会覆盖mixin中的配置

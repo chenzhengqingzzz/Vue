@@ -5110,3 +5110,357 @@ Student.vue中的样式：
 </style>
 ```
 
+## 3.7 TodoList案例
+
+### 3.7.1 静态组件的分类
+
+​	在我们开发时，尤其是在做老项目移植的组件开发时，往往我们要想着按照需求合理的拆分组件，我们做的这个TodoList案例也是如此
+
+**组件化编码流程：**
+
+​	 1. 拆分静态组件：组件要按照功能点拆分，命名不要与html元素冲突
+
+   	2. 实现动态组件：考虑好数据的存放位置，数据是一个组件在用，还是一些组件在用：
+        	1.  一个组件在用：放在组件自身即可
+        	2. 一些组件在用：放在他们共同的父组件上（状态提升）
+   	3. 实现交互：从绑定事件开始
+
+按照业务需求：我们拆分了这几个组件：Header、List、Item、Footer 其中Item是List的子组件
+
+App.vue:
+
+```vue
+<template>
+  <div id="root">
+    <div class="todo-container">
+      <div class="todo-wrap">
+        <Header/>
+        <List/>
+        <Footer/>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import Header from "./components/Header.vue";
+import List from "./components/List.vue";
+import Footer from "./components/Footer.vue";
+
+export default {
+  name: "App",
+  components: {
+    Header,
+    List,
+    Footer,
+  },
+};
+</script>
+
+<style>
+/*base*/
+body {
+  background: #fff;
+}
+
+.btn {
+  display: inline-block;
+  padding: 4px 12px;
+  margin-bottom: 0;
+  font-size: 14px;
+  line-height: 20px;
+  text-align: center;
+  vertical-align: middle;
+  cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 1px 2px rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+}
+
+.btn-danger {
+  color: #fff;
+  background-color: #da4f49;
+  border: 1px solid #bd362f;
+}
+
+.btn-danger:hover {
+  color: #fff;
+  background-color: #bd362f;
+}
+
+.btn:focus {
+  outline: none;
+}
+
+.todo-container {
+  width: 600px;
+  margin: 0 auto;
+}
+.todo-container .todo-wrap {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+</style>
+```
+
+Heder.vue:
+
+```vue
+<template>
+  <div class="todo-header">
+    <input type="text" placeholder="请输入你的任务名称，按回车键确认" />
+  </div>
+</template>
+
+<script>
+export default {
+  name: "Header",
+};
+</script>
+
+<style scoped>
+    /*Header*/
+    .todo-header input {
+    width: 560px;
+    height: 28px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 4px 7px;
+    }
+
+    .todo-header input:focus {
+    outline: none;
+    border-color: rgba(82, 168, 236, 0.8);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075),
+        0 0 8px rgba(82, 168, 236, 0.6);
+    }
+</style>
+```
+
+List.vue:
+
+```vue
+<template>
+  <Item />
+</template>
+
+<script>
+import Item from "./Item.vue";
+
+export default {
+  name: "List",
+  components: {
+    Item,
+  },
+};
+</script>
+
+<style scoped>
+    /*List*/
+    .todo-main {
+    margin-left: 0px;
+    border: 1px solid #ddd;
+    border-radius: 2px;
+    padding: 0px;
+    }
+
+    .todo-empty {
+    height: 40px;
+    line-height: 40px;
+    border: 1px solid #ddd;
+    border-radius: 2px;
+    padding-left: 5px;
+    margin-top: 10px;
+    }
+</style>
+```
+
+Item.vue:
+
+```vue
+<template>
+  <ul class="todo-main">
+    <li>
+      <label>
+        <input type="checkbox" />
+        <span>xxxxx</span>
+      </label>
+      <button class="btn btn-danger" style="display: none">删除</button>
+    </li>
+  </ul>
+</template>
+
+<script>
+export default {
+  name: "Item",
+};
+</script>
+
+<style scoped>
+    /*Item*/
+    li {
+    list-style: none;
+    height: 36px;
+    line-height: 36px;
+    padding: 0 5px;
+    border-bottom: 1px solid #ddd;
+    }
+
+    li label {
+    float: left;
+    cursor: pointer;
+    }
+
+    li label li input {
+    vertical-align: middle;
+    margin-right: 6px;
+    position: relative;
+    top: -1px;
+    }
+
+    li button {
+    float: right;
+    display: none;
+    margin-top: 3px;
+    }
+
+    li:before {
+    content: initial;
+    }
+
+    li:last-child {
+    border-bottom: none;
+    }
+</style>
+```
+
+Footer.vue
+
+```vue
+<template>
+  <ul class="todo-main">
+    <li>
+      <label>
+        <input type="checkbox" />
+        <span>xxxxx</span>
+      </label>
+      <button class="btn btn-danger" style="display: none">删除</button>
+    </li>
+  </ul>
+</template>
+
+<script>
+export default {
+  name: "Item",
+};
+</script>
+
+<style scoped>
+    /*Item*/
+    li {
+    list-style: none;
+    height: 36px;
+    line-height: 36px;
+    padding: 0 5px;
+    border-bottom: 1px solid #ddd;
+    }
+
+    li label {
+    float: left;
+    cursor: pointer;
+    }
+
+    li label li input {
+    vertical-align: middle;
+    margin-right: 6px;
+    position: relative;
+    top: -1px;
+    }
+
+    li button {
+    float: right;
+    display: none;
+    margin-top: 3px;
+    }
+
+    li:before {
+    content: initial;
+    }
+
+    li:last-child {
+    border-bottom: none;
+    }
+</style>
+```
+
+调试结果：
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230323170951480.png" alt="image-20230323170951480" style="zoom:50%;" />
+
+### 3.7.2 TodoList案例 初始化列表
+
+​	拆分完静态组建后我们就该考虑数据交互的事情了，我们选择将数据存放在List中，Item读取List通过props传值，里面用到了props和绑定
+
+​	List.vue
+
+```html
+<template>
+  <ul class="todo-main">
+    <Item v-for="todoObj in todos" :key=todoObj.id :todo="todoObj" />
+  </ul>
+</template>
+```
+
+```javascript
+  data() {
+    return {
+      todos: [
+        { id: "001", title: "唱", isDone: true },
+        { id: "002", title: "跳", isDone: true },
+        { id: "003", title: "rap", isDone: true },
+        { id: "004", title: "篮球", isDone: false },
+      ],
+    };
+  },
+};
+```
+
+​	这里用到了v-for指令并且通过props传递参数给子组件Item
+
+​	item.vue
+
+```html
+<template>
+  <ul class="todo-main">
+    <li>
+      <label>
+        <input type="checkbox" :checked="this.todo.isDone" />
+        <span>{{ this.todo.title }}</span>
+      </label>
+      <button class="btn btn-danger" style="display: none">删除</button>
+    </li>
+  </ul>
+</template>
+```
+
+```javascript
+export default {
+  name: "Item",
+  props: {
+    // 声明接收todo对象
+    todo: {
+      type: Object,
+      required: true,
+    },
+  },
+};
+</script>
+```
+
+​	这里用v-bind而不用v-model指令来管理数据的原因是：props传递的参数是只读的，用v-model无法修改
+
+调试结果：
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230324153027916.png" alt="image-20230324153027916" style="zoom:50%;" />

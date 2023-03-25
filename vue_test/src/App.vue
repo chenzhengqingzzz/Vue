@@ -2,9 +2,10 @@
   <div id="root">
     <div class="todo-container">
       <div class="todo-wrap">
-        <Header/>
-        <List/>
-        <Footer/>
+        <!-- 通过props传给子组件一个函数 -->
+        <Header :addTodo="addTodo" />
+        <List :todos="todos" />
+        <Footer />
       </div>
     </div>
   </div>
@@ -21,6 +22,22 @@ export default {
     Header,
     List,
     Footer,
+  },
+  data() {
+    return {
+      todos: [
+        { id: "001", title: "唱", isDone: true },
+        { id: "002", title: "跳", isDone: true },
+        { id: "003", title: "rap", isDone: true },
+        { id: "004", title: "篮球", isDone: false },
+      ],
+    };
+  },
+  methods: {
+    // 当初传给子组件的函数
+    addTodo(todoObj){
+      this.todos.unshift(todoObj)
+    }
   },
 };
 </script>
@@ -70,3 +87,4 @@ body {
   border-radius: 5px;
 }
 </style>
+

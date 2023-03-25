@@ -5464,3 +5464,206 @@ export default {
 调试结果：
 
 <img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230324153027916.png" alt="image-20230324153027916" style="zoom:50%;" />
+
+### 3.7.3 TodoList案例 添加
+
+​	上一节，我们将Todos这个数据存在了List组件中，这一节我们要在Header组件输入文字实现添加的功能，要涉及到兄弟组件（Header组件将数据传给List组件）通信，这可以通过全局事件总线、vuex实现，我们这一节主要掌握另外一种方式：Header组件与父组件App通信，再让父组件App通过props将数据传给子组件List
+
+​	父子组件通信方式我们可以用props解决，子组件传数据给父组件我们也可以通过props解决，要求是当初父组件传一个函数个子组件，子组件在进行通信的时候调用这个函数。
+
+App.vue
+
+```vue
+<template>
+  <div id="root">
+    <div class="todo-container">
+      <div class="todo-wrap">
+        <!-- 通过props传给子组件一个函数 -->
+        <Header :addTodo="addTodo" />
+        <List :todos="todos" />
+        <Footer />
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import Header from "./components/Header.vue";
+import List from "./components/List.vue";
+import Footer from "./components/Footer.vue";
+
+export default {
+  name: "App",
+  components: {
+    Header,
+    List,
+    Footer,
+  },
+  data() {
+    return {
+      todos: [
+        { id: "001", title: "唱", isDone: true },
+        { id: "002", title: "跳", isDone: true },
+        { id: "003", title: "rap", isDone: true },
+        { id: "004", title: "篮球", isDone: false },
+      ],
+    };
+  },
+  methods: {
+    // 当初传给子组件的函数
+    addTodo(todoObj){
+      this.todos.unshift(todoObj)
+    }
+  },
+};
+</script>
+
+<style>
+/*base*/
+body {
+  background: #fff;
+}
+
+.btn {
+  display: inline-block;
+  padding: 4px 12px;
+  margin-bottom: 0;
+  font-size: 14px;
+  line-height: 20px;
+  text-align: center;
+  vertical-align: middle;
+  cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 1px 2px rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+}
+
+.btn-danger {
+  color: #fff;
+  background-color: #da4f49;
+  border: 1px solid #bd362f;
+}
+
+.btn-danger:hover {
+  color: #fff;
+  background-color: #bd362f;
+}
+
+.btn:focus {
+  outline: none;
+}
+
+.todo-container {
+  width: 600px;
+  margin: 0 auto;
+}
+.todo-container .todo-wrap {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+</style>
+
+
+```
+
+Header.vue
+
+这里生成id引入了一个库：nanoid
+
+```vue
+<template>
+  <div class="todo-header">
+    <input type="text" placeholder="请输入你的任务名称，按回车键确认" v-model="title" @keyup.enter="addData" />
+  </div>
+</template>
+
+<script>
+import {nanoid} from 'nanoid'
+export default {
+  name: "Header",
+  // 声明接收这个函数
+  props: ['addTodo'],
+  data() {
+    return {
+      title : ''
+    }
+  },
+  methods: {
+    addData(){
+      // 校验数据
+      if(!this.title.trim()) return alert('输入不能为空！')
+      // 将用户的输入包装成一个todo对象
+      const todoObj = {id: nanoid(), title: this.title, done: false}
+      // 通知App组件去添加一个todo对象
+      this.addTodo(todoObj)
+      // 清空输入
+      this.title = ''
+    }
+  },
+};
+</script>
+
+<style scoped>
+    /*Header*/
+    .todo-header input {
+    width: 560px;
+    height: 28px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 4px 7px;
+    }
+
+    .todo-header input:focus {
+    outline: none;
+    border-color: rgba(82, 168, 236, 0.8);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075),
+        0 0 8px rgba(82, 168, 236, 0.6);
+    }
+</style>
+```
+
+修改过后的List.vue:
+
+```vue
+<template>
+  <ul class="todo-main">
+    <Item v-for="todoObj in todos" :key=todoObj.id :todo="todoObj" />
+  </ul>
+</template>
+
+<script>
+import Item from "./Item.vue";
+
+export default {
+  name: "List",
+  components: {
+    Item,
+  },
+  props: ['todos']
+
+};
+</script>
+
+<style scoped>
+/*List*/
+.todo-main {
+  margin-left: 0px;
+  border: 1px solid #ddd;
+  border-radius: 2px;
+  padding: 0px;
+}
+
+.todo-empty {
+  height: 40px;
+  line-height: 40px;
+  border: 1px solid #ddd;
+  border-radius: 2px;
+  padding-left: 5px;
+  margin-top: 10px;
+}
+</style>
+```
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230325171207846.png" alt="image-20230325171207846" style="zoom:50%;" />

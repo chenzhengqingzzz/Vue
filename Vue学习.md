@@ -5749,3 +5749,153 @@ Item.vue
 ​	调试结果：
 
 <img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230327155954133.png" alt="image-20230327155954133" style="zoom:50%;" />
+
+### 3.7.5 TodoList案例 删除
+
+​	同样的在App里操作数据，涉及到逐级传递函数
+
+App.vue
+
+```vue
+<List :todos="todos" :changeIsDone="changeIsDone" :deleteTodo="deleteTodo" />
+```
+
+methods中
+
+```javascript
+    // 删除一个todo
+    deleteTodo(id){
+      this.todos = this.todos.filter((todo) => {
+        return todo.id !== id
+      })
+    }
+```
+
+​	这里用到了filter方法过滤一个全新的数组并重新赋给原数组，不会造成性能浪费，因为我们id已经维护好了
+
+List.vue
+
+```vue
+    <Item
+      v-for="todoObj in todos"
+      :key="todoObj.id"
+      :todo="todoObj"
+      :changeIsDone="changeIsDone"
+      :deleteTodo="deleteTodo"
+    />
+```
+
+```javascript
+  props: ["todos", "changeIsDone", "deleteTodo"],
+```
+
+Item.vue
+
+```vue
+<template>
+  <ul class="todo-main">
+    <li>
+      <label>
+        <input
+          type="checkbox"
+          :checked="this.todo.isDone"
+          @change="handleCheck(todo.id)"
+        />
+        <!-- 如下代码也能实现功能，但是不太推荐，因为有点违反原则，修改了props -->
+        <!-- <input type="checkbox" v-model="this.todo.isDone" > -->
+        <span>{{ this.todo.title }}</span>
+      </label>
+      <button class="btn btn-danger" @click="handleDelete(todo.id)">删除</button>
+    </li>
+  </ul>
+</template>
+
+<script>
+export default {
+  name: "Item",
+  mounted() {
+    console.log(this);
+  },
+  props: {
+    // 声明接收todo对象
+    todo: {
+      type: Object,
+      required: true,
+    },
+    changeIsDone: {
+      type: Function,
+      required: true
+    },
+    deleteTodo: {
+      type: Function,
+      required: true
+    }
+  },
+  methods: {
+    // 勾选or取消勾选
+    handleCheck(id) {
+      // 通知App组件将对应的todo对象的idDone值取反
+      this.changeIsDone(id)
+    },
+    // 删除
+    handleDelete(id){
+      if (confirm('确定删除吗？')) {
+        // 通知App删除对应id的todo项
+        this.deleteTodo(id)
+      }
+    }
+  },
+};
+</script>
+
+<style scoped>
+/*Item*/
+li {
+  list-style: none;
+  height: 36px;
+  line-height: 36px;
+  padding: 0 5px;
+  border-bottom: 1px solid #ddd;
+}
+
+li label {
+  float: left;
+  cursor: pointer;
+}
+
+li label li input {
+  vertical-align: middle;
+  margin-right: 6px;
+  position: relative;
+  top: -1px;
+}
+
+li button {
+  float: right;
+  display: none;
+  margin-top: 3px;
+}
+
+li:before {
+  content: initial;
+}
+
+li:last-child {
+  border-bottom: none;
+}
+
+li:hover {
+  background-color: #ddd;
+}
+
+li:hover button {
+  display: block;
+}
+</style>
+```
+
+​	在Item组件中我们在样式中写了一个高亮效果，并且每一个item都会显示删除按钮，在交互上仍然跟上面的勾选一样调用App里的函数
+
+调试结果：
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230327164714103.png" alt="image-20230327164714103" style="zoom:50%;" />

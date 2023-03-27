@@ -11,7 +11,7 @@
         <!-- <input type="checkbox" v-model="this.todo.isDone" > -->
         <span>{{ this.todo.title }}</span>
       </label>
-      <button class="btn btn-danger" style="display: none">删除</button>
+      <button class="btn btn-danger" @click="handleDelete(todo.id)">删除</button>
     </li>
   </ul>
 </template>
@@ -31,13 +31,25 @@ export default {
     changeIsDone: {
       type: Function,
       required: true
+    },
+    deleteTodo: {
+      type: Function,
+      required: true
     }
   },
   methods: {
+    // 勾选or取消勾选
     handleCheck(id) {
       // 通知App组件将对应的todo对象的idDone值取反
       this.changeIsDone(id)
     },
+    // 删除
+    handleDelete(id){
+      if (confirm('确定删除吗？')) {
+        // 通知App删除对应id的todo项
+        this.deleteTodo(id)
+      }
+    }
   },
 };
 </script>
@@ -76,5 +88,13 @@ li:before {
 
 li:last-child {
   border-bottom: none;
+}
+
+li:hover {
+  background-color: #ddd;
+}
+
+li:hover button {
+  display: block;
 }
 </style>

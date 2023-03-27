@@ -4,7 +4,7 @@
       <div class="todo-wrap">
         <!-- 通过props传给子组件一个函数 -->
         <Header :addTodo="addTodo" />
-        <List :todos="todos" :changeIsDone="changeIsDone" />
+        <List :todos="todos" :changeIsDone="changeIsDone" :deleteTodo="deleteTodo" />
         <Footer />
       </div>
     </div>
@@ -47,6 +47,12 @@ export default {
         }
       });
     },
+    // 删除一个todo
+    deleteTodo(id){
+      this.todos = this.todos.filter((todo) => {
+        return todo.id !== id
+      })
+    }
   },
 };
 </script>

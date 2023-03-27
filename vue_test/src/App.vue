@@ -4,7 +4,7 @@
       <div class="todo-wrap">
         <!-- 通过props传给子组件一个函数 -->
         <Header :addTodo="addTodo" />
-        <List :todos="todos" />
+        <List :todos="todos" :changeIsDone="changeIsDone" />
         <Footer />
       </div>
     </div>
@@ -34,10 +34,19 @@ export default {
     };
   },
   methods: {
+    // 添加一个todo
     // 当初传给子组件的函数
-    addTodo(todoObj){
-      this.todos.unshift(todoObj)
-    }
+    addTodo(todoObj) {
+      this.todos.unshift(todoObj);
+    },
+    // 勾选or取消勾选一个todo
+    changeIsDone(id) {
+      this.todos.forEach((todo) => {
+        if (todo.id === id) {
+          todo.isDone = !todo.isDone;
+        }
+      });
+    },
   },
 };
 </script>

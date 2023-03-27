@@ -5667,3 +5667,85 @@ export default {
 ```
 
 <img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230325171207846.png" alt="image-20230325171207846" style="zoom:50%;" />
+
+### 3.7.4 TodoList案例 勾选
+
+​	我们在这一节实现TodoList中的勾选功能，当我们勾选checkbox时，item将会通知App组件进行isDone值的修改
+
+​	由于我们在上一节将todos数据存在了App中，所以要想修改到isDone的值，就会涉及到爷孙组件传递数据，我们没有学事件总线以及消息订阅与发布，所以此次我们决定现将数据传到List组件，再传到Item中，逐级传递
+
+App.vue
+
+```vue
+<List :todos="todos" :changeIsDone="changeIsDone" />
+```
+
+method中：
+
+```javascript
+    // 勾选or取消勾选一个todo
+    changeIsDone(id) {
+      this.todos.forEach((todo) => {
+        if (todo.id === id) {
+          todo.isDone = !todo.isDone;
+        }
+      });
+    },
+```
+
+List.vue
+
+```vue
+    <Item
+      v-for="todoObj in todos"
+      :key="todoObj.id"
+      :todo="todoObj"
+      :changeIsDone="changeIsDone"
+    />
+```
+
+```javascript
+  props: ["todos", "changeIsDone"],
+```
+
+Item.vue
+
+```vue
+        <input
+          type="checkbox"
+          :checked="this.todo.isDone"
+          @change="handleCheck(todo.id)"
+        />
+        <!-- 如下代码也能实现功能，但是不太推荐，因为有点违反原则，修改了props -->
+        <!-- <input type="checkbox" v-model="this.todo.isDone" > -->
+```
+
+```javascript
+  name: "Item",
+  mounted() {
+    console.log(this);
+  },
+  props: {
+    // 声明接收todo对象
+    todo: {
+      type: Object,
+      required: true,
+    },
+    changeIsDone: {
+      type: Function,
+      required: true
+    }
+  },
+  methods: {
+    handleCheck(id) {
+      // 通知App组件将对应的todo对象的idDone值取反
+      this.changeIsDone(id)
+    },
+  },
+```
+
+​	这里需要提的一点是：我们使用v-model双向数据绑定也可以实现需求，但是不推荐我们这样做，修改对象中的数据时，引用没变。vue这里做的是一个浅层次的监视，我们修改对象里面的值会直接修改props中的数据，这个操作是vue官方不推荐的
+
+​	调试结果：
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230327155954133.png" alt="image-20230327155954133" style="zoom:50%;" />

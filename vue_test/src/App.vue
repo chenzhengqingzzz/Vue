@@ -5,7 +5,7 @@
         <!-- 通过props传给子组件一个函数 -->
         <Header :addTodo="addTodo" />
         <List :todos="todos" :changeIsDone="changeIsDone" :deleteTodo="deleteTodo" />
-        <Footer />
+        <Footer :todos="todos" />
       </div>
     </div>
   </div>

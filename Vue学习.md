@@ -2744,9 +2744,9 @@ Vue监视数据的原理：
 ​	若：`<input type="checkbox"/>`
 
 				1. 没有配置input的`value`属性，那么收集的就是`checked`（勾选 或 未勾选，是布尔值）
-   				2. 配置input的`value`属性：
-          				1. v-model的初始值是非数组，那么收集的就是`checked`（勾选 或 未勾选，是布尔值）
-          				2. v-model的初始值是数组，那么收集的就是`value`组成的数组
+				2. 配置input的`value`属性：
+	      				1. v-model的初始值是非数组，那么收集的就是`checked`（勾选 或 未勾选，是布尔值）
+	      				2. v-model的初始值是数组，那么收集的就是`value`组成的数组
 
 备注：v-model的三个修饰符：
 
@@ -2966,9 +2966,9 @@ Vue监视数据的原理：
 **v-html指令：**
 
 	1. 作用：向指定节点中渲染包含html结构的内容
- 	2. 与插值语法的区别：
-     	1. v-html会替换掉节点中所有的内容，{{xx}}则不会
-     	2. v-html可以识别html结构 
+	2. 与插值语法的区别：
+	 	1. v-html会替换掉节点中所有的内容，{{xx}}则不会
+	 	2. v-html可以识别html结构 
 
 3. 严重注意：v-html上有安全性问题！！！
    1. 在网站上动态渲染人任意HTML是非常危险的，容易导致XSS攻击（因为用户提交的内容有可能就是一个恶意的a标签，点击可以获取你的所有cookie）
@@ -5121,8 +5121,8 @@ Student.vue中的样式：
 ​	 1. 拆分静态组件：组件要按照功能点拆分，命名不要与html元素冲突
 
    	2. 实现动态组件：考虑好数据的存放位置，数据是一个组件在用，还是一些组件在用：
-        	1.  一个组件在用：放在组件自身即可
-        	2. 一些组件在用：放在他们共同的父组件上（状态提升）
+   	    	1.  一个组件在用：放在组件自身即可
+   	    	2. 一些组件在用：放在他们共同的父组件上（状态提升）
    	3. 实现交互：从绑定事件开始
 
 按照业务需求：我们拆分了这几个组件：Header、List、Item、Footer 其中Item是List的子组件
@@ -5899,3 +5899,89 @@ li:hover button {
 调试结果：
 
 <img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230327164714103.png" alt="image-20230327164714103" style="zoom:50%;" />
+
+### 3.7.6 TodoList案例 底部统计
+
+​	我们需要对Footer组件里面的已完成/总数的数字进行绑定
+
+App.vue
+
+```vue
+        <Footer :todos="todos" />
+```
+
+数据在App中，由App组件传输数据给Footer组件
+
+Footer.vue
+
+```vue
+<template>
+  <div class="todo-footer">
+    <label>
+      <input type="checkbox" />
+    </label>
+    <span>
+      <span>已完成{{ doneTotal }}</span> / 全部{{ total }}</span
+    >
+    <button class="btn btn-danger">清除已完成任务</button>
+  </div>
+</template>
+
+<script>
+export default {
+  name: "Footer",
+  props: {
+    todos: {
+      type: Array,
+      required: true,
+    },
+  },
+  computed: {
+    doneTotal() {
+      return this.todos.filter((todo) => {
+        return todo.isDone == true;
+      }).length;
+      // const doneTodos = this.todos.filter((todo) => {
+      //   return todo.isDone == true
+      // })
+      // return doneTodos.length
+
+      // doneTotal(){
+      //此处使用reduce方法做条件统计
+      /* const x = this.todos.reduce((pre,current)=>{
+					console.log('@',pre,current)
+					return pre + (current.done ? 1 : 0)
+				},0) */
+      //简写
+      // return this.todos.reduce((pre,todo)=> pre + (todo.done ? 1 : 0) ,0)
+      // },
+    },
+    total(){
+      return this.todos.length
+    }
+  },
+};
+</script>
+```
+
+​	显示总数只需要读取todos数组长度就可以，而要计算已完成的总数，就需要读取todos里面每个isDone为true的元素个数，我们将计算好的属性放入页面，需要用到计算属性
+
+​	这里用filter方法将isDone为true的元素过滤出来，并读取了新数组的长度
+
+​	另外也可以用条件统计的reduce方法：
+
+```javascript
+			doneTotal(){
+				//此处使用reduce方法做条件统计
+				/* const x = this.todos.reduce((pre,current)=>{
+					console.log('@',pre,current)
+					return pre + (current.done ? 1 : 0)
+				},0) */
+				//简写
+				return this.todos.reduce((pre,todo)=> pre + (todo.done ? 1 : 0) ,0)
+			},
+```
+
+​	reduce方法：根据数组的长度决定调用次数 第二个参数为初始值，每一次调用后的返回值将会作为第一个参数。最后一次调用函数的返回值就是数组的长度。详情见https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce
+
+调试结果：<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230327192456376.png" alt="image-20230327192456376" style="zoom:50%;" />

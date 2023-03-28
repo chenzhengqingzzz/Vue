@@ -25,12 +25,8 @@ export default {
   },
   data() {
     return {
-      todos: [
-        { id: "001", title: "唱", isDone: true },
-        { id: "002", title: "跳", isDone: true },
-        { id: "003", title: "rap", isDone: true },
-        { id: "004", title: "篮球", isDone: false },
-      ],
+      // 由于todos是Header组件和Footer组件都在使用，所以放在App中（状态提升）
+      todos: JSON.parse(localStorage.getItem('todos')) || []
     };
   },
   methods: {
@@ -66,6 +62,14 @@ export default {
       })
     }
   },
+  watch: {
+    todos: {
+      deep: true,
+      handler(newValue){
+        localStorage.setItem('todos', JSON.stringify(newValue))
+      }
+    }
+  }
 };
 </script>
 

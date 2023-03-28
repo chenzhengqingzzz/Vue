@@ -6634,3 +6634,49 @@ export default {
 </html>
 ```
 
+​	学了localStorage本地存储后，我们可以继续完善我们的TodoList案例：
+
+​		我们可以把todos的数据存储在localStorage中，因为localStorage的特性，它在我们关闭浏览器、刷新页面都不会消失，而且存储的数据也不会是我们刚开始todo写死了的唱跳rap篮球
+
+​	我们有好几种方法将todos这个数据存储在localStorage中，例如将我们当初在Header中写的添加回调、Item中删除的回调的逻辑都加入到localStorage中，这样太麻烦了，我们建议使用监视属性来完成这个过程，只要监视到todos被修改，就往localStorage存一份，然后再将localStorage中存储的最新的todos放入App的data中展示
+
+App.vue
+
+```javascript
+  data() {
+    return {
+      // 由于todos是Header组件和Footer组件都在使用，所以放在App中（状态提升）
+      todos: JSON.parse(localStorage.getItem('todos')) || []
+    };
+```
+
+```javascript
+  watch: {
+    todos: {
+      deep: true,
+      handler(newValue){
+        localStorage.setItem('todos', JSON.stringify(newValue))
+      }
+    }
+  }
+```
+
+关于data中为什么要写或空数组：
+
+​	因为当我们将todos里面的数据清空的时候，存储在localStorage中的数据也会为空，	这样子`JSON.Stringify()`方法解析出来的结果也为null，我们在Footer组件中会读取
+
+```javascript
+    total(){
+      return this.todos.length
+    },
+```
+
+​		读取数组长度，null.length是没有结果的，所以它会报错，所以当todos里面没有东西的时候，我们得使用空数组来填补，空数组的长度为0，可以读出length属性
+
+关于为什么监视的todos需要完整写法？
+
+​	我们如果不写完整的写法的话，watch只会做浅层次的监视，无法读取到todo里面的isDone，这样在我们勾选某一项todo时，刷新页面后就会默认false展现在页面中，这样不符合我们的需求，所以我们得深度监视。
+
+​	调试结果：
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230328162258381.png" alt="image-20230328162258381" style="zoom:50%;" />

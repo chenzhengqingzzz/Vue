@@ -1,121 +1,64 @@
 <template>
-  <div id="root">
-    <div class="todo-container">
-      <div class="todo-wrap">
-        <!-- 通过props传给子组件一个函数 -->
-        <Header :addTodo="addTodo" />
-        <List :todos="todos" :changeIsDone="changeIsDone" :deleteTodo="deleteTodo" />
-        <Footer :todos="todos" :checkAllTodo="checkAllTodo" :clearAllDoneTodo="clearAllDoneTodo" />
-      </div>
-    </div>
+  <div class="app">
+    <h1>{{msg}}，{{studentName}}</h1>
+    <!-- 通过父组件给子组件传递函数类型的props实现：子给父传递数据 -->
+    <School :getSchoolName="getSchoolName"/>
+    <hr/>
+    <!-- 通过父组件给子组件绑定一个自定义事件实现：子给父传递数据（第一种写法：使用@或v-on） -->
+    <Student @atguigu="getStudentName" @demo="m1" @click.native="show"/>
+    <!-- 通过父组件给子组件绑定一个自定义事件实现：子给父传递数据（第二种写法：使用ref 比直接在标签写更灵活） -->
+    <!-- <Student ref="student"/> -->
   </div>
 </template>
 
 <script>
-import Header from "./components/Header.vue";
-import List from "./components/List.vue";
-import Footer from "./components/Footer.vue";
+import Student from './components/Student.vue'
+import School from './components/School.vue'
 
 export default {
-  name: "App",
-  components: {
-    Header,
-    List,
-    Footer,
-  },
-  data() {
-    return {
-      // 由于todos是Header组件和Footer组件都在使用，所以放在App中（状态提升）
-      todos: JSON.parse(localStorage.getItem('todos')) || []
-    };
-  },
-  methods: {
-    // 添加一个todo
-    // 当初传给子组件的函数
-    addTodo(todoObj) {
-      this.todos.unshift(todoObj);
+    name: 'App',
+    components: {
+        Student,
+        School
     },
-    // 勾选or取消勾选一个todo
-    changeIsDone(id) {
-      this.todos.forEach((todo) => {
-        if (todo.id === id) {
-          todo.isDone = !todo.isDone;
-        }
-      });
-    },
-    // 删除一个todo
-    deleteTodo(id){
-      this.todos = this.todos.filter((todo) => {
-        return todo.id !== id
-      })
-    },
-    // 全选or取消全选
-    checkAllTodo(isDone){
-      this.todos.forEach((todo) => {
-        todo.isDone = isDone
-      })
-    },
-    // 删除所有已完成的todo
-    clearAllDoneTodo(){
-      this.todos = this.todos.filter((todo) => {
-        return todo.isDone !== true
-      })
-    }
-  },
-  watch: {
-    todos: {
-      deep: true,
-      handler(newValue){
-        localStorage.setItem('todos', JSON.stringify(newValue))
+    data() {
+      return {
+        msg: '你好啊',
+        studentName: ''
+
       }
-    }
-  }
-};
+    },
+    methods: {
+      getSchoolName(name){
+        console.log('App收到了学校名：', name);
+      },
+      // 接收多个参数，1、可以用ES6的新语法，将其他的参数自动包装成一个params数组 2、对个参数包装成对象
+      getStudentName(name, ...args){
+        console.log('App收到了学生名：', name, args)
+        this.studentName = name
+      },
+      m1(){
+        console.log('demo事件被触发了');
+      },
+      show(){
+        alert(123)
+      }
+    },
+    mounted() {
+      // Student的组件实例对象中的操作
+      // this.$refs.student.$on('atguigu', this.getStudentName) //绑定自定义事件
+      // this.$refs.student.$once('atguigu', this.getStudentName) //绑定自定义事件（一次性）
+      // this.$refs.student.$on('atguigu', () => {
+      //   console.log('App收到了学生名：', name, args)
+      //   this.studentName = name
+      // })
+    },
+}
 </script>
 
-<style>
-/*base*/
-body {
-  background: #fff;
-}
-
-.btn {
-  display: inline-block;
-  padding: 4px 12px;
-  margin-bottom: 0;
-  font-size: 14px;
-  line-height: 20px;
-  text-align: center;
-  vertical-align: middle;
-  cursor: pointer;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2),
-    0 1px 2px rgba(0, 0, 0, 0.05);
-  border-radius: 4px;
-}
-
-.btn-danger {
-  color: #fff;
-  background-color: #da4f49;
-  border: 1px solid #bd362f;
-}
-
-.btn-danger:hover {
-  color: #fff;
-  background-color: #bd362f;
-}
-
-.btn:focus {
-  outline: none;
-}
-
-.todo-container {
-  width: 600px;
-  margin: 0 auto;
-}
-.todo-container .todo-wrap {
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-}
+<style scoped>
+  .app {
+    background-color: gray;
+    padding: 5px;
+  }
 </style>
-

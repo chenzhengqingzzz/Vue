@@ -7101,3 +7101,55 @@ export default {
 </style>
 ```
 
+### 3.9.4 TodoList案例 组件自定义事件
+
+​	既然提到了子传父，我们可以用自定义事件来替代传props来实现我们的需求
+
+App.vue
+
+```vue
+<Header @addTodo="addTodo" />
+<Footer :todos="todos" @checkAllTodo="checkAllTodo" @clearAllDoneTodo="clearAllDoneTodo" />
+```
+
+涉及到直接子传父的组件有：Header、Footer
+
+Header.vue
+
+```javascript
+  methods: {
+    addData(){
+      // 校验数据
+      if(!this.title.trim()) return alert('输入不能为空！')
+      // 将用户的输入包装成一个todo对象
+      const todoObj = {id: nanoid(), title: this.title, isDone: false}
+      // 通知App组件去添加一个todo对象
+      this.$emit('addTodo', todoObj) //直接使用$emit方法触发
+      // 清空输入
+      this.title = ''
+    }
+  },
+```
+
+Footer.vue
+
+```javascript
+    isAll: {
+      get(){
+        return this.doneTotal === this.total && this.total > 0
+      },
+      set(value){
+        this.$emit('checkAllTodo', value)
+      }
+    }
+```
+
+```javascript
+    clearAll(){
+      if (confirm('确定删除所有已完成的任务吗？')) {
+        this.$emit('clearAllDoneTodo')
+      }
+    }
+```
+
+​	之前涉及到调用回调函数的地方我们都可以使用`$emit()`方法来触发自定义事件

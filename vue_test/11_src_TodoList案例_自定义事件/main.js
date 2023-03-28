@@ -12,9 +12,4 @@ new Vue({
     render(h) {
         return h(App)
     },
-    // mounted(){
-    //     setTimeout(() => {
-    //         this.$destroy()
-    //     }, 3000)
-    // }
 })

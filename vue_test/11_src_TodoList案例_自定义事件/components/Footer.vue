@@ -18,14 +18,6 @@ export default {
       type: Array,
       required: true,
     },
-    checkAllTodo: {
-      type: Function,
-      required: true
-    },
-    clearAllDoneTodo: {
-      type: Function,
-      required: true
-    }
   },
   computed: {
     doneTotal() {
@@ -56,7 +48,7 @@ export default {
         return this.doneTotal === this.total && this.total > 0
       },
       set(value){
-        this.checkAllTodo(value)
+        this.$emit('checkAllTodo', value)
       }
     }
   },
@@ -68,7 +60,7 @@ export default {
     // 清除所有已完成任务相关
     clearAll(){
       if (confirm('确定删除所有已完成的任务吗？')) {
-        this.clearAllDoneTodo()
+        this.$emit('clearAllDoneTodo')
       }
     }
   },

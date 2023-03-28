@@ -6069,7 +6069,7 @@ methods部分：
     (2).实现动态组件：考虑好数据的存放位置，数据是一个组件在用，还是一些组件在用：
 
     	1).一个组件在用：放在组件自身即可。
-
+	
     	2). 一些组件在用：放在他们共同的父组件上（状态提升）。
 
     (3).实现交互：从绑定事件开始。
@@ -6680,3 +6680,424 @@ App.vue
 ​	调试结果：
 
 <img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230328162258381.png" alt="image-20230328162258381" style="zoom:50%;" />
+
+## 3.9 组件自定义事件
+
+### 3.9.1 绑定
+
+​	当我们需要在子组件向父组件传递数据的时候，可以使用前面说过的：**传递函数类型的props**
+
+​	第二种方法就是绑定自定义事件
+
+App.vue
+
+​	这里App.vue给Student.vue的vc身上绑定了一个自定义事件：atguigu，当atguigu事件触发的时候，将会调用函数：`getStudentName`
+
+```vue
+<template>
+  <div class="app">
+    <h1>{{msg}}</h1>
+    <!-- 通过父组件给子组件传递函数类型的props实现：子给父传递数据 -->
+    <School :getSchoolName="getSchoolName"/>
+    <hr/>
+    <!-- 通过父组件给子组件绑定一个自定义事件实现：子给父传递数据（第一种写法：使用@或v-on） -->
+    <Student @atguigu="getStudentName"/>
+    <!-- 通过父组件给子组件绑定一个自定义事件实现：子给父传递数据（第二种写法：使用ref 比直接在标签写更灵活） -->
+    <!-- <Student ref="student"/> -->
+  </div>
+</template>
+
+<script>
+import Student from './components/Student.vue'
+import School from './components/School.vue'
+
+export default {
+    name: 'App',
+    components: {
+        Student,
+        School
+    },
+    data() {
+      return {
+        msg: '你好啊'
+      }
+    },
+    methods: {
+      getSchoolName(name){
+        console.log('App收到了学校名：', name);
+      },
+      // 接收多个参数，1、可以用ES6的新语法，将其他的参数自动包装成一个params数组 2、对个参数包装成对象
+      getStudentName(name, ...args){
+        console.log('App收到了学生名：', name, args)
+      }
+    },
+    mounted() {
+      // Student的组件实例对象中的操作
+      // this.$refs.student.$on('atguigu', this.getStudentName) //绑定自定义事件
+      // this.$refs.student.$once('atguigu', this.getStudentName) //绑定自定义事件（一次性）
+    },
+}
+</script>
+
+<style scoped>
+  .app {
+    background-color: gray;
+    padding: 5px;
+  }
+</style>
+```
+
+这里的School.vue演示的是我们前面学过的传函数类型的props：
+
+```vue
+<template>
+  <div class="school">
+    <h2>学校名称：{{name}}</h2>
+    <h2>学校地址：{{address}}</h2>
+    <button @click="sendSchoolName">点我给App传学校名</button>
+  </div>
+</template>
+
+<script>
+export default {
+    name: 'School',
+    data() {
+        return {
+            name: 'x大学芜湖芜湖',
+            address: 'HuBei'
+        }
+    },
+    props: ['getSchoolName'],
+    methods: {
+      sendSchoolName(){
+        this.getSchoolName(this.name)
+      }
+    },
+}
+</script>
+
+<style scoped>
+.school {
+  background-color: skyblue;
+  padding: 5px;
+}
+</style>
+```
+
+Student.vue里面提到了一个新的方法：`$emit()`
+
+```vue
+<template>
+  <div class="student">
+    <h2>学生姓名：{{name}}</h2>
+    <h2>学生性别：{{sex}}</h2>
+    <button @click="sendStudentName">点我给App传学生名</button>
+  </div>
+</template>
+
+<script>
+
+export default {
+    name: 'Student',
+    data() {
+        return {
+            name: '张三',
+            sex: '男',
+        }
+    },
+    methods: {
+      sendStudentName(){
+        // 触发Student组件实例身上的atguigu事件
+        this.$emit('atguigu', this.name, 666, 888, 999)
+      }
+    },
+}
+</script>
+
+<style lang="less" scoped>
+.student {
+  background-color: orange;
+  padding: 5px;
+  margin-top: 30px;
+}
+</style>
+```
+
+调试结果：
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230328172146859.png" alt="image-20230328172146859" style="zoom:50%;" />
+
+### 3.9.2 解绑
+
+​	我们既然绑定了自定义事件，就可以涉及到解绑
+
+​	通过`this.$destroy()` 可以销毁一个组件实例，当组件实例被销毁时，当前组件所有的自定义事件全部不奏效。
+
+App.vue
+
+```vue
+    <Student @atguigu="getStudentName" @demo="m1"/>
+```
+
+```javascript
+      m1(){
+        console.log('demo事件被触发了');
+      }
+```
+
+Student.vue
+
+```vue
+<template>
+  <div class="student">
+    <h2>学生姓名：{{name}}</h2>
+    <h2>学生性别：{{sex}}</h2>
+    <h2>当前求和为：{{number}}</h2>
+    <button @click="add">点我number++</button>
+    <button @click="sendStudentName">点我给App传学生名</button>
+    <button @click="unBind">点我解绑atguigu事件</button>
+    <button @click="death">销毁当前Student组件的实例（vc）</button>
+  </div>
+</template>
+```
+
+```javascript
+    methods: {
+      add(){
+        console.log('add回调被调用了');
+        this.number++
+      },
+      sendStudentName(){
+        // 触发Student组件实例身上的atguigu事件
+        this.$emit('atguigu', this.name, 666, 888, 999)
+        this.$emit('demo')
+      },
+      unBind(){
+        // this.$off('atguigu') //解绑一个自定义事件
+        // this.$off(['atguigu', 'demo']) //解绑多个自定义事件
+        this.$off() //解绑所有的自定义事件
+      },
+      death(){
+        this.$destroy() //销毁了当前Student组件实例，销毁后所有Student实例的自定义事件全部不奏效了
+      }
+    },
+```
+
+​	这里我们新学了解绑的API:`vc.$off()`它可以解绑一个和多个（传数组）自定义事件，也可以不传参数来解绑所有自定义事件
+
+​	当我们摧毁组件的时候，其身上的自定义事件也会失效
+
+调试结果：
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230328175259595.png" alt="image-20230328175259595" style="zoom:50%;" />
+
+​	点按后面的按钮再去按前面的按钮将会失效。
+
+### 3.9.3 总结组件的自定义事件
+
+ 1. 一种组件间通信的方式，适用于：**子组件 ===> 父组件**
+
+ 2. 使用场景：A是父组件，B是子组件，B想给A传数据，那么就要在A中给B绑定自定义事件（**事件的回调在A中**）
+
+ 3. 绑定自定义事件：
+
+    * 第一种方式： 父组件中：`<Demo @atguigu="test"/>`或`<Demo v-on:atguigu="test"/>`
+
+    * 第二种方式，在父组件中：
+
+      ```vue
+      <Demo ref="demo"/>
+      ......
+      mounted(){
+      	this.$refs.$on('atguigu', this.test)
+      }
+      ```
+
+    * 若想让自定义事件只能触发一次，可以使用`once`修饰符，或`$once`方法
+
+ 4. 触发自定义事件：`this.$emit('atguigu', 数据)`
+
+ 5. 解绑自定义事件：`this.$off('atguigu')`
+
+ 6. 组件上也可以绑定原生DOM事件,需要使用`native`修饰符
+
+ 7. 注意：通过`this.$refs.xxx.$on('atguigu', 回调)`绑定自定义事件时，回调**要么配置在methods中，要么用箭头函数**，否则this指向会出问题！
+
+```vue
+<Student @atguigu="getStudentName" @demo="m1" @click.native="show"/>
+```
+
+```javascript
+      show(){
+        alert(123)
+      }
+```
+
+​	这里的 native就是让vue知道这个是内置事件
+
+全部代码：
+
+App.vue
+
+```vue
+<template>
+  <div class="app">
+    <h1>{{msg}}，{{studentName}}</h1>
+    <!-- 通过父组件给子组件传递函数类型的props实现：子给父传递数据 -->
+    <School :getSchoolName="getSchoolName"/>
+    <hr/>
+    <!-- 通过父组件给子组件绑定一个自定义事件实现：子给父传递数据（第一种写法：使用@或v-on） -->
+    <Student @atguigu="getStudentName" @demo="m1" @click.native="show"/>
+    <!-- 通过父组件给子组件绑定一个自定义事件实现：子给父传递数据（第二种写法：使用ref 比直接在标签写更灵活） -->
+    <!-- <Student ref="student"/> -->
+  </div>
+</template>
+
+<script>
+import Student from './components/Student.vue'
+import School from './components/School.vue'
+
+export default {
+    name: 'App',
+    components: {
+        Student,
+        School
+    },
+    data() {
+      return {
+        msg: '你好啊',
+        studentName: ''
+
+      }
+    },
+    methods: {
+      getSchoolName(name){
+        console.log('App收到了学校名：', name);
+      },
+      // 接收多个参数，1、可以用ES6的新语法，将其他的参数自动包装成一个params数组 2、对个参数包装成对象
+      getStudentName(name, ...args){
+        console.log('App收到了学生名：', name, args)
+        this.studentName = name
+      },
+      m1(){
+        console.log('demo事件被触发了');
+      },
+      show(){
+        alert(123)
+      }
+    },
+    mounted() {
+      // Student的组件实例对象中的操作
+      // this.$refs.student.$on('atguigu', this.getStudentName) //绑定自定义事件
+      // this.$refs.student.$once('atguigu', this.getStudentName) //绑定自定义事件（一次性）
+      // this.$refs.student.$on('atguigu', () => {
+      //   console.log('App收到了学生名：', name, args)
+      //   this.studentName = name
+      // })
+    },
+}
+</script>
+
+<style scoped>
+  .app {
+    background-color: gray;
+    padding: 5px;
+  }
+</style>
+```
+
+School.vue
+
+```vue
+<template>
+  <div class="school">
+    <h2>学校名称：{{name}}</h2>
+    <h2>学校地址：{{address}}</h2>
+    <button @click="sendSchoolName">点我给App传学校名</button>
+  </div>
+</template>
+
+<script>
+export default {
+    name: 'School',
+    data() {
+        return {
+            name: 'x大学芜湖芜湖',
+            address: 'HuBei'
+        }
+    },
+    props: ['getSchoolName'],
+    methods: {
+      sendSchoolName(){
+        this.getSchoolName(this.name)
+      }
+    },
+}
+</script>
+
+<style scoped>
+.school {
+  background-color: skyblue;
+  padding: 5px;
+}
+</style>
+```
+
+Student.vue
+
+```vue
+<template>
+  <div class="student">
+    <h2>学生姓名：{{name}}</h2>
+    <h2>学生性别：{{sex}}</h2>
+    <h2>当前求和为：{{number}}</h2>
+    <button @click="add">点我number++</button>
+    <button @click="sendStudentName">点我给App传学生名</button>
+    <button @click="unBind">点我解绑atguigu事件</button>
+    <button @click="death">销毁当前Student组件的实例（vc）</button>
+  </div>
+</template>
+
+<script>
+
+export default {
+    name: 'Student',
+    data() {
+        return {
+            name: '张三',
+            sex: '男',
+            number: 0
+        }
+    },
+    methods: {
+      add(){
+        console.log('add回调被调用了');
+        this.number++
+      },
+      sendStudentName(){
+        // 触发Student组件实例身上的atguigu事件
+        this.$emit('atguigu', this.name, 666, 888, 999)
+        // this.$emit('demo')
+        // this.$emit('click')
+      },
+      unBind(){
+        this.$off('atguigu') //解绑一个自定义事件
+        // this.$off(['atguigu', 'demo']) //解绑多个自定义事件
+        this.$off() //解绑所有的自定义事件
+      },
+      death(){
+        this.$destroy() //销毁了当前Student组件实例，销毁后所有Student实例的自定义事件全部不奏效了
+      }
+    },
+}
+</script>
+
+<style lang="less" scoped>
+.student {
+  background-color: orange;
+  padding: 5px;
+  margin-top: 30px;
+}
+</style>
+```
+

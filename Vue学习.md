@@ -4190,6 +4190,8 @@ Vue构造函数缔造了**vm**，VueComponent构造函数缔造了**vc**，所�
 
 ​	但是Vue做了一件事：让**VueComponent的原型对象的隐式原型属性**指向了**Vue的原型对象**，没有直接指向Object原型对象
 
+**VueComponent.prototype.__proto__ === Vue.prototype**
+
 ![image-20230320172546242](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230320172546242.png)
 
 ```html
@@ -6069,7 +6071,7 @@ methods部分：
     (2).实现动态组件：考虑好数据的存放位置，数据是一个组件在用，还是一些组件在用：
 
     	1).一个组件在用：放在组件自身即可。
-	
+		
     	2). 一些组件在用：放在他们共同的父组件上（状态提升）。
 
     (3).实现交互：从绑定事件开始。
@@ -7153,3 +7155,263 @@ Footer.vue
 ```
 
 ​	之前涉及到调用回调函数的地方我们都可以使用`$emit()`方法来触发自定义事件
+
+## 3.10 全局事件总线
+
+​	全局事件总线是一种组件间通信的方式，适用于**任意组件间通信**
+
+​	我们在做TodoList案例的时候总会发现我们很难在兄弟组件之间传递数据，我们想要实现任意组件间的通信，就需要借助到全局事件总线。
+
+​	假设我们独立于App组件之外有一个中转站名为X，每一个组件需要在X这个中转站绑定一个**自定义事件**，回调函数留在我们当初绑定事件的那个组件中，当我们以后有需要组件间传递数据的时候，就需要传递数据的组件调用在X中转站的某个事件，数据将会从回调函数跑到我们当初绑定事件的那个函数中，这就达到了两个组件间的通信目的
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230329201259670.png" alt="image-20230329201259670" style="zoom:50%;" />
+
+​	这个中转站X需要做到两点：
+
+	1. 所有组件包括App都能够随时看到它
+	1. 它里面可以使用自定义事件的相关API（`$on()`、`$off()`、`$emit()`）
+
+**现在我们着手实现第一个要求：**
+
+​	前面在解释 Vue实例与组件实例的内置关系的时候提到：Vue构造函数缔造了**vm**，VueComponent构造函数缔造了**vc**，所以构造函数（Vue构造函数、VueComponent构造函数）的显式原型和实例对象（vm、vc）的隐式原型都会指向同一组
+
+​	所以就有这个关系：
+
+​	**VueComponent.prototype.__proto__ === Vue.prototype**
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230320172546242.png" alt="image-20230320172546242" style="zoom:50%;" />
+
+​	所以我们可以把中转站X放到Vue原型对象上，这样子所有的组件都可以读取到。
+
+main.js
+
+```javascript
+// 引入Vue
+import Vue from 'vue';
+// 引入App
+import App from './App'
+// 关闭Vue的生产提示
+Vue.config.productionTip = false
+
+Vue.prototype.x = {a: 1, b: 2}
+
+// 创建vm
+new Vue({
+    el: '#app',
+    render(h) {
+        return h(App)
+    },
+})
+```
+
+App.vue
+
+```vue
+<template>
+  <div class="app">
+    <h1>{{msg}}</h1>
+    <School/>
+    <Student/>
+  </div>
+</template>
+
+<script>
+import Student from './components/Student.vue'
+import School from './components/School.vue'
+
+export default {
+    name: 'App',
+    components: {
+        Student,
+        School
+    },
+    data() {
+      return {
+        msg: '你好啊',
+      }
+    },
+}
+</script>
+
+<style scoped>
+  .app {
+    background-color: gray;
+    padding: 5px;
+  }
+</style>
+```
+
+School.vue
+
+```vue
+<template>
+  <div class="school">
+    <h2>学校名称：{{name}}</h2>
+    <h2>学校地址：{{address}}</h2>
+  </div>
+</template>
+
+<script>
+export default {
+    name: 'School',
+    data() {
+        return {
+            name: 'x大学芜湖芜湖',
+            address: 'HuBei'
+        }
+    },
+    mounted() {
+      console.log('School', this.x);
+    },
+}
+</script>
+
+<style scoped>
+.school {
+  background-color: skyblue;
+  padding: 5px;
+}
+</style>
+```
+
+Student.vue
+
+```vue
+<template>
+  <div class="student">
+    <h2>学生姓名：{{name}}</h2>
+    <h2>学生性别：{{sex}}</h2>
+  </div>
+</template>
+
+<script>
+
+export default {
+    name: 'Student',
+    data() {
+        return {
+            name: '张三',
+            sex: '男',
+        }
+    },
+    mounted() {
+      console.log('Student', this.x);
+    },
+}
+</script>
+
+<style lang="less" scoped>
+.student {
+  background-color: orange;
+  padding: 5px;
+  margin-top: 30px;
+}
+</style>
+```
+
+在main.js中，在Vue实例对象上放入了一个对象x，这样全部组件都可以读取到
+
+![image-20230329210020511](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230329210020511.png)
+
+**现在我们着手实现第二个要求：**
+
+​	之所以我们在之前的自定义事件里能够使用`$on()`等API，是因为它们位于组件实例对象中
+
+​	vm的缔造者Vue身上就有相关的`$on()`和`$off()`方法，所以我们可以选择将中转站放在vm的原型对象上！
+
+安装全局事件总线：
+
+main.js
+
+​	这个中转站有一个官方的名字：总线($bus)
+
+```js
+// 引入Vue
+import Vue from 'vue';
+// 引入App
+import App from './App'
+// 关闭Vue的生产提示
+Vue.config.productionTip = false
+
+// 在vc身上追加一个能使用$on()的组件实例对象
+// const Demo = Vue.extend({})
+// const d = new Demo()
+// Vue.prototype.x = d
+
+// 创建vm
+new Vue({
+    el: '#app',
+    render(h) {
+        return h(App)
+    },
+    beforeCreate() {
+        Vue.prototype.$bus = this //安装全局事件总线
+    },
+    mounted() {
+        console.log(this);
+    },
+})
+```
+
+​	使用事件总线：
+
+	1. 接收数据：这里是我们的School组件想接收数据，则School组件中给$bus绑定自定义事件hello，**事件的回调留在School组件自身**
+
+School.vue
+
+```javascript
+    mounted() {
+      // console.log('School', this.x);
+      this.$bus.$on('hello', (data) => {
+        console.log('我是School组件，收到了数据', data);
+      })
+    },
+    // 销毁组件之前解绑对应自定义事件，如果我们off里面什么都不写，就代表销毁所有事件，就会代表所有给中转站绑定的时间全部失效
+    beforeDestroy() {
+      this.$bus.$off('hello')
+    },
+```
+
+最好在beforeDestroy钩子中，用$off去解绑当前组件所用到的事件
+
+2. 提供数据 这里由兄弟组件Student提供数据 `this.$bus.$emit('xxx',数据)`
+
+​	Student.vue
+
+```vue
+<template>
+  <div class="student">
+    <h2>学生姓名：{{name}}</h2>
+    <h2>学生性别：{{sex}}</h2>
+    <button @click="sendStudentName">把学生名给School组件</button>
+  </div>
+</template>
+```
+
+```javascript
+export default {
+    name: 'Student',
+    data() {
+        return {
+            name: '张三',
+            sex: '男',
+        }
+    },
+    mounted() {
+      // console.log('Student', this.x);
+    },
+    methods: {
+      sendStudentName(){
+        this.$bus.$emit('hello', this.name)
+      }
+    },
+}
+```
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230329214237812.png" alt="image-20230329214237812" style="zoom:50%;" />
+
+调试结果：
+
+![image-20230329215224886](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230329215224886.png)
+
+![image-20230329215254709](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230329215254709.png)

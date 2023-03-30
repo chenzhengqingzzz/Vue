@@ -7657,3 +7657,144 @@ Item.vue
 
 ​	由于pubsub-js的API设计需要传入消息名字作为第一个参数，而我们业务需求只需要传递id这个数据就可以了，所以我们选择在deleteTodo方法里面传一个占位符来充当第一个参数
 
+## 3.12 完善TodoList案例：追加编辑按钮
+
+​	我们的需求是在每一个Todo项的删除按钮旁边加一个编辑按钮，用来修改todo项的title属性
+
+​	用全局事件总线实现，我们可以定义一个`updateTodo`事件来更新数据
+
+​	首先我们需要在Item组件里实现点按编辑的时候，出来一个带有todo.title属性的input框并获取焦点，在我们失去焦点的时候将input框的值赋给todo.title
+
+​	所以标识这个todo是否在编辑状态就显得很重要，我们重新给todo追加了一个变量：`isEdit`
+
+Header.vue
+
+```javascript
+  methods: {
+    addData(){
+      // 校验数据
+      if(!this.title.trim()) return alert('输入不能为空！')
+      // 将用户的输入包装成一个todo对象
+      const todoObj = {id: nanoid(), title: this.title, isDone: false, isEdit: false}
+      // 通知App组件去添加一个todo对象
+      this.addTodo(todoObj)
+      // 清空输入
+      this.title = ''
+    }
+  },
+```
+
+
+
+Item.vue
+
+​	在Item组件里我们得写相关实现 需要在我们点按编辑按钮以及完成输入的时候修改`isEdit`的值以及完成修改的时候失去焦点
+
+
+
+```vue
+<template>
+  <ul class="todo-main">
+    <li>
+      <label>
+        <input
+          type="checkbox"
+          :checked="this.todo.isDone"
+          @change="handleCheck(todo.id)"
+        />
+        <!-- 如下代码也能实现功能，但是不太推荐，因为有点违反原则，修改了props -->
+        <!-- <input type="checkbox" v-model="this.todo.isDone" > -->
+        <span v-show="!todo.isEdit">{{ this.todo.title }}</span>
+        <input
+          type="text"
+          v-show="todo.isEdit"
+          :value="todo.title"
+          @blur="handleBlur(todo, $event)"
+          ref="inputTitle"
+        />
+      </label>
+      <button class="btn btn-danger" @click="handleDelete(todo.id)">
+        删除
+      </button>
+      <button
+        class="btn btn-edit"
+        v-show="!todo.isEdit"
+        @click="handleEdit(todo)"
+      >
+        编辑
+      </button>
+    </li>
+  </ul>
+</template>
+```
+
+​	在我们编辑的时候，Vue会在回调函数执行完之后在修改页面，这也就代表我们写的获取焦点的代码会在input框生成在页面之前就会执行，无法实现功能，所以我们必须使用到这个API:`$nextTick`
+
+```javascript
+    // 编辑
+    handleEdit(todo) {
+      todo.isEdit = true;
+      // nextTick所指定的回调函数会在DOM节点更新完毕之后再执行
+      this.$nextTick(function () {
+        this.$refs.inputTitle.focus();
+      });
+      // 这样不指定延迟时间也可以实现立即获取焦点，上面是官方的写法
+      // setTimeout(() => {
+      //   this.$refs.inputTitle.focus()
+      // })
+    },
+```
+
+​	失去焦点就代表我们可以将title值进行修改，这里我们需要拿到我们修改后的值，所以需要拿到我们的事件对象
+
+```vue
+@blur="handleBlur(todo, $event)"
+```
+
+```javascript
+    // 失去焦点回调（真正执行修改逻辑）
+    handleBlur(todo, e) {
+      todo.isEdit = false;
+      console.log(e);
+      if (!e.target.value.trim()) return alert("输入不能为空！");
+      this.$bus.$emit("updateTodo", todo.id, e.target.value);
+    },
+```
+
+App.vue
+
+​	App中就可以写关于更新的事件回调了
+
+```javascript
+    // 更新一个Todo
+    updateTodo(id, title){
+      this.todos.forEach((todo) => {
+        if (todo.id === id) {
+          todo.title = title
+        }
+      })
+    }
+```
+
+绑定事件以及销毁：
+
+```javascript
+  mounted() {
+    // 绑定自定义事件，回调留在本组件中
+    // 全局事件总线写法
+    this.$bus.$on('changeIsDone', this.changeIsDone)
+    // 消息订阅与发布写法
+    this.pubId = pubsub.subscribe('deleteTodo', this.deleteTodo)
+    // 更新title的回调
+    this.$bus.$on('updateTodo', this.updateTodo)
+  },
+  beforeDestroy() {
+    // 销毁组件之前解绑自定义事件
+    this.$bus.$off('changeIsDone')
+    this.$bus.$off('updateTodo')
+    // 消息订阅与发布写法
+    pubsub.unsubscribe(pubId)
+  },
+```
+
+调试结果：![image-20230330200638858](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230330200638858.png)

@@ -7534,3 +7534,72 @@ Item.vue
 ​	这样子就实现了任意两个组件之间的直接通信，不用逐层传递。
 
 <img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230330164754990.png" alt="image-20230330164754990" style="zoom:50%;" />
+
+## 3.11 消息订阅与发布（pubsub）
+
+​	这也是一种组件间通信的方式，适用于**任意组件间通信**（适用各类前端框架，Vue使用较少）
+
+​	使用步骤：
+
+1. 安装第三方库pubsub:`npm i pubsub-js`
+2. 在需要用的地方引入：`import pubsub from 'pubsub-js'`
+3. 接收数据：A组件想要接收数据，则在A组件中订阅消息，订阅的回调留在A组件自身
+
+```javascript
+methods:{
+	demo(data){...}
+}
+......
+mounted(){
+	this.pid = pubsub.subscribe('xxx',this.demo) 	// 订阅消息，会创建一个id
+}
+......
+beforeDestroy(){
+	pubsub.unsubscribe(this.pid)
+}
+
+```
+
+4. 提供数据：`pubsub.publish('xxx', 数据)`
+5. 最好在beforeDestory钩子中，用`pubsub.unsubcrive(pid)`去取消订阅
+
+我们仍然使用School组件和Student通信来验证这个问题：
+
+School需要Student传来的数据，所以School是订阅消息，Student是发布消息
+
+School.vue
+
+```javascript
+    mounted() {
+      // console.log('School', this.x);
+      // this.$bus.$on('hello', (data) => {
+      //   console.log('我是School组件，收到了数据', data);
+      // })
+      this.pubId = pubsub.subscribe('hello', (msgName, data) => {
+        console.log('有人发布了hello消息，hello消息的回调执行了', msgName, data);
+        console.log(this);
+      })
+    },
+    // 销毁组件之前解绑对应自定义事件，如果我们off里面什么都不写，就代表销毁所有事件，就会代表所有给中转站绑定的时间全部失效
+    beforeDestroy() {
+      // this.$bus.$off('hello')
+      pubsub.unsubscribe(this.pubId)
+    },
+```
+
+Student.vue
+
+```javascript
+    methods: {
+      sendStudentName(){
+        // this.$bus.$emit('hello', this.name)
+        pubsub.publish('hello', this.name)
+      }
+    },
+```
+
+​	需要注意的是，我们订阅消息的回调需要写成箭头函数，如果我们写成普通函数的话，这里的this的值将会是`undefined`，是因为我们这是在第三方库里面使用this，vue不会保证在第三方库里面的this指向是vm或vc，所以最好的解决办法就是写成箭头函数，箭头函数没有自己的this，它会往外找，自然会找到vc。
+
+调试结果：
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230330174838187.png" alt="image-20230330174838187" style="zoom:50%;" />

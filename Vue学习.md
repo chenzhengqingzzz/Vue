@@ -7603,3 +7603,57 @@ Student.vue
 调试结果：
 
 <img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230330174838187.png" alt="image-20230330174838187" style="zoom:50%;" />
+
+**TodoList案例使用pubsub写法：**
+
+​	我们这里将Item组件的删除功能使用pubsub写法来实现：
+
+​	这里需要App接收到删除Item的id，所以App是订阅，Item是发布
+
+App.vue
+
+method中负责删除的实现：
+
+```javascript
+    // 删除一个todo
+    deleteTodo(_, id){
+      this.todos = this.todos.filter((todo) => {
+        return todo.id !== id
+      })
+    },
+```
+
+```javascript
+  mounted() {
+    // 绑定自定义事件，回调留在本组件中
+    // 全局事件总线写法
+    this.$bus.$on('changeIsDone', this.changeIsDone)
+    // 消息订阅与发布写法
+    this.pubId = pubsub.subscribe('deleteTodo', this.deleteTodo)
+  },
+  beforeDestroy() {
+    // 销毁组件之前解绑自定义事件
+    this.$bus.$off('changeIsDone')
+    // 消息订阅与发布写法
+    pubsub.unsubscribe(pubId)
+  },
+};
+```
+
+Item.vue
+
+```javascript
+    // 删除
+    handleDelete(id){
+      if (confirm('确定删除吗？')) {
+        // 通知App删除对应id的todo项
+        // this.deleteTodo(id)
+        // this.$bus.$emit('deleteTodo', id)
+        pubsub.publish('deleteTodo', id)
+      } 
+    }
+  },
+```
+
+​	由于pubsub-js的API设计需要传入消息名字作为第一个参数，而我们业务需求只需要传递id这个数据就可以了，所以我们选择在deleteTodo方法里面传一个占位符来充当第一个参数
+

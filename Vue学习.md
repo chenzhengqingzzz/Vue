@@ -7415,3 +7415,122 @@ export default {
 ![image-20230329215224886](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230329215224886.png)
 
 ![image-20230329215254709](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230329215254709.png)
+
+**用全局事件总线完善TodoList案例：**
+
+​	我们学习了全局事件总线之后，可以实现在任意两个组件之间传递数据，所以我们可以着手来完善TodoList案例中的组件传递数据部分
+
+​	父子组件之间传递数据和子父组件传递数据我们都可以使用props的方法传递，所以可以不用修改
+
+​	爷孙组件传递数据我们还是使用的是逐层传递，这是没必要的操作，所以当孙组件Item传数据给爷组件App的时候我们可以用全局事件总线来实现，从而不用走List这个组件
+
+main.js
+
+```javascript
+    // 安装全局事件总线
+    beforeCreate() {
+        Vue.prototype.$bus = this
+    },
+```
+
+既然不用props，则可以把那些传在List的回调全部删除，相应的在List、Item里面接收的props也可以删除
+
+App.vue
+
+```vue
+<template>
+  <div id="root">
+    <div class="todo-container">
+      <div class="todo-wrap">
+        <!-- 通过props传给子组件一个函数 -->
+        <Header :addTodo="addTodo" />
+        <List :todos="todos" />
+        <Footer :todos="todos" :checkAllTodo="checkAllTodo" :clearAllDoneTodo="clearAllDoneTodo" />
+      </div>
+    </div>
+  </div>
+</template>
+```
+
+```javascript
+  mounted() {
+    // 绑定自定义事件，回调留在本组件中
+    this.$bus.$on('changeIsDone', this.changeIsDone)
+    this.$bus.$on('deleteTodo', this.deleteTodo)
+  },
+  beforeDestroy() {
+    // 销毁组件之前解绑自定义事件
+    this.$bus.$off('changeIsDone')
+    this.$bus.$off('deleteTodo')
+  },
+```
+
+List.vue
+
+```vue
+<template>
+  <ul class="todo-main">
+    <Item
+      v-for="todoObj in todos"
+      :key="todoObj.id"
+      :todo="todoObj"
+    />
+  </ul>
+</template>
+```
+
+```javascript
+  props: ["todos"],
+```
+
+Item.vue
+
+```vue
+<template>
+  <ul class="todo-main">
+    <li>
+      <label>
+        <input
+          type="checkbox"
+          :checked="this.todo.isDone"
+          @change="handleCheck(todo.id)"
+        />
+        <!-- 如下代码也能实现功能，但是不太推荐，因为有点违反原则，修改了props -->
+        <!-- <input type="checkbox" v-model="this.todo.isDone" > -->
+        <span>{{ this.todo.title }}</span>
+      </label>
+      <button class="btn btn-danger" @click="handleDelete(todo.id)">删除</button>
+    </li>
+  </ul>
+</template>
+```
+
+```javascript
+  props: {
+    // 声明接收todo对象
+    todo: {
+      type: Object,
+      required: true,
+    },
+  },
+  methods: {
+    // 勾选or取消勾选
+    handleCheck(id) {
+      // 通知App组件将对应的todo对象的idDone值取反
+      // this.changeIsDone(id)
+      this.$bus.$emit('changeIsDone', id)
+    },
+    // 删除
+    handleDelete(id){
+      if (confirm('确定删除吗？')) {
+        // 通知App删除对应id的todo项
+        // this.deleteTodo(id)
+        this.$bus.$emit('deleteTodo', id)
+      }
+    }
+  },
+```
+
+​	这样子就实现了任意两个组件之间的直接通信，不用逐层传递。
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230330164754990.png" alt="image-20230330164754990" style="zoom:50%;" />

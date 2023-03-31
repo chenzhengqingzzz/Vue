@@ -7798,3 +7798,232 @@ App.vue
 ```
 
 调试结果：![image-20230330200638858](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230330200638858.png)
+
+## 3.13 过渡与动画效果
+
+### 3.13.1 动画效果
+
+​	我们在组件中写入一个动画，如果在动画的标签外围包裹一个`<transition>`标签的话，vue可以帮我们在核实的时候给元素添加样式类名
+
+```vue
+<template>
+  <div>
+    <button @click="isShow = !isShow">显示/隐藏</button>
+    <transition name="transform" :appear="true">
+      <h1 v-show="isShow">你好啊</h1>
+    </transition>
+  </div>
+</template>
+
+<script>
+export default {
+  name: "Test",
+  data() {
+    return {
+      isShow: true,
+    };
+  },
+};
+</script>
+
+<style scoped>
+h1 {
+  background-color: orange;
+}
+.transform-enter-active {
+  animation: hello 0.5s linear;
+}
+
+.transform-leave-active {
+  animation: hello 0.5s linear reverse;
+}
+@keyframes hello {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0px);
+  }
+}
+</style>
+
+```
+
+​		在外围报裹了transition标签，我们在这里只需要修改isShow的值就能够控制动画的类名修改，非常方便，而且vue编译完之后会给我们脱掉transition标签
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230330204827876.png" alt="image-20230330204827876" style="zoom:50%;" />
+
+### 3.13.2 过渡效果
+
+​	这一节我们使用过渡效果来写上面的动画案例：
+
+​	在这里我们就可以不用使用关键帧了，直接使用Vue给我们提供的4个类名：`.name-enter`、`.name-enter-to`、`.name-leave`、`.name-leave-to`
+
+​	动画转换的方式以及参数我们用`.name-enter/leave-active`写
+
+```vue
+<style scoped>
+h1 {
+  background-color: orange;
+}
+
+/* 进入的起点、离开的终点 */
+.transform-enter, .transform-leave-to  {
+  transform: translateX(-100%);
+}
+
+/* 转换的方式 */
+.transform-enter-active, .transform-leave-active {
+  transition: 0.5s;
+}
+
+/* 进入的终点、离开的起点  */
+.transform-enter-to, .transform-leave {
+  transform: translateX(0);
+}
+
+</style>
+```
+
+​	就会发现和上个组件一样的效果
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230331161923649.png" alt="image-20230331161923649" style="zoom:50%;" />
+
+​	个人认为过渡效果做出来的动画，在多次转换的时候更平滑
+
+### 3.13.3 多个元素过渡
+
+​	我们如果要在transition标签里面放入多个元素，则可以将transition变为transition-group
+
+```vue
+<template>
+  <div>
+    <button @click="isShow = !isShow">显示/隐藏</button>
+    <transition-group name="transform" :appear="true">
+      <h1 v-show="isShow" key="1">你好啊</h1>
+      <h1 v-show="!isShow" key="2">睡大觉</h1>
+    </transition-group>
+  </div>
+</template>
+```
+
+![image-20230331162747168](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230331162747168.png)
+
+### 3.13.4 集成第三方动画
+
+​	Vue也可以让我们使用第三方的库来实现完美的动画效果
+
+​	这里在npm官网引入的是animate.css
+
+```shell
+npm install animate.css
+```
+
+引入样式库
+
+```javascript
+import 'animate.css';
+```
+
+然后将transition里面的name配置项改为`animate__animated animate__bounce`，我们将会使用两个新配置项：`enter-active-class`、`leave-active-class`，分别对应元素的进入和离开，然后我们就可以在网站复制效果名作为它们的值了
+
+```vue
+<template>
+  <div>
+    <button @click="isShow = !isShow">显示/隐藏</button>
+    <transition-group
+      :appear="true"
+      name="animate__animated animate__bounce"
+      enter-active-class="animate__swing"
+      leave-active-class="animate__backOutUp"
+    >
+      <h1 v-show="isShow" key="1">你好啊</h1>
+      <h1 v-show="!isShow" key="2">睡大觉</h1>
+    </transition-group>
+  </div>
+</template>
+```
+
+​	style标签只用写简单的样式就行了，animate.css都能帮我们实现
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230331164445783.png" alt="image-20230331164445783" style="zoom:50%;" />
+
+### 3.13.5 总结Vue封装的过渡与动画
+
+ 1. 作用：在插入、更新或移除DOM元素时，在合适的时候给元素添加样式类名
+
+ 2. 图示：![image-20230331164813825](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230331164813825.png)
+
+ 3. 写法：
+
+    1. 准备好样式：
+
+       * 元素进入的样式：
+         1. v-enter：进入的起点
+         2. v-enter-active：进入过程中
+         3. v-enter-to：进入的终点
+       * 元素离开的样式：
+         1. v-leave：离开的起点
+         2. v-leave-active：离开过程中
+         3. v-leave-to：离开的终点
+
+    2. 使用`<transition>`包裹要过渡的元素，并配置name属性：
+
+       ```vue
+       <transition name="hello">
+       	<h1 v-show="isShow">你好啊/h1>
+       </transition>
+       ```
+
+    3. 备注：若有多个元素需要过渡，则需要使用：`<transision-group>`，且每个元素都要指定`key`值
+
+    **完善TodoList案例：给Item添加动画**
+
+    ​	我们来着手给每一个Item添加Animate.css中的动画：
+
+    ```vue
+    <template>
+      <transition
+        name="animate__animated animate__bounce"
+        enter-active-class="animate__rotateInDownLeft"
+        leave-active-class="animate__rotateOutUpRight"
+        :appear="true"
+      >
+        <ul class="todo-main">
+          <li>
+            <label>
+              <input
+                type="checkbox"
+                :checked="this.todo.isDone"
+                @change="handleCheck(todo.id)"
+              />
+              <!-- 如下代码也能实现功能，但是不太推荐，因为有点违反原则，修改了props -->
+              <!-- <input type="checkbox" v-model="this.todo.isDone" > -->
+              <span v-show="!todo.isEdit">{{ this.todo.title }}</span>
+              <input
+                type="text"
+                v-show="todo.isEdit"
+                :value="todo.title"
+                @blur="handleBlur(todo, $event)"
+                ref="inputTitle"
+              />
+            </label>
+            <button class="btn btn-danger" @click="handleDelete(todo.id)">
+              删除
+            </button>
+            <button
+              class="btn btn-edit"
+              v-show="!todo.isEdit"
+              @click="handleEdit(todo)"
+            >
+              编辑
+            </button>
+          </li>
+        </ul>
+      </transition>
+    </template>
+    ```
+
+    在这里我们直接将整个组件外面包裹`<transition>`标签，以及附上相应的属性，最后在`<script>`标签中引入样式库就可以了
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230331171245606.png" alt="image-20230331171245606" style="zoom:50%;" />

@@ -8140,3 +8140,128 @@ export default {
 1. 优点：配置简单，请求资源时直接发给前端（8080）即可
 2. 缺点：不能配置多个代理，不能灵活的控制请求是否走代理
 3. 工作方式：若按照上述配置代理，当请求了前端不存在的资源时，那么该请求会转发给服务器（优先匹配前端资源 public文件夹中的）
+
+### 3.14.3 Vue脚手架配置代理 方法二
+
+​	编写vue.config配置具体代理规则：
+
+```javascript
+module.exports = {
+	  devServer: {
+    proxy: {
+      // 请求前缀 代理服务器会检查请求有没有这个前缀，控制是否需要全部走代理
+      '/api': { // 匹配所有以 '/api'开头的请求路径
+        target: 'http://localhost:3000',// 代理目标的基础路径
+
+        // 匹配所有以/api开头的路径，都变成空字符串
+        // 避免代理服务器转发给服务器的路径中带有/api从而匹配错误404
+        pathRewrite: {'^/api': ''},
+        ws: true, // 用于支持websocket
+        // changeOrigin: true // 用于控制请求头中的host值
+      },
+      '/czq': { // 匹配所有以 '/czq'开头的请求路径
+        target: 'http://localhost:3001',// 代理目标的基础路径
+        
+        // 匹配所有以/api开头的路径，都变成空字符串
+        // 避免代理服务器转发给服务器的路径中带有/czq从而匹配错误404
+        pathRewrite: {'^/czq': ''},
+        ws: true, // 用于支持websocket
+        // changeOrigin: true // 用于控制请求头中的host值
+      },
+    }
+  }
+}
+/*
+   changeOrigin设置为true时，服务器收到的请求头中的host为：localhost:5000
+   changeOrigin设置为false时，服务器收到的请求头中的host为：localhost:8080
+   changeOrigin默认值为true
+*/
+```
+
+在App中给server2发送ajax请求以获取车辆信息
+
+```vue
+<template>
+  <div id="root">
+    <button @click="getStudents">获取学生信息</button>
+    <button @click="getCars">获取汽车信息</button>
+  </div>
+</template>
+```
+
+```javascript
+		getCars(){
+      axios({
+        method: 'GET', 
+        url: 'http://localhost:8080/czq/cars'
+      }).then((response) => {
+        console.log('请求成功了', response.data);
+      })
+    }
+```
+
+server2.js
+
+```javascript
+const express = require('express')
+const app = express()
+
+app.use((request,response,next)=>{
+	console.log('有人请求服务器2了');
+	next()
+})
+
+app.get('/cars',(request,response)=>{
+	// 设置响应头 设置允许跨域
+    response.setHeader('Access-Control-Allow-Origin', '*')
+    // 设置允许任何类型的响应头
+    response.setHeader('Access-Control-Allow-Headers', "*")
+	const cars = [
+		{id:'001',name:'奔驰',price:199},
+		{id:'002',name:'马自达',price:109},
+		{id:'003',name:'捷达',price:120},
+	]
+	response.send(cars)
+})
+
+app.listen(3001,(err)=>{
+	if(!err) console.log('服务器2启动成功了,请求汽车信息地址为：http://localhost:3001/cars');
+})
+const express = require('express')
+const app = express()
+
+app.use((request,response,next)=>{
+	console.log('有人请求服务器2了');
+	next()
+})
+
+app.get('/cars',(request,response)=>{
+	// 设置响应头 设置允许跨域
+    response.setHeader('Access-Control-Allow-Origin', '*')
+    // 设置允许任何类型的响应头
+    response.setHeader('Access-Control-Allow-Headers', "*")
+	const cars = [
+		{id:'001',name:'奔驰',price:199},
+		{id:'002',name:'马自达',price:109},
+		{id:'003',name:'捷达',price:120},
+	]
+	response.send(cars)
+})
+
+app.listen(3001,(err)=>{
+	if(!err) console.log('服务器2启动成功了,请求汽车信息地址为：http://localhost:3001/cars');
+})
+
+```
+
+调试结果：
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230331204836159.png" alt="image-20230331204836159" style="zoom:50%;" />
+
+server1中的输出
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230331204902142.png" alt="image-20230331204902142" style="zoom:50%;" />
+
+server2中的输出
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230331204927354.png" alt="image-20230331204927354" style="zoom:50%;" />

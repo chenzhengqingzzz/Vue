@@ -8027,3 +8027,116 @@ import 'animate.css';
     在这里我们直接将整个组件外面包裹`<transition>`标签，以及附上相应的属性，最后在`<script>`标签中引入样式库就可以了
 
 <img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230331171245606.png" alt="image-20230331171245606" style="zoom:50%;" />
+
+## 3.14 Vue脚手架配置代理
+
+### 3.14.1 尝试为nodejs服务器发送Ajax请求
+
+​	我们现在尝试在Vue脚手架中用axois给本地的node服务器发送ajax请求来获取数据
+
+​	Ajax服务器 server1.js
+
+```javascript
+const express = require('express')
+const app = express()
+
+app.use((request,response,next)=>{
+	console.log('有人请求服务器1了');
+	// console.log('请求来自于',request.get('Host'));
+	// console.log('请求的地址',request.url);
+	next()
+})
+
+app.get('/students',(request,response)=>{
+	
+	const students = [
+		{id:'001',name:'tom',age:18},
+		{id:'002',name:'jerry',age:19},
+		{id:'003',name:'tony',age:120},
+	]
+	response.send(students)
+})
+
+app.listen(3000,(err)=>{
+	if(!err) console.log('服务器1启动成功了,请求学生信息地址为：http://localhost:3000/students');
+})
+
+```
+
+App.vue
+
+```vue
+<template>
+  <div id="root">
+    <button @click="getStudents">获取学生信息</button>
+  </div>
+</template>
+
+<script>
+import axios from 'axios'
+export default {
+  name: "App",
+  methods: {
+    getStudents(){
+      // axios.get('http://localhost:3000/students').then(
+      // (response) => {
+      //   console.log(' 请求成功了', response.data);
+      // },
+      // (error) => {
+      //   console.log('请求失败了', error.message);
+      // })
+      axios({
+        method: 'GET',
+        url: 'http://localhost:8080/students',
+
+      }).then((response) => {
+        console.log('请求成功了', response.data);
+      })
+    }
+  },
+};
+</script>
+```
+
+​	这边引入了axios这个库，并且在目标服务器配置了一些请求头设置了可跨域
+
+​	如果不设置跨域，就会发现有错误，原因是我们的客户端和服务器的端口不一样，浏览器接收到服务器返回的数据，发现我们和服务器不是同源，就不把数据给我们
+
+![image-20230331195340436](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230331195340436.png)
+
+​	当我们在服务器里配置了跨域的请求头，下面的线就走通了
+
+```javascript
+		// 设置响应头 设置允许跨域
+    response.setHeader('Access-Control-Allow-Origin', '*')
+    // 设置允许任何类型的响应头
+    response.setHeader('Access-Control-Allow-Headers', "*")
+```
+
+![image-20230331195531962](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230331195531962.png)
+
+​	这是我们借助axios来发送Ajax请求，其实我们还可以配置代理服务器来为我们发送Ajax请求，由于服务器之间不受同源策略的限制，所以我们需要代理服务器跟我们同源，跟目标服务器不同源即可。
+
+![image-20230331200006157](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230331200006157.png)
+
+​	配置代理服务器的方法，图里面有两种：1. nginx服务器 2. vue-cli脚手架代理
+
+使用nginx服务器的学习成本较高，而且需要后端诸多知识，我们这边选择vue-cli中的脚手架代理
+
+### 3.14.2 Vue脚手架配置代理 方法一
+
+在`vue.config.js`中添加如下配置：
+
+```js
+  // 开启代理服务器
+  devServer: {
+    // 告诉代理服务器请求转发的服务器
+    proxy: 'http://localhost:3000'
+  }
+```
+
+说明：
+
+1. 优点：配置简单，请求资源时直接发给前端（8080）即可
+2. 缺点：不能配置多个代理，不能灵活的控制请求是否走代理
+3. 工作方式：若按照上述配置代理，当请求了前端不存在的资源时，那么该请求会转发给服务器（优先匹配前端资源 public文件夹中的）

@@ -23,15 +23,21 @@ export default {
   },
   methods: {
     searchUsers(){
+      // 请求前更新List的数据
+      this.$bus.$emit('updateListData', {isFirst: false, isLoading: true, errMsg: '', users: []})
       axios({
         method: 'GET',
         url: `https://api.github.com/search/users?q=${this.keyWord}`
       }).then(
         (response) => {
-          this.$bus.$emit('getUsers', response.data.items)
+          console.log('请求成功了');
+          // 请求成功后更新List的数据
+          this.$bus.$emit('updateListData', {isLoading: false, errMsg: '', users: response.data.items})
         },
         (error) => {
-          console.log(error);
+          // 请求失败后更新List的数据
+          this.$bus.$emit('updateListData', {isLoading: false, errMsg: error.message, users: []})
+      
         }
       )
     }

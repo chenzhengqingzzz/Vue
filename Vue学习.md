@@ -8497,3 +8497,94 @@ List.vue
 调试结果：
 
 <img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230403175335719.png" alt="image-20230403175335719" style="zoom:50%;" />
+
+### 3.15.4 GitHub搜索案例_完善案例
+
+​	上一节我们的搜索案例大抵是完成了，但是还有一些需要完善的：在List这个组件中，我们只写了搜索成功之后的回应，我们应该还写出欢迎界面、加载界面和错误信息显示，将它们包在了一个数组中
+
+​	我们需要定义这些变量来赋给模板从而决定页面的展示与否
+
+List.vue
+
+```javascript
+  name: "List",
+  data() {
+    return {
+      info: {
+        isFirst: true,
+        isLoading: false,
+        errMsg: "",
+        users: [],
+      },
+    };
+```
+
+```vue
+<template>
+  <div class="row">
+    <!-- 展示用户列表 -->
+    <div
+      v-show="info.users.length"
+      class="card"
+      v-for="user in info.users"
+      :key="user.id"
+    >
+      <a :href="user.html_url" target="_blank">
+        <img :src="user.avatar_url" style="width: 100px" />
+      </a>
+      <p class="card-text">{{ user.login }}</p>
+    </div>
+    <!-- 展示欢迎词 -->
+    <h1 v-show="info.isFirst">欢迎使用！！！</h1>
+    <!-- 展示加载中 -->
+    <h1 v-show="info.isLoading">加载中......</h1>
+    <!-- 展示错误信息 -->
+    <h1 v-show="info.errMsg">{{ info.errMsg }}</h1>
+  </div>
+</template>
+```
+
+事件的触发所传的相关参数：
+
+```javascript
+  mounted() {
+    this.$bus.$on("updateListData", (dataObj) => {
+      console.log(dataObj);
+      // 它会把info中的属性所有都摊在这，最后再把dataObj中所有属性也摊在这，重名的属性以后面的为主
+      // 这样就不会丢失isFirst
+      this.info = {...this.info, ...dataObj}
+    });
+  },
+```
+
+Search中所决定的数据类型：
+
+```javascript
+    searchUsers(){
+      // 请求前更新List的数据
+      this.$bus.$emit('updateListData', {isFirst: false, isLoading: true, errMsg: '', users: []})
+      axios({
+        method: 'GET',
+        url: `https://api.github.com/search/users?q=${this.keyWord}`
+      }).then(
+        (response) => {
+          console.log('请求成功了');
+          // 请求成功后更新List的数据
+          this.$bus.$emit('updateListData', {isLoading: false, errMsg: '', users: response.data.items})
+        },
+        (error) => {
+          // 请求失败后更新List的数据
+          this.$bus.$emit('updateListDataupdateListData', {isLoading: false, errMsg: error.message, users: []})
+      
+        }
+      )
+    }
+```
+
+调试结果：
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230403185624780.png" alt="image-20230403185624780" style="zoom:50%;" />
+
+![image-20230403185652188](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230403185652188.png)
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230403185733036.png" alt="image-20230403185733036" style="zoom:50%;" />

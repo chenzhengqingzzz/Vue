@@ -8265,3 +8265,9 @@ server1中的输出
 server2中的输出
 
 <img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230331204927354.png" alt="image-20230331204927354" style="zoom:50%;" />
+
+## 3.15 GitHub搜索案例
+
+### 3.15.1 效果
+
+![image-20230403144710081](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230403144710081.png)

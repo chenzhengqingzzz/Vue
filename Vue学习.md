@@ -8271,3 +8271,140 @@ server2中的输出
 ### 3.15.1 效果
 
 ![image-20230403144710081](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230403144710081.png)
+
+### 3.15.2 静态页面的搭建
+
+​	我们将在这个案例中将使用第三方样式库bootstrap来布局页面
+
+​	在public中新建一个css文件夹来存放bootstrap.css
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230403161601052.png" alt="image-20230403161601052" style="zoom:50%;" />
+
+Index.html中引入：
+
+```html
+    <!-- 引入 第三方样式 -->
+    <link rel="stylesheet" href="<%= BASE_URL %>css/bootstrap.css">
+```
+
+App.vue
+
+```vue
+<template>
+  <div class="container">
+    <Search />
+    <List />
+  </div>
+</template>
+
+<script>
+import Search from "./components/Search.vue";
+import List from "./components/List.vue";
+export default {
+  name: "App",
+  components: {
+    Search,
+    List,
+  },
+};
+</script>
+
+```
+
+Search.vue
+
+```vue
+<template>
+  <section class="jumbotron">
+    <h3 class="jumbotron-heading">Search Github Users</h3>
+    <div>
+      <input
+        type="text"
+        placeholder="enter the name you search"
+      />&nbsp;<button>Search</button>
+    </div>
+  </section>
+</template>
+
+<script>
+export default {
+  name: "Search",
+};
+</script>
+
+<style>
+</style>
+```
+
+List.vue
+
+```vue
+<template>
+  <div class="row">
+    <div class="card">
+      <a href="https://github.com/xxxxxx" target="_blank">
+        <img src="https://cn.vuejs.org/images/logo.svg" style="width: 100px" />
+      </a>
+      <p class="card-text">xxxxxx</p>
+    </div>
+    <div class="card">
+      <a href="https://github.com/xxxxxx" target="_blank">
+        <img src="https://cn.vuejs.org/images/logo.svg" style="width: 100px" />
+      </a>
+      <p class="card-text">xxxxxx</p>
+    </div>
+    <div class="card">
+      <a href="https://github.com/xxxxxx" target="_blank">
+        <img src="https://cn.vuejs.org/images/logo.svg" style="width: 100px" />
+      </a>
+      <p class="card-text">xxxxxx</p>
+    </div>
+    <div class="card">
+      <a href="https://github.com/xxxxxx" target="_blank">
+        <img src="https://cn.vuejs.org/images/logo.svg" style="width: 100px" />
+      </a>
+      <p class="card-text">xxxxxx</p>
+    </div>
+    <div class="card">
+      <a href="https://github.com/xxxxxx" target="_blank">
+        <img src="https://cn.vuejs.org/images/logo.svg" style="width: 100px" />
+      </a>
+      <p class="card-text">xxxxxx</p>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: "List",
+};
+</script>
+
+<style scoped>
+.album {
+  min-height: 50rem; /* Can be removed; just added for demo purposes */
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+  background-color: #f7f7f7;
+}
+
+.card {
+  float: left;
+  width: 33.333%;
+  padding: 0.75rem;
+  margin-bottom: 2rem;
+  border: 1px solid #efefef;
+  text-align: center;
+}
+
+.card > img {
+  margin-bottom: 0.75rem;
+  border-radius: 100px;
+}
+
+.card-text {
+  font-size: 85%;
+}
+</style>
+```
+

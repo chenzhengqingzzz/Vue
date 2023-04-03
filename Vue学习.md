@@ -8636,3 +8636,70 @@ Search.vue
 ```
 
 <img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230403192359023.png" alt="image-20230403192359023" style="zoom:50%;" />
+
+## 3.16 插槽
+
+	1. 作用：让父组件可以向子组件指定位置插入HTML结构，也是一种组件间通信的方式，适用于**父组件 ===> 子组件**。插槽就是一个占位符，存放父组件内部独有的HTML结构
+	1. 分类：默认插槽、具名插槽、作用域插槽
+
+### 3.16.1 默认插槽
+
+```vue
+<!-- 父组件中： -->
+ <Category>
+     <div>html结构1</div>
+ </Category>
+ 
+ 
+<!-- 子组件Category.vue中： -->
+   <template>
+      <div>
+         <!-- 定义插槽 -->
+         <slot>插槽默认内容...</slot>
+      </div>
+   </template>
+
+```
+
+App.vue
+
+```vue
+<template>
+  <div class="container">
+    <Category title="美食" :listData="foods">
+      <img src="https://n.sinaimg.cn/sinakd20200530ac/320/w640h480/20200530/3d3e-iufmpmp2778569.jpg" alt="">
+    </Category>
+
+    <Category title="动物">
+      <ul>
+        <li v-for="(item, index) in animals" :key="index">{{item}}</li>
+      </ul>
+    </Category>
+
+    <Category title="游戏">
+      <video controls src="http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4"></video>
+    </Category>
+  </div>
+</template>
+```
+
+Categoray.vue
+
+```vue
+<template>
+  <div class="category">
+    <h3>{{title}}分类</h3>
+    <!-- 定义一个插槽（挖个坑，等着组件的使用者进行填充） -->
+    <slot>我是一些默认值，当使用者没有传递具体结构时，我会出现</slot>
+  </div>
+</template>
+
+<script>
+export default {
+    name: 'Category',
+    props: ['title']
+}
+</script>
+```
+
+​	<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230403203659913.png" alt="image-20230403203659913" style="zoom:50%;" />

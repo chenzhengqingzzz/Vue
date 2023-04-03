@@ -8588,3 +8588,51 @@ Search中所决定的数据类型：
 ![image-20230403185652188](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230403185652188.png)
 
 <img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230403185733036.png" alt="image-20230403185733036" style="zoom:50%;" />
+
+### 3.15.5 搜索案例的Vue-resource写法
+
+​	vue-resource这个库和axios类似，里面的API很多都是一样的，风格也是promise风格。这个库在Vue1.0的时候用的比较多，现在作为了解即可
+
+```shell
+npm i vue-resource
+```
+
+​	这个库是一个插件，所以我们需要全局配置
+
+```javascript
+// 引入vue-resource插件
+import vueResource from 'vue-resource';
+// 使用插件
+Vue.use(vueResource)
+```
+
+​	使用之后，在我们vm和vc身上全局都会有`$http`这个属性
+
+所以我们可以开始发送请求
+
+Search.vue
+
+```javascript
+      this.$http.get(`https://api.github.com/search/users?q=${this.keyWord}`)
+        .then(
+          (response) => {
+            console.log("请求成功了");
+            // 请求成功后更新List的数据
+            this.$bus.$emit("updateListData", {
+              isLoading: false,
+              errMsg: "",
+              users: response.data.items,
+            });
+          },
+          (error) => {
+            // 请求失败后更新List的数据
+            this.$bus.$emit("updateListData", {
+              isLoading: false,
+              errMsg: error.message,
+              users: [],
+            });
+          }
+        );
+```
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230403192359023.png" alt="image-20230403192359023" style="zoom:50%;" />

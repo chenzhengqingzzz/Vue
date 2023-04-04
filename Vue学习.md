@@ -8844,3 +8844,114 @@ export default {
 调试结果：
 
 <img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230404180042581.png" alt="image-20230404180042581" style="zoom:50%;" />
+
+# 4.Vuex
+
+## 4.1 理解Vuex
+
+### 4.1.1 Vuex是什么
+
+	1. 概念：专门在Vue中实现集中式状态（数据）管理的一个Vue插件，对vue应用中多个组件的共享状态进行集中式的管理（读/写），也是一种组件间通信的方式，且适用于**任意组件间通信**
+	1. GitHub地址：https://github.com/vuejs/vuex
+
+多组件共享数据时使用**全局事件总线**管理：
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230404191931567.png" alt="image-20230404191931567" style="zoom:50%;" />
+
+多组件共享数据时使用**Vuex**管理：
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230404192039779.png" alt="image-20230404192039779" style="zoom:50%;" />
+
+### 4.1.3 什么时候使用Vuex
+
+1. 多个组件依赖于同一状态
+2. 来自不同组件的行为需要变更同一状态
+
+## 4.2 求和案例_纯vue版
+
+​	这里我们写出两个版本的求和案例：纯vue版和Vuex版，用来对比
+
+App.vue
+
+```vue
+<template>
+  <Count/>
+</template>
+
+<script>
+import Count from './components/Count.vue'
+export default {
+    name: 'App',
+    components: {
+        Count
+    }
+}
+</script>
+
+<style>
+
+</style>
+```
+
+Count.vue
+
+```vue
+<template>
+  <div>
+    <h1>当前求和为：{{ this.sum }}</h1>
+    <select v-model="selectedNumber">
+    <!-- 或者不用v-bind，直接在v-model使用类型转换 -->
+    <!-- <select v-model.number="selectedNumber"> -->
+      <option :value="1">1</option>
+      <option :value="2">2</option>
+      <option :value="3">3</option>
+    </select>
+    <button @click="increment">+</button>
+    <button @click="decrement">-</button>
+    <button @click="incrementOdd">当前求和为奇数再加</button>
+    <button @click="incrementAsync">等一等再加</button>
+  </div>
+</template>
+
+<script>
+export default {
+  name: "Count",
+  data() {
+    return {
+      sum: 0, // 当前的求和
+      selectedNumber: 1, // 用户选择的数字
+    };
+  },
+  methods: {
+    increment() {
+      this.sum += this.selectedNumber;
+    },
+    decrement() {
+      this.sum -= this.selectedNumber;
+    },
+    incrementOdd() {
+      if (this.sum % 2) {
+        this.sum += this.selectedNumber;
+      }
+    },
+    incrementAsync(){
+        setTimeout(() => {
+            this.sum += this.selectedNumber
+        }, 500);
+    }
+  },
+};
+</script>
+
+<style>
+button {
+  margin-left: 5px;
+}
+</style>
+```
+
+这里我们将sum求和存在了Count这个组件中，Vuex将会把它提取出来
+
+调试结果：
+
+![image-20230404201951594](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230404201951594.png)

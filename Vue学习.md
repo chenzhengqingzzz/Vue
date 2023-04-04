@@ -8703,3 +8703,67 @@ export default {
 ```
 
 ​	<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230403203659913.png" alt="image-20230403203659913" style="zoom:50%;" />
+
+### 3.16.2 具名插槽
+
+​	当我们想在页面中使用多个插槽的时候，往往我们会给插槽取名字来区分
+
+​	Category.vue
+
+```vue
+<template>
+  <div class="category">
+    <h3>{{title}}分类</h3>
+    <!-- 定义一个插槽（挖个坑，等着组件的使用者进行填充） -->
+    <slot name="center">我是一些默认值，当使用者没有传递具体结构时，我会出现</slot>
+    <slot name="footer">我是一些默认值，当使用者没有传递具体结构时，我会出现</slot>
+  </div>
+</template>
+```
+
+App.vue
+
+```vue
+<template>
+  <div class="container">
+    <Category title="美食" :listData="foods">
+      <img
+        slot="center"
+        src="https://n.sinaimg.cn/sinakd20200530ac/320/w640h480/20200530/3d3e-iufmpmp2778569.jpg"
+        alt=""
+      />
+      <a slot="footer" href="http://www.baidu.com">更多美食</a>
+    </Category>
+
+    <Category title="动物">
+      <ul slot="center">
+        <li v-for="(item, index) in animals" :key="index">{{ item }}</li>
+      </ul>
+      <div class="foot" slot="footer">
+        <a href="http://www.baidu.com">单机游戏</a>
+        <a href="http://www.baidu.com">网络游戏</a>
+      </div>
+    </Category>
+
+    <Category title="游戏">
+      <video
+        slot="center"
+        controls
+        src="http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4"
+      ></video>
+      <template v-slot:footer>
+        <div class="foot">
+          <a href="http://www.baidu.com">经典</a>
+          <a href="http://www.baidu.com">热门</a>
+          <a href="http://www.baidu.com">推荐</a>
+        </div>
+        <h4>欢迎试玩</h4>
+      </template>
+    </Category>
+  </div>
+</template>
+```
+
+​	值得注意的是 如果被操作的标签是template，我们在标签上的插槽标记应该写成`v-slot:xxx`形式
+
+![image-20230404165752384](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230404165752384.png)

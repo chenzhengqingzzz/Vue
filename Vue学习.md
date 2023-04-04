@@ -8955,3 +8955,9 @@ button {
 调试结果：
 
 ![image-20230404201951594](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230404201951594.png)
+
+## 4.3 Vuex原理图
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230404210756215.png" alt="image-20230404210756215" style="zoom:50%;" />
+
+​	1. 当我们用户在vc中写出我们的逻辑时，可以调用`dispatch()`，传入我们方法的名字，在Action这个对象中肯定会有一个ket与我们的方法相符，然后Action就会调用`commit()`将（Dispatch）我们的动作放给Mutations（Commit），Mutations本质也是一个对象，它手中会握住我们的目标数据和我们传过来需要改变的参数，他帮我们修改数据之后（Mutate），存在State中的我们的数据将会修该，并会帮我们重新渲染页面（Render）

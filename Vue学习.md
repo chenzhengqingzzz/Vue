@@ -8767,3 +8767,80 @@ App.vue
 ​	值得注意的是 如果被操作的标签是template，我们在标签上的插槽标记应该写成`v-slot:xxx`形式
 
 ![image-20230404165752384](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230404165752384.png)
+
+### 3.16.3 作用域插槽
+
+​	这个时候**数据在组件的自身，但根据数据生成的解构需要组件的使用者来决定**（animals这个数据在Category组件中，但使用数据所遍历出来的解构由App组件决定）
+
+像props一样传值
+
+父组件App.vue
+
+```vue
+<template>
+  <div class="container">
+    <Category title="动物">
+      <template scope="test">
+        <!-- {{test.animals}} -->
+        <ul>
+          <li v-for="(item, index) in test.animals" :key="index">{{ item }}</li>
+        </ul>
+        <!-- 可以传多个参数 -->
+        <h4>{{test.meg}}</h4>
+      </template>
+    </Category>
+
+    <Category title="动物">
+      <!-- es6解构赋值 -->
+      <template scope="{animals}">
+        <ol>
+          <li style="color: red" v-for="(item, index) in animals" :key="index">{{ item }}</li>
+        </ol>
+      </template>
+    </Category>
+
+    <Category title="动物">
+    	<!-- 这里的 slot-scope 等价于 scope,写法不同 -->
+      <template slot-scope="test">
+        <h4 v-for="(item, index) in test.animals" :key="index">{{ item }}</h4>
+      </template>
+    </Category>
+  </div>
+</template>
+<script>
+import Category from "./components/Category.vue";
+export default {
+  name: "App",
+  components: {
+    Category,
+  },
+};
+</script>
+```
+
+子组件Category.vue
+
+```vue
+<template>
+  <div class="category">
+    <h3>{{ title }}分类</h3>
+    <slot :animals="animals" msg="hello">我是默认的一些内容</slot>
+  </div>
+</template>
+
+<script>
+export default {
+  name: "Category",
+  props: ["title"],
+  data() {
+    return {
+      animals: ["泥杆马", "梅狸猫", "蒸德湿泥鸭", "灰勒塔德钱兔", "醉嚎狮"],
+    };
+  },
+};
+</script>
+```
+
+调试结果：
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230404180042581.png" alt="image-20230404180042581" style="zoom:50%;" />

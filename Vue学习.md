@@ -8960,4 +8960,157 @@ button {
 
 <img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230404210756215.png" alt="image-20230404210756215" style="zoom:50%;" />
 
-​	1. 当我们用户在vc中写出我们的逻辑时，可以调用`dispatch()`，传入我们方法的名字，在Action这个对象中肯定会有一个ket与我们的方法相符，然后Action就会调用`commit()`将（Dispatch）我们的动作放给Mutations（Commit），Mutations本质也是一个对象，它手中会握住我们的目标数据和我们传过来需要改变的参数，他帮我们修改数据之后（Mutate），存在State中的我们的数据将会修该，并会帮我们重新渲染页面（Render）
+​	1. 当我们用户在vc中写出我们的逻辑时，可以调用`dispatch()`，传入我们方法的名字，在Action这个对象中肯定会有一个key与我们的方法相符，然后Action就会调用`commit()`将（Dispatch）我们的动作放给Mutations（Commit），Mutations本质也是一个对象，它手中会握住我们的目标数据和我们传过来需要改变的参数，他帮我们修改数据之后（Mutate），存在State中的我们的数据将会修该，并会帮我们重新渲染页面（Render）
+
+## 4.4 搭建Vuex开发环境
+
+1. 下载安装：`npm i vuex@3`
+
+这里要注意的是：在2022年3月之后，由于我们创建脚手架默认安装的是Vue3，所以我们安装Vuex的时候默认版本是Vuex4，这个版本只能给Vue3使用，所以我们在安装的时候必须使用Vue2对应的Vuex3
+
+安装了Vuex，并使用之后，我们就可以在我们的vm或者vc的配置项中写`store`这个配置项了，并且所有vm和vc都可以看到`store`
+
+main.js
+
+```javascript
+// 引入Vue
+import Vue from 'vue';
+// 引入Vuex
+import Vuex from 'Vuex'
+// 引入App
+import App from './App'
+// 引入vue-resource插件
+import vueResource from 'vue-resource';
+// 引入store
+import store from './store';
+
+// 关闭Vue的生产提示
+Vue.config.productionTip = false
+// 使用插件
+Vue.use(vueResource)
+// 使用Vuex插件
+Vue.use(Vuex)
+
+// 创建vm
+new Vue({
+    el: '#app',
+    render(h) {
+        return h(App)
+    },
+    store,
+    // 安装全局事件总线
+    beforeCreate() {
+        Vue.prototype.$bus = this
+    },
+    mounted(){
+        //console.log(this);
+    }
+})
+```
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230405201607266.png" alt="image-20230405201607266" style="zoom:50%;" />
+
+2. 有两种创建文件的方法：`src/vuex/store.js`和`src/store/index.js`，这边Vue更推荐后者
+
+```js
+// Actions——用于响应组件里面的动作
+const actions = {
+
+}
+// 准备Mutations——用于操作数据(state)
+const mutations = {
+
+}
+// 准备State——用于存储数据
+const state = {
+
+}
+
+// 创建并暴露Store
+export default new Vuex.Store({
+    actions,
+    mutations,
+    state
+})
+```
+
+​	这样我们会发现有错误：原因是我们创建Store实例后再引入的Vuex，这里面的顺序是有问题的，而且在我们模块化语法中，只有当我们引入的文件中的代码在跑完之后的变量才会放入我们自己的代码中生效，而且vue在执行语句的时候会首先把所有的import语句中的代码先执行完毕然后再看我们自己的代码，所以我们手动更改顺序也不行
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230405202436841.png" alt="image-20230405202436841" style="zoom:50%;" />
+
+​	为了解决这个问题，我们不妨直接在引入的文件（store）中先一步创建Vuex的实例，这样就不会出现代码先后的差错了
+
+3. 在main.js中创建vm是传入store配置项
+
+main.js
+
+```javascript
+// 引入Vue
+import Vue from 'vue';
+// 引入App
+import App from './App'
+// 引入vue-resource插件
+import vueResource from 'vue-resource';
+// 引入store
+import store from './store';
+
+// 关闭Vue的生产提示
+Vue.config.productionTip = false
+// 使用插件
+Vue.use(vueResource)
+
+// 创建vm
+new Vue({
+    el: '#app',
+    render(h) {
+        return h(App)
+    },
+    store,
+    // 安装全局事件总线
+    beforeCreate() {
+        Vue.prototype.$bus = this
+    },
+    mounted(){
+        // console.log(this);
+    }
+})
+```
+
+`/src/store/index.js`
+
+```js
+// 该文件用于创建Vuex中最为核心的store
+
+// // 引入Vue
+import Vue from 'vue'
+// // 引入Vuex
+import Vuex from 'vuex'
+
+// 使用vuex插件
+Vue.use(Vuex)
+
+// Actions——用于响应组件里面的动作
+const actions = {
+
+}
+// 准备Mutations——用于操作数据(state)
+const mutations = {
+
+}
+// 准备State——用于存储数据
+const state = {
+
+}
+
+// 创建并暴露Store
+export default new Vuex.Store({
+    actions,
+    mutations,
+    state
+})
+
+```
+
+​	这样我们的store才能正确被vm和所有vc看到并且拥有强大的功能
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230405202901097.png" alt="image-20230405202901097" style="zoom:50%;" />

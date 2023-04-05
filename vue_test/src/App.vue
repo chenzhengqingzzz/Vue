@@ -10,7 +10,7 @@ export default {
         Count
     },
     mounted() {
-      console.log('App', this);
+      // console.log('App', this);
     },
 }
 </script>

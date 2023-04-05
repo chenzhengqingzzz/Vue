@@ -9114,3 +9114,131 @@ export default new Vuex.Store({
 ​	这样我们的store才能正确被vm和所有vc看到并且拥有强大的功能
 
 <img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230405202901097.png" alt="image-20230405202901097" style="zoom:50%;" />
+
+## 4.5 使用Vuex编写求和案例
+
+1. 初始化数据、配置`actions`、配置`mutations`，操作文件`store.js`
+
+```javascript
+// 该文件用于创建Vuex中最为核心的store
+
+// // 引入Vue
+import Vue from 'vue'
+// // 引入Vuex
+import Vuex from 'vuex'
+
+// 使用vuex插件
+Vue.use(Vuex)
+
+// Actions——用于响应组件里面的动作
+const actions = {
+    // 没有网络请求或其他业务逻辑的动作可以不需要经过actions，直接和mutations对话
+    // increment(context, value) {
+    //     console.log('actions中的increment被调用了', context, value);
+    //     context.commit('INCREMENT', value)
+    // },
+    // decrement(context, value) {
+    //     console.log('actions中的decrement被调用了', context, value);
+    //     context.commit('DECREMENT', value)
+    // },
+
+    // 网络请求或其他业务逻辑一般在actions里面完成
+    incrementOdd(context, value) {
+        if (context.state.sum % 2) {
+            console.log('actions中的incrementOdd被调用了', context, value);
+            context.commit('INCREMENT', value)
+        }
+    },
+    // 网络请求或其他业务逻辑一般在actions里面完成
+    incrementAsync(context, value){
+        setTimeout(() => {
+            console.log('actions中的incrementAsync被调用了', context, value);
+            context.commit('INCREMENT', value)
+        }, 500)
+    }
+}
+// 准备Mutations——用于操作数据(state)
+const mutations = {
+    INCREMENT(state, value) {
+        console.log('mutations中的INCREMENT被调用了', state, value);
+        state.sum += value
+    },
+    DECREMENT(state, value) {
+        console.log('mutations中的INCREMENT被调用了', state, value);
+        state.sum -= value
+    },
+}
+// 准备State——用于存储数据
+const state = {
+    sum: 0, // 当前的求和
+}
+
+// 创建并暴露Store
+export default new Vuex.Store({
+    actions,
+    mutations,
+    state
+})
+
+```
+
+2. 组件中读取Vuex中的数据：`$this.store.state.存入的数据名`
+3. 组件中修改Vuex中的数据：`this.$store.dispatch('actions中的方法名', 数据)`或`this.$store.commit('mutations中的方法名', 数据)`
+
+​	**备注：若没有网络请求或其他业务逻辑，组件中也可以越过actions，直接与mutations对话。即不写`dispatch`，直接编写`commit`**
+
+`src/components/Count.vue`
+
+```vue
+<template>
+  <div>
+    <h1>当前求和为：{{this.$store.state.sum}}</h1>
+    <select v-model="selectedNumber">
+    <!-- 或者不用v-bind，直接在v-model使用类型转换 -->
+    <!-- <select v-model.number="selectedNumber"> -->
+      <option :value="1">1</option>
+      <option :value="2">2</option>
+      <option :value="3">3</option>
+    </select>
+    <button @click="increment">+</button>
+    <button @click="decrement">-</button>
+    <button @click="incrementOdd">当前求和为奇数再加</button>
+    <button @click="incrementAsync">等一等再加</button>
+  </div>
+</template>
+
+<script>
+export default {
+  name: "Count",
+  data() {
+    return {
+      selectedNumber: 1, // 用户选择的数字
+    };
+  },
+  methods: {
+    // 没有网络请求或其他业务逻辑的动作可以不需要经过actions，直接和mutations对话
+    increment() {
+      this.$store.commit('INCREMENT', this.selectedNumber)
+    },
+    // 没有网络请求或其他业务逻辑的动作可以不需要经过actions，直接和mutations对话
+    decrement() {
+      this.$store.commit('DECREMENT', this.selectedNumber)
+    },
+    incrementOdd() {
+      this.$store.dispatch('incrementOdd', this.selectedNumber)
+    },
+    incrementAsync(){
+      this.$store.dispatch('incrementAsync', this.selectedNumber)
+    }
+  },
+};
+</script>
+
+<style>
+button {
+  margin-left: 5px;
+}
+</style>
+```
+
+![image-20230405212601308](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230405212601308.png)

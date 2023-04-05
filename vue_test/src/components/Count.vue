@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>当前求和为：{{ this.sum }}</h1>
+    <h1>当前求和为：{{this.$store.state.sum}}</h1>
     <select v-model="selectedNumber">
     <!-- 或者不用v-bind，直接在v-model使用类型转换 -->
     <!-- <select v-model.number="selectedNumber"> -->
@@ -20,26 +20,23 @@ export default {
   name: "Count",
   data() {
     return {
-      sum: 0, // 当前的求和
       selectedNumber: 1, // 用户选择的数字
     };
   },
   methods: {
+    // 没有网络请求或其他业务逻辑的动作可以不需要经过actions，直接和mutations对话
     increment() {
-      this.sum += this.selectedNumber;
+      this.$store.commit('INCREMENT', this.selectedNumber)
     },
+    // 没有网络请求或其他业务逻辑的动作可以不需要经过actions，直接和mutations对话
     decrement() {
-      this.sum -= this.selectedNumber;
+      this.$store.commit('DECREMENT', this.selectedNumber)
     },
     incrementOdd() {
-      if (this.sum % 2) {
-        this.sum += this.selectedNumber;
-      }
+      this.$store.dispatch('incrementOdd', this.selectedNumber)
     },
     incrementAsync(){
-        setTimeout(() => {
-            this.sum += this.selectedNumber
-        }, 500);
+      this.$store.dispatch('incrementAsync', this.selectedNumber)
     }
   },
 };

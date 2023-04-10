@@ -9248,3 +9248,41 @@ button {
 ​	和redux一样，Vuex也有属于自己的开发者工具 它集成在了vue开发者工具的TimeLine选项卡中
 
 <img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230410194014387.png" alt="image-20230410194014387" style="zoom:50%;" />
+
+## 4.6 Vuex中的Store中的getters配置项
+
+1. 概念：当`state`中的数据需要经过加工后再使用并且需要多组件复用时，可以使用getters加工
+2. 在`store.js`中追加`getters`配置
+
+```javascript
+// 准备getters——用于将state中的数据进行加工
+const getters = {
+    bigSum(state){
+        return state.sum * 10
+    }
+}
+
+// 创建并暴露Store
+export default new Vuex.Store({
+    actions,
+    mutations,
+    state,
+    getters
+})
+```
+
+3. 读取组件中的数据：`$store.getters.bigSum`
+
+Count组件中：
+
+```vue
+<h3>当前求和被放大10倍后为：{{$store.getters.bigSum}}</h3>
+```
+
+调试结果：
+
+![image-20230410195847953](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230410195847953.png)
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230410195916362.png" alt="image-20230410195916362" style="zoom:50%;" />
+
+​	我们将store中的`state`与`getters`同vc中的`data`与`computed`对比，发现这两对属性都非常相似，`state`与`data`都充当数据源， `getters`和`computed`都是对数据进行加工，而且他们的值都是由返回值决定，`getters`可以多个组件同时使用，`computed`只能给当前组件自己使用

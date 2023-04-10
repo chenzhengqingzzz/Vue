@@ -1,6 +1,7 @@
 <template>
   <div>
     <h1>当前求和为：{{this.$store.state.sum}}</h1>
+    <h3>当前求和被放大10倍后为：{{$store.getters.bigSum}}</h3>
     <select v-model="selectedNumber">
     <!-- 或者不用v-bind，直接在v-model使用类型转换 -->
     <!-- <select v-model.number="selectedNumber"> -->
@@ -38,6 +39,9 @@ export default {
     incrementAsync(){
       this.$store.dispatch('incrementAsync', this.selectedNumber)
     }
+  },
+  mounted() {
+    console.log(this);
   },
 };
 </script>

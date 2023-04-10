@@ -9286,3 +9286,55 @@ Count组件中：
 <img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230410195916362.png" alt="image-20230410195916362" style="zoom:50%;" />
 
 ​	我们将store中的`state`与`getters`同vc中的`data`与`computed`对比，发现这两对属性都非常相似，`state`与`data`都充当数据源， `getters`和`computed`都是对数据进行加工，而且他们的值都是由返回值决定，`getters`可以多个组件同时使用，`computed`只能给当前组件自己使用
+
+## 4.7 四个map方法的使用
+
+在Count.vue中新加入：
+
+```vue
+    <h1>当前求和为：{{sum}}</h1>
+    <h3>当前求和被放大10倍后为：{{bigSum}}</h3>
+    <h3>我在{{school}}，学习{{subject}}</h3>
+```
+
+
+
+1. mapState方法：帮助我们映射`state`中的数据为`计算属性`
+
+```javascript
+  computed: {
+    // 靠程序员自己亲自去写计算属性：
+    // sum(){
+    //   return this.$store.state.sum
+    // },
+    // school(){
+    //   return this.$store.state.school
+    // },
+    // subject(){
+    //   return this.$store.state.subject
+    // },
+
+    // es6语法：把每一组keyvalue都展开放入这里
+    // 借助mapState生成计算属性，从state中读取属性（对象写法）
+    ...mapState({sum: 'sum', school: 'school', subject: 'subject'}),
+    // 借助mapState生成计算属性，从state中读取属性（数组写法）
+    ...mapState(['sum', 'school', 'subject']),
+```
+
+2. mapGetters方法：用于帮助我们映射`getters`中的数据为计算属性
+
+```javascript
+  computed: {
+
+    // ------------------------------------
+    // bigSum(){
+    //   return this.$store.getters.bigSum
+    // }
+    
+    // 借助mapState生成计算属性，从getters中读取属性（对象写法）
+   	...mapGetters({bigSum: 'bigSum'}),
+    // 借助mapState生成计算属性，从getters中读取属性（数组写法）
+    ...mapGetters(['bigSum'])
+  },
+```
+

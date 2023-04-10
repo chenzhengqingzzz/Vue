@@ -1,4 +1,4 @@
-# j1. Vue基础知识和原理
+# 1. Vue基础知识和原理
 
 ## 1.1 初识Vue
 
@@ -9242,3 +9242,9 @@ button {
 ```
 
 ![image-20230405212601308](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230405212601308.png)
+
+## 4.5 Vue开发者工具的使用
+
+​	和redux一样，Vuex也有属于自己的开发者工具 它集成在了vue开发者工具的TimeLine选项卡中
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230410194014387.png" alt="image-20230410194014387" style="zoom:50%;" />

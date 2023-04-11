@@ -9299,7 +9299,7 @@ Count组件中：
 
 
 
-1. mapState方法：帮助我们映射`state`中的数据为`计算属性`
+1. **mapState**方法：帮助我们映射`state`中的数据为`计算属性`
 
 ```javascript
   computed: {
@@ -9321,7 +9321,7 @@ Count组件中：
     ...mapState(['sum', 'school', 'subject']),
 ```
 
-2. mapGetters方法：用于帮助我们映射`getters`中的数据为计算属性
+2. **mapGetters**方法：用于帮助我们映射`getters`中的数据为计算属性
 
 ```javascript
   computed: {
@@ -9338,3 +9338,82 @@ Count组件中：
   },
 ```
 
+3. **mapActions**方法：用于帮助我们生成与`actions`对话的方法，即：包含`$store.dispatch(xxx)`的函数
+
+```vue
+    <button @click="incrementOdd">当前求和为奇数再加</button>
+    <button @click="incrementAsync">等一等再加</button>
+```
+
+```js
+  methods: {
+    // ----------------------------------------------------------
+    // 程序员亲自写方法
+    // incrementOdd() {
+    //   this.$store.dispatch('incrementOdd', this.selectedNumber)
+    // },
+    // incrementAsync(){
+    //   this.$store.dispatch('incrementAsync', this.selectedNumber)
+    // }
+
+    // 借助mapActions生成对应方法，方法中会调用dispatch去联系actions（对象写法）
+    // ...mapActions({incrementOdd: 'incrementOdd', incrementAsync: 'incrementAsync'}),
+    // 借助mapActions生成对应方法，方法中会调用dispatch去联系actions（数组写法）
+    ...mapActions(['incrementOdd', 'incrementAsync']),
+  },
+```
+
+​	我们需要注意的一点是：如果我们在模板中制定方法不传参的话，系统会帮我们默认传一个事件对象（event），由于我们这个写法没有指定value值，再加上模板也没有声明接收参数，则会导致我们在mutations中操作的value值为事件对象(event)，sum和event相加会变成拼接字符串
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230411162121335.png" alt="image-20230411162121335" style="zoom:50%;" />
+
+​	为了解决这个问题，我们必须在模板里就提前声明传入我们需要的value
+
+```vue
+    <button @click="incrementOdd(selectedNumber)">当前求和为奇数再加</button>
+    <button @click="incrementAsync(selectedNumber)">等一等再加</button>
+```
+
+这样才恢复正常，下面操作用commit同mutations通信也是一样的
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230411162237975.png" alt="image-20230411162237975" style="zoom:50%;" />
+
+4. **mapMutations**方法：用于帮助我们生成与`mutations`对话的方法，即：包含`$store.commit(xxx)`的函数
+
+```vue
+    <button @click="increment(selectedNumber)">+</button>
+    <button @click="decrement(selectedNumber)">-</button>
+```
+
+```js
+  computed: {
+    // es6语法：把每一组keyvalue都展开放入这里
+    // 借助mapState生成计算属性，从state中读取属性（对象写法）
+    // ...mapState({sum: 'sum', school: 'school', subject: 'subject'}),
+    // 借助mapState生成计算属性，从state中读取属性（数组写法）
+    ...mapState(['sum', 'school', 'subject']),
+    
+    // 借助mapState生成计算属性，从getters中读取属性（对象写法）
+    // ...mapGetters({bigSum: 'bigSum'}),
+    // 借助mapState生成计算属性，从getters中读取属性（数组写法）
+    ...mapGetters(['bigSum'])
+  },
+  methods: {
+    // // 没有网络请求或其他业务逻辑的动作可以不需要经过actions，直接和mutations对话
+    // 程序员亲自写的方法
+    // increment() {
+    //   this.$store.commit('INCREMENT', this.selectedNumber)
+    // },
+    // // 没有网络请求或其他业务逻辑的动作可以不需要经过actions，直接和mutations对话
+    // decrement() {
+    //   this.$store.commit('DECREMENT', this.selectedNumber)
+    // },
+
+    // 借助mapMutataions生成对应的方法，方法中会调用commit去联系mutations（对象写法）
+    ...mapMutations({increment: 'INCREMENT', decrement: 'DECREMENT'}),
+    // 借助mapMutataions生成对应的方法，方法中会调用commit去联系mutations（数组写法）
+    // ...mapMutations(['INCREMENT', 'DECREMENT']),
+  },
+```
+
+备注：`mapActions`与`mapMutations`使用时，若需要传递参数需要：在模板中绑定事件时传递好参数，否则参数是事件对象。

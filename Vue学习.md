@@ -9417,3 +9417,77 @@ Count组件中：
 ```
 
 备注：`mapActions`与`mapMutations`使用时，若需要传递参数需要：在模板中绑定事件时传递好参数，否则参数是事件对象。
+
+## 4.8 多组件共享数据
+
+​	我们使用vuex的初衷就是将数据存在vuex中，每一个组件都可以访问到它
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230411170125354.png" alt="image-20230411170125354" style="zoom:50%;" />
+
+​	我们在页面中新加一个组件Person，并且将数据源存放在state中
+
+`src/store/index.js`
+
+```js
+const state = {
+    sum: 0, // 当前的求和
+    school: '尚硅谷',
+    subject: '前端',
+    personList: [
+        {id:'001', name: '张三'}
+    ]
+}
+```
+
+Person.vue
+
+```vue
+<template>
+  <div>
+    <h1>人员列表</h1>
+    <h3 style="color: red">Count组件求和为：{{sum}}</h3>
+    <input type="text" placeholder="请输入名字" v-model="name">
+    <button @click="add">添加</button>
+    <ul>
+        <li v-for="person in personList" :key="person.id">{{person.name}}</li>
+    </ul>
+  </div>
+</template>
+
+<script>
+import { nanoid } from 'nanoid'
+import { mapState } from 'vuex'
+export default {
+    name: 'Person',
+    data() {
+        return {
+            name: ''
+        }
+    },
+    computed: {
+        // personList(){
+        //     return this.$store.state.personList
+        // },
+        // sum(){
+        //     return this.$store.state.sum
+        // }
+        ...mapState(['personList', 'sum'])
+    },
+    methods: {
+        add(){
+            const personObj = {id: nanoid(), name: this.name}
+            this.$store.commit('ADD_PERSON', personObj)
+            this.name = ''
+        }
+    },
+}
+</script>
+
+<style>
+
+</style>
+```
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230411170835306.png" alt="image-20230411170835306" style="zoom:50%;" />
+
+​	这样组件间通信将会变得非常简单

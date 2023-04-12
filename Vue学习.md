@@ -9491,3 +9491,93 @@ export default {
 <img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230411170835306.png" alt="image-20230411170835306" style="zoom:50%;" />
 
 ​	这样组件间通信将会变得非常简单
+
+## 4.9 模块化+命名空间
+
+1. 目的：让代码更好维护，让多种数据分类更加明确
+
+2. 修改`store.js`为了拒绝不同模块命名冲突的问题，将不同模块的`namespaced: true`，之后在不同页面中引入`getter、actions、mutations`时，需要加上所属的模块名，才能在组件中使用
+
+   ```javascript
+   const countOptions = {
+       // 开启命名空间，好让对应的组件可以使用countOption
+       namespaced: true,
+       actions: {...},
+       mutations: {...},
+       state: {
+           sum: 0, // 当前的求和
+           school: '尚硅谷',
+           subject: '前端',
+       },
+       getters: {
+           bigSum(state) {
+               return state.sum * 10
+           }
+       }
+   }
+   const personAbout = {
+       namespaced: true,
+       actions: {...},
+     	mutations: {...},
+       state: {...},
+   }
+   // 创建并暴露Store
+   export default new Vuex.Store({
+       modules: {
+           countAbout: countOptions,
+           personAbout: personOptions
+       }
+   })
+   ```
+
+   3. 开启命名空间后，组件中读取`state`的数据
+
+   ```js
+   //方式一：自己直接读取
+   this.$store.state.personAbout.personList
+   //方式二：借助mapState读取：
+   ...mapState('countAbout',['sum','school','subject']),
+   ```
+
+   4. 开启命名空间后，组件中读取`getters`数据：
+
+      ```javascript
+      //方式一：自己直接读取
+      firstPersonName(){
+         //读取对象里面的属性除了点，也可以用中括号
+        return this.$store.getters[personAbout/firstPersonName]
+      },
+      //方式二：借助mapGetters读取：
+      ...mapGetters('countAbout',['bigSum'])
+      ```
+
+   5. 开启命名空间后，组件中调用dispatch
+
+   ```javascript
+   //方式一：自己直接读取
+   addPersonWang(){
+       const personObj = {id: nanoid(), name: this.name}
+       this.$store.dispatch('personAbout/addPersonWang', personObj)
+       this.name = ''
+   },
+   //方式二：借助mapActions：
+   // 如果要在这里触发简写方式，则必须要在模板里提前传值，则最好是我们在data中就配置好数据，前面在Count中就已经配置好了selectedNumber
+    ...mapActions('countAbout', ['incrementOdd', 'incrementAsync']),
+   ```
+
+   6. 开启命名空间后，组件中调用commit
+
+   ```js
+   //方式一：自己直接commit
+   this.$store.commit('personAbout/ADD_PERSON',person)
+   //方式二：借助mapMutations：
+   //同样的，触发简写方式需要在模板里提前传值
+   ...mapMutations('countAbout', {increment: 'INCREMENT', decrement: 'DECREMENT'}),
+   
+   ```
+
+   将每个组件要用到的数据模块化后，我们就可以非常轻松的建立单独的文件夹并进行维护
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230412195220192.png" alt="image-20230412195220192" style="zoom:50%;" />
+
+简写、进行模块化都是为了更好地编码，跟纯vuex实现的业务逻辑都是一样的。具体代码已上传GitHub的vuex模块：https://github.com/chenzhengqingzzz/Vue

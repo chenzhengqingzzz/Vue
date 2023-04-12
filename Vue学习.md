@@ -9581,3 +9581,49 @@ export default {
 <img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230412195220192.png" alt="image-20230412195220192" style="zoom:50%;" />
 
 简写、进行模块化都是为了更好地编码，跟纯vuex实现的业务逻辑都是一样的。具体代码已上传GitHub的vuex模块：https://github.com/chenzhengqingzzz/Vue
+
+# 5. vue-router
+
+## 5.1 相关理解
+
+### 5.1.1 vue-router的理解
+
+​	vue的一个插件库，专门来实现SPA(Single Page Web Application)应用
+
+### 5.1.2 对SPA应用的理解
+
+1. 单页Web应用（Single Page Web Application，SPA）
+2. 整个应用只有**一个完整的页面**
+3. 点击页面中的导航链接**不会刷新**页面，只会做页面的**局部更新**
+4. 数据需要通过ajax请求获取
+
+### 5.1.3 路由的理解
+
+1. 什么是路由？
+
+   1. 一个路由（route）就是一组映射关系（key-value），多个路由需要路由器（router）进行管理
+
+   2. `key`是路径，`value`是`function`或`component`
+
+2. 路由分类
+
+   1. 前端路由：
+
+      1. 理解：value是component，用于展示页面内容
+
+      2. 工作过程：当浏览器的路径发生改变时，对应的组件就会显示:
+
+         * 用户点击了页面上的路由链接（本质是a链接）
+
+         * 导致了URL地址栏中的Hash值发生了变化
+
+         * 前端路由监听到了Hash地址的变化
+
+         * 前端路由把当前Hash地址对应的组件渲染到浏览器中
+
+           ![31cee169efea10e9bf4e539663c2a62db48e5ac7](https://i0.hdslb.com/bfs/album/31cee169efea10e9bf4e539663c2a62db48e5ac7.png)
+
+   2. 后端路由：
+
+      1. 理解：value是function，用于处理客户端提交的请求
+      2. 工作过程：服务器接收到一个请求时，根据**请求路径**找到匹配的**函数**来处理请求，返回相应数据

@@ -9840,10 +9840,99 @@ export default new VueRouter({
 
 <img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230413190720371.png" alt="image-20230413190720371" style="zoom:50%;" />
 
-**发现一个致命的问题：**
+**发现一个因为自己牛马所导致的一个bug：**
 
 ​	5.2.1的基本路由的使用中，我把Home组件中的to后的语句由`to=/home`**错写成了**`to=home`，这就会导致一个致命的问题：**由于vue-router在为我们匹配子路由时会默认加上`/`，表示我我配置的路由是相对路由，不是绝对路由，由于我这里的错写，当我们给Home组件嵌套其他组件的时候，会导致我们浏览器地址栏匹配的路径与vue-router`不一致，会出现高亮效果错误的情况，以及当我们回过头来点击Home组件时，会让vue router动态路由点击跳转路径地址重复追加！！**这是自己犯的一个很傻的错（排除了好久）
+
+App.vue
+
+错误写法：
+
+```vue
+<!-- vue中借助router-link标签实现路由的切换 -->
+<router-link class="list-group-item" active-class="active" to="home">Home</router-link>
+```
+
+正确写法：
+
+```vue
+<!-- vue中借助router-link标签实现路由的切换 -->
+<router-link class="list-group-item" active-class="active" to="/home">Home</router-link>
+```
 
 <img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230413202156219.png" alt="image-20230413202156219" style="zoom:50%;" />
 
 <img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230413202214596.png" alt="image-20230413202214596" style="zoom:50%;" />
+
+### 5.2.4 路由的query参数
+
+​	当我们在需要在跳转路由的时候将不同的数据放在页面上时，可能需要用到url传参，这里刚好可以将参数以不同的传参方式放入`$route`中
+
+原始数据：
+
+`src/pages/Message.vue`
+
+```js
+export default {
+  name: "Message",
+  data(){
+    return {
+      messageList: [
+        {id: '001', title: '消息001'},
+        {id: '002', title: '消息002'},
+        {id: '003', title: '消息003'},
+        ]
+    }
+  }
+};
+```
+
+
+
+1. 传递参数
+
+```vue
+    <ul>
+      <li v-for="item in messageList" :key="item.id">
+        <!-- 跳转路由并携带query参数，to的字符串写法 -->
+        <!-- <router-link :to="`/home/message/detail?id=${item.id}&title=${item.title}`">{{item.title}}</router-link>&nbsp;&nbsp; -->
+        <!-- 跳转路由并携带query参数，to的对象写法 -->
+        <router-link :to="{
+          path: '/home/message/detail',
+          query: {
+            id: item.id,
+            title: item.title
+          }
+        }">
+          {{item.title}}
+        </router-link>&nbsp;&nbsp;
+      </li>
+    </ul>
+```
+
+2. 在目标组件中接收参数：
+
+`src/pages/Details.vue`
+
+```vue
+<template>
+  <ul>
+    <li>消息编号：{{this.$route.query.id}}</li>
+    <li>消息标题：{{this.$route.query.title}}</li>
+  </ul>
+</template>
+
+<script>
+export default {
+    name: 'Detail',
+    // 在钩子里声明接收来自Message的query参数
+    mounted() {
+      console.log(this);
+    },
+}
+</script>
+```
+
+​	打印Detail中的vc，我们可以发现参数已经传入了$route的query中，并且地址栏也显示出来了传的参数(query传参的特色)
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230413204832481.png" alt="image-20230413204832481" style="zoom:50%;" />

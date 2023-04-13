@@ -9671,7 +9671,7 @@ export default router
 
 <!-- vue中借助router-link标签实现路由的切换 -->
 <router-link class="list-group-item" active-class="active" to="/about">About</router-link>
-<router-link class="list-group-item" active-class="active" to="home">Home</router-link>
+<router-link class="list-group-item" active-class="active" to="/home">Home</router-link>
 ```
 
 5. 指定展示的位置
@@ -9839,3 +9839,11 @@ export default new VueRouter({
 ```
 
 <img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230413190720371.png" alt="image-20230413190720371" style="zoom:50%;" />
+
+**发现一个致命的问题：**
+
+​	5.2.1的基本路由的使用中，我把Home组件中的to后的语句由`to=/home`**错写成了**`to=home`，这就会导致一个致命的问题：**由于vue-router在为我们匹配子路由时会默认加上`/`，表示我我配置的路由是相对路由，不是绝对路由，由于我这里的错写，当我们给Home组件嵌套其他组件的时候，会导致我们浏览器地址栏匹配的路径与vue-router`不一致，会出现高亮效果错误的情况，以及当我们回过头来点击Home组件时，会让vue router动态路由点击跳转路径地址重复追加！！**这是自己犯的一个很傻的错（排除了好久）
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230413202156219.png" alt="image-20230413202156219" style="zoom:50%;" />
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230413202214596.png" alt="image-20230413202214596" style="zoom:50%;" />

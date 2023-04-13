@@ -4,7 +4,10 @@
 
 <script>
 export default {
-    name: 'About'
+    name: 'About',
+    beforeDestroy() {
+      console.log('About组件即将被销毁了');
+    },
 }
 </script>
 

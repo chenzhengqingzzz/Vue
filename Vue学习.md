@@ -9684,3 +9684,17 @@ export default router
 ​	切换的时候会把路由销毁，触发销毁生命周期的函数
 
 <img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230413174025835.png" alt="image-20230413174025835" style="zoom:50%;" />
+
+### 5.2.2 几个注意点
+
+1. 路由组件通常存放在`pages`文件夹，一般组件通常存放在`components`文件夹
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230413175819982.png" alt="image-20230413175819982" style="zoom:50%;" />
+
+2. 通过切换，“隐藏”了路由组件，默认是被销毁掉的，需要的时候再去挂载
+3. 每个组件都有自己的`$route`属性，里面存储着自己的路由信息
+
+4. 整个应用只有一个router，可以通过组件的`$router`属性获取到
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230413180112848.png" alt="image-20230413180112848" style="zoom:50%;" />
+

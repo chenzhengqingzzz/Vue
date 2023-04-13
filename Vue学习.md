@@ -9627,3 +9627,60 @@ export default {
 
       1. 理解：value是function，用于处理客户端提交的请求
       2. 工作过程：服务器接收到一个请求时，根据**请求路径**找到匹配的**函数**来处理请求，返回相应数据
+
+## 5.2 基本路由
+
+### 5.2.1 基本使用
+
+1. 安装`vue-router`，像上面安装vuex一样，默认安装的将会是router4，只能应用于vue3中，所以我们的命令是：`npm i vue-router@3`
+2. 在main.js引入插件：`import 'VueRouter' from 'vue-router'`  应用插件：`Vue.use(VueRouter)` 这里没有vuex中的需要在index.js中提前引入的类似问题
+3. 在`src/router/index.js`中编写router的配置项
+
+```js
+//引入VueRouter
+import VueRouter from 'vue-router'
+//引入路由组件
+import About from '../components/About'
+import Home from '../components/Home'
+
+//创建router实例对象，去管理一组一组的路由规则
+const router = new VueRouter({
+	routes:[
+		{
+			path:'/about',
+			component:About
+		},
+		{
+			path:'/home',
+			component:Home
+		}
+	]
+})
+
+//暴露router
+export default router
+
+```
+
+4. 实现切换`<router-link></router-link>`浏览器会被替换为a标签`active-class`可以设置链接激活时使用的CSS类名
+
+```vue
+<!-- 原始HTML中我们使用a标签实现页面的跳转 -->
+<!-- <a class="list-group-item active" href="./about.html">About</a> -->
+<!-- <a class="list-group-item" href="./home.html">Home</a> -->
+
+<!-- vue中借助router-link标签实现路由的切换 -->
+<router-link class="list-group-item" active-class="active" to="/about">About</router-link>
+<router-link class="list-group-item" active-class="active" to="home">Home</router-link>
+```
+
+5. 指定展示的位置
+
+```vue
+            <!-- 指定组件的呈现位置 -->
+            <router-view></router-view>
+```
+
+​	切换的时候会把路由销毁，触发销毁生命周期的函数
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230413174025835.png" alt="image-20230413174025835" style="zoom:50%;" />

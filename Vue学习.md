@@ -9993,3 +9993,128 @@ export default {
    
 
 <img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230414141927102.png" alt="image-20230414141927102" style="zoom:50%;" />
+
+### 5.2.6 路由的params参数
+
+**视频中没讲到的问题：**
+
+注意：路由传递参数的时候，对象的写法可以是name、path形式，但是，`path这种写法不能与params参数一同使用，只能写name`
+
+```js
+// 这种path与params混合的写法，报错！
+        <router-link :to="{
+					path: '/home/message/detail'
+          // params参数里，下面只能写name，如果写path传入完整路径会报错
+          // name: 'xiangqing',
+          params: {
+            id: item.id,
+            title: item.title
+          }
+        }">
+          {{item.title}}
+        </router-link>&nbsp;&nbsp;
+```
+
+如果路由要求传递params参数，但是不传递时，URL会有问题导致无法跳转。如需指定params参数可传可不传，在配置路由`router/index.js`时，在**占位的后面加上一个问号**即可
+
+```js
+{
+    name: 'xiangqing',
+    path: 'detail/:id/:title/age?', //通过问号匹配参数可传可不传
+    component: Detail
+}
+```
+
+另：当params参数可传可不传时，如果传递的是空串，可能导致URL路径缺失，这里可以用`undefined`解决
+
+```js
+// 跳转
+        <router-link :to="{
+          // params参数里，下面只能写name，如果写path传入完整路径会报错
+          name: 'xiangqing',
+          params: { 
+            id: item.id,
+            title: item.title
+            age: '' || undefined //加一个undefined
+          }
+        }">
+          {{item.title}}
+        </router-link>&nbsp;&nbsp;
+
+
+// router/index.js
+// ......
+{
+	name:'xiangqing',
+	path: 'detail/:id/:title/:age?', //通过问号匹配参数可传可不传
+	component:Detail
+}
+
+```
+
+
+
+
+
+1. 配置路由，声明接收`params`参数
+
+```js
+{
+            path: '/home',
+            component: Home,
+            // 通过children配置嵌套（子级）路由
+            children: [
+                {
+                    path: 'news', // 此处一定不要写：/news
+                    component: News
+                },
+                {
+                    path: 'message',// 此处一定不要写：/message
+                    component: Message,
+                    children: [
+                        {
+                            name: 'xiangqing',
+                            path: 'detail/:id/:title/:age?', //使用占位符声明接收params参数，问号代表参数可传可不传
+                            component: Detail
+                        }
+                    ]
+                }
+            ]
+        },
+```
+
+2. 传递参数：
+
+`src/pages/Message.vue`
+
+```vue
+        <!-- 跳转路由并携带params参数，to的字符串写法 -->
+        <!-- <router-link :to="`/home/message/detail/${item.id}/${item.title}`">{{item.title}}</router-link>&nbsp;&nbsp; -->
+        <!-- 跳转路由并携带params参数，to的对象写法 -->
+        <router-link :to="{
+          // params参数里，下面只能写name，如果写path传入完整路径会报错
+          name: 'xiangqing',
+          params: { 
+            id: item.id,
+            title: item.title,
+            age: '' || undefined
+          }
+        }">
+          {{item.title}}
+        </router-link>&nbsp;&nbsp;
+```
+
+3. 接收参数：
+
+`src/pages/Detail.vue`
+
+```vue
+<template>
+  <ul>
+    <li>消息编号：{{this.$route.params.id}}</li>
+    <li>消息标题：{{this.$route.params.title}}</li>
+  </ul>
+</template>
+```
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230414150000717.png" alt="image-20230414150000717" style="zoom:50%;" />

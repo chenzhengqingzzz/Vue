@@ -9936,3 +9936,60 @@ export default {
 ​	打印Detail中的vc，我们可以发现参数已经传入了$route的query中，并且地址栏也显示出来了传的参数(query传参的特色)
 
 <img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230413204832481.png" alt="image-20230413204832481" style="zoom:50%;" />
+
+### 5.2.5 命名路由
+
+1. 作用：可以简化路由的跳转
+
+2. 如何使用
+
+   1. 给路由命名
+
+   ```js
+   routes: [
+           {
+               name: 'guanyu',
+               path: '/about',
+               component: About
+           },
+           {
+               path: '/home',
+               component: Home,
+               // 通过children配置嵌套（子级）路由
+               children: [
+                   {
+                       path: 'news', // 此处一定不要写：/news
+                       component: News
+                   },
+                   {
+                       path: 'message',// 此处一定不要写：/message
+                       component: Message,
+                       children: [
+                           {
+                               name: 'xiangqing',
+                               path: 'detail',
+                               component: Detail
+                           }
+                       ]
+                   }
+               ]
+           },
+       ]
+   ```
+
+   这里的name属性就是给路由命名
+
+   2. 简化跳转
+
+   ```vue
+   <!-- 简化前，需要写完整的路径 -->
+   <router-link class="list-group-item" active-class="active" to="/about">About</router-link>
+   
+   <!-- 简化后，直接通过名字跳转 -->
+   <router-link class="list-group-item" active-class="active"  
+                :to="{name: 'guanyu'}">About</router-link>
+   ```
+
+   
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230414141927102.png" alt="image-20230414141927102" style="zoom:50%;" />

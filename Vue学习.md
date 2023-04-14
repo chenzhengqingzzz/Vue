@@ -10118,3 +10118,54 @@ export default {
 ```
 
 <img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230414150000717.png" alt="image-20230414150000717" style="zoom:50%;" />
+
+### 5.2.7 路由props配置
+
+​	作用：让路由组件更方便的收到参数
+
+`src/router/index.js`
+
+```js
+{
+    name: 'xiangqing',
+    path: 'detail/:id/:title/:age?', //使用占位符声明接收params参数，问号代表参数可传可不传
+    component: Detail,
+    // 路由中props的第一种写法，值为对象，该对象中的所有key-value都会以props的形式传给Detail组件
+    // props: {a: 1, b: 'hello'},
+
+    // 路由中props的第二种写法，值为布尔值，若布尔值为真，就会把该路由组件收到的所有的params参数，以props的形式传给Detail组件
+    // props: true,
+
+    // 路由中props的第二种写法，值为函数，它是一个回调函数，vue调用这个的时候会默认传入$route，所以query、params都可以读出，不像第二种那样只能读params
+      //这里可以用结构赋值props({ query:{id,title} }){ return{ id,title } }
+    props($route) {
+        	return {
+               id: $route.params.id,
+               title: $route.params.title
+          }
+      }
+}
+```
+
+接收props的组件：`src/pages/Detail.vue`
+
+```vue
+<template>
+  <ul>
+    <li>消息编号：{{id}}</li>
+    <li>消息标题：{{title}}</li>
+  </ul>
+</template>
+
+<script>
+export default {
+    name: 'Detail',
+    mounted() {
+      console.log(this);
+    },
+    props: ['id', 'title']
+}
+</script>
+```
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230414152825615.png" alt="image-20230414152825615" style="zoom:50%;" />

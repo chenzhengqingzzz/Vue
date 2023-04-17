@@ -10376,3 +10376,51 @@ VueRouter.prototype.push = function (location,resolve,reject){
 
 ```
 
+### 5.2.11 缓存路由组件
+
+1. 作用：让不展示的路由组件保持挂载，不被销毁，适用于存数据的组件然后实现缓存
+2. 具体编码：
+
+​	我们要缓存哪个组件的数据，就去找展示**被缓存数据组件的那个组件**
+
+**这个`include`指的是组件名**
+
+**`src/pages/Home.vue`**
+
+```vue
+// 缓存一个路由组件
+<keep-alive include="News"> // include中写想要缓存的组件名，不写表示全部缓存
+    <router-view></router-view>
+</keep-alive>
+
+// 缓存多个路由组件
+<keep-alive :include="['News','Message']"> 
+    <router-view></router-view>
+</keep-alive>
+
+```
+
+`src/pages/News.vue`
+
+```vue
+<template>
+  <ul>
+    <li>news001 <input type="text"></li>
+    <li>news002 <input type="text"></li>
+    <li>news003 <input type="text"></li>
+  </ul>
+</template>
+
+<script>
+export default {
+  name: "News",
+};
+</script>
+
+<style>
+</style>
+```
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230417162219586.png" alt="image-20230417162219586" style="zoom:50%;" />
+
+切换完回来不会清除已输入的内容，实现数据的缓存

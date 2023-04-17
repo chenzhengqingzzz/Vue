@@ -9,7 +9,14 @@
         <router-link replace class="list-group-item" active-class="active" to="/home/message">Message</router-link>
       </li>
     </ul>
-    <router-view></router-view>
+    <!-- 缓存一个路由组件 -->
+    <keep-alive include="News"> <!-- include中写想要缓存的组件名，不写表示全部缓存 -->
+      <router-view></router-view>
+    </keep-alive>
+    <!-- 缓存多个路由组件 -->
+    <!-- <keep-alive :include="['News', 'Message']">
+      <router-view></router-view>
+    </keep-alive> -->
   </div>
 </template>
 

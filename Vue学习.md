@@ -10548,3 +10548,55 @@ export default router
 调试结果：
 
 ![image-20230417182515947](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230417182515947.png)
+
+​	上面的写法判断鉴权我们有更简便的写法（如果判断的路径多的话）：
+
+​		只需要在需要鉴权的组件上的route中的meta（用于放我们自己东西的容器）中加入我们自定义的配置项：`isAuth = true`  ，然后在鉴权判断中直接筛选`isAuth = true`的配置对象 则可以极大地简化代码
+
+```js
+                {
+                    name: 'xinwen',
+                    path: 'news', // 此处一定不要写：/news
+                    component: News,
+                    meta: { //路由元信息，用于塞我们自己的东西
+                        isAuth: true //是否授权 如果是false则配置项都可以不用写
+                    }
+                },
+                {
+                    name: 'xiaoxi',
+                    path: 'message',// 此处一定不要写：/message
+                    component: Message,
+                    meta: { //路由元信息，用于塞我们自己的东西
+                        isAuth: true //是否授权 如果是false则配置项都可以不用写
+                    },
+                }
+```
+
+​	全局前置路由守卫中的鉴权判断简化：
+
+```js
+router.beforeEach((to, from, next) => {
+    if (to.meta.isAuth) { //判断是否需要鉴权
+        if (localStorage.getItem('school') === 'atguigu') {
+            next()
+        } else {
+            alert('学校名不对，无权限查看！')
+        }
+    } else {
+        next()
+    }
+})
+```
+
+你可以使用router.afterEach注册一个全局后置守卫：
+
+```js
+// 全局后置路由守卫————初始化的时候被调用、每次路由切换之后被调用
+router.afterEach((to, from) => {
+    console.log('后置路由守卫', to, from);
+    document.title = to.meta.title || 'Vue路由Demo'
+})
+```
+
+​	后置路由守卫一般没有next函数可调用，我们一般在这里处理走完鉴权之后所以需要的事情（例如这里从meta中修改DOM的title）
+

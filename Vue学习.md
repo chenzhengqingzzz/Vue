@@ -10332,3 +10332,47 @@ export default {
 ```
 
 <img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230417155203626.png" alt="image-20230417155203626" style="zoom:50%;" />
+
+### 5.2.10 多次执行相同的push问题
+
+多次执行相同的push，控制台会出现警告
+
+例如：使用`this.$router.push({name: 'xiangqing', params: {age: '' || undefined}})`时，如果多次执行相同的push，控制台就会出现警告
+
+```js
+let result = this.$router.push({name: 'xiangqing', params: {..., age: "" || undefined}})
+console.log(result)
+```
+
+执行结果：<img src="https://img-blog.csdnimg.cn/d7b3e04b2986474d8009fe970b7b2e63.png" alt="d7b3e04b2986474d8009fe970b7b2e63" style="zoom:67%;" />
+
+
+
+多次执行push则会出现警告：
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230417161221323.png" alt="image-20230417161221323" style="zoom:50%;" />
+
+原因：push是一个promise，promise需要传递成功和失败两个参数，我们的push中没有传递
+
+方法：`this.$router.push({name: 'xiangqing', params: {..., age: "" || undefined}}, () => {}, () => {})`后面两项分别代表执行成功和失败的回调函数
+
+**这种写法治标不治本，将来在别的组件中push/replace时，编程式路由导航还是会有类似错误**
+
+push是VueRouter.prototype的一个方法，在router中的index重写该方法即可(看不懂也没关系，这是前端面试题)
+
+```js
+//1、先把VueRouter原型对象的push，保存一份
+let originPush = VueRouter.prototype.push;
+//2、重写push|replace
+//第一个参数：告诉原来的push，跳转的目标位置和传递了哪些参数
+VueRouter.prototype.push = function (location,resolve,reject){
+    if(resolve && reject){
+        //因为函数是被window调用，这里函数内部的this得是vuerouter实例
+        originPush.call(this,location,resolve,reject)
+    }else{
+        originPush.call(this,location,() => {},() => {})
+    }
+}
+
+```
+

@@ -10424,3 +10424,66 @@ export default {
 <img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230417162219586.png" alt="image-20230417162219586" style="zoom:50%;" />
 
 切换完回来不会清除已输入的内容，实现数据的缓存
+
+### 5.2.12 两个新的生命周期钩子
+
+1. 作用：路由组件中所独有的两个钩子，用于捕获路由组件的激活状态
+
+2. 具体名字：
+
+   1. `actived`路由组件被激活时触发
+   2. `deactived`路由组件失活时触发
+
+   用这两个钩子就可以实现我们既存数据又将定时器开启或关闭的实现
+
+`src/pages/News.vue`
+
+```vue
+<template>
+  <ul>
+    <li :style="{ opacity }">欢迎学习Vue</li>
+    <li>news001 <input type="text" /></li>
+    <li>news002 <input type="text" /></li>
+    <li>news003 <input type="text" /></li>
+  </ul>
+</template>
+<script>
+export default {
+  name: "News",
+  data() {
+    return {
+      opacity: 1,
+    };
+  },
+  // mounted() {
+  //   this.timer = setInterval(() => {
+  //     console.log('@');
+  //     this.opacity -= 0.01
+  //     if(this.opacity <= 0) this.opacity = 1
+  //   }, 16);
+  // },
+  // beforeDestroy() {
+  //   console.log('News组件被销毁了');
+  //   clearInterval(this.timer)
+  // },
+
+  activated() {
+    console.log("News组件被激活了");
+    this.timer = setInterval(() => {
+      console.log("@");
+      this.opacity -= 0.01;
+      if (this.opacity <= 0) this.opacity = 1;
+    }, 16);
+  },
+  deactivated() {
+    console.log("News组件失活了");
+    clearInterval(this.timer)
+  },
+};
+</script>
+
+<style>
+</style>
+```
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230417171833667.png" alt="image-20230417171833667" style="zoom:50%;" />

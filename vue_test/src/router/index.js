@@ -8,7 +8,7 @@ import Message from '../pages/Message'
 import Detail from '../pages/Detail'
 
 // 创建并暴露一个路由器
-export default new VueRouter({
+const router = new VueRouter({
     routes: [
         {
             name: 'guanyu',
@@ -16,15 +16,18 @@ export default new VueRouter({
             component: About
         },
         {
+            name: 'zhuye',
             path: '/home',
             component: Home,
             // 通过children配置嵌套（子级）路由
             children: [
                 {
+                    name: 'xinwen',
                     path: 'news', // 此处一定不要写：/news
                     component: News
                 },
                 {
+                    name: 'xiaoxi',
                     path: 'message',// 此处一定不要写：/message
                     component: Message,
                     children: [
@@ -52,3 +55,23 @@ export default new VueRouter({
         },
     ]
 })
+
+// 在每一次路由切换之前
+// 全局前置路由守卫————初始化的时候被调用、每次路由切换之前被调用
+router.beforeEach((to, from, next) => {
+    //to是将要访问的路由的信息对象
+    //from是将要离开的路由的信息对象
+    //next是一个函数，调用next()表示放行，允许这次路由导航
+    console.log(to, from);
+    if (to.name === 'xinwen' || to.name === 'xinwen') {
+        if (localStorage.getItem('school') === 'atguigu') {
+            next()
+        } else {
+            alert('学校名不对，无权限查看！')
+        }
+    } else {
+        next()
+    }
+})
+
+export default router

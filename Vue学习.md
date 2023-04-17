@@ -10487,3 +10487,64 @@ export default {
 ```
 
 <img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230417171833667.png" alt="image-20230417171833667" style="zoom:50%;" />
+
+## 5.3 路由守卫
+
+1. 作用：对路由进行权限控制
+2. 分类：全局守卫、独享守卫、组件内守卫三大类
+
+路由守卫总共有7个：
+
+* 全局路由守卫
+  * beforeEach 前置守卫
+  * affterEatch 后置守卫
+  * beforeResolve 解析守卫
+* 路由的守卫
+  * beforeRouterEnter 进入组件之前触发，在Created前面
+  * beforeRouterUpdated 路由更新但是内容不会改变
+  * beforeRouterLeave 离开之前触发，在beforeDestory之前触发
+* 路由独享守卫
+  * beforeEnter 读取路由的信息
+
+### 5.3.1 全局路由守卫
+
+每次发生路由的导航跳转时，都会触发全局前置守卫。因此，在全局前置守卫中，程序员可以对每个路由进行访问权限的控制：
+
+你可以使用router.becoreEach注册一个全局前置守卫：
+
+```js
+//创建路由的实例对象
+const router = new VueRouter({...})
+ 
+//为router实例对象，声明全局前置导航守卫
+//只要发生了路由的跳转，必然会触发beforeEach指定的function回调函数
+router.beforeEach((to, from, next)=>{
+//to是将要访问的路由的信息对象
+//from是将要离开的路由的信息对象
+//next是一个函数，调用next()表示放行，允许这次路由导航
+    console.log(to, from);
+    if (to.name === 'xinwen' || to.name === 'xinwen') {
+        if (localStorage.getItem('school') === 'atguigu') {
+            next() //next函数表示放行的意思
+        } else {
+            alert('学校名不对，无权限查看！')
+        }
+    } else {
+        next()
+    }
+})
+ 
+export default router
+
+```
+
+每个守卫方法接收三个参数：
+
+* to: RouterObject：即将要进入的目标路由对象
+* from:RouterObject：当前导航正要离开的路由
+* next:Function：钩子函数，里面定义参数，确认下一步路由要做什么
+  * next(’/’)或者 next({ path: ‘/’ }): 跳转到一个不同的地址。当前的导航被中断，然后进行一个新的导航。你可以向 next 传递任意位置对象，next({name: ‘home’}) 
+
+调试结果：
+
+![image-20230417182515947](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230417182515947.png)

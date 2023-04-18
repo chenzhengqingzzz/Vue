@@ -10699,3 +10699,76 @@ export default router
 ```
 
 ​	这些守卫与全局前置守卫的方法参数是一样的，要注意的是没有独享后置守卫这一说，一般是配合全局后置守卫使用
+
+### 5.3.3 组件内路由守卫
+
+可以在路由组件内直接定义以下路由导航守卫：
+
+进入组件前的守卫`beforeRouteEnter`、路由更新时的守卫`beforeRouteUpdate`（2.2新增）、离开组件时的守卫`beforeRouteLeave`
+
+```js
+beforeRouteEnter(to, from, next) {
+// 在渲染该组件的对应路由被 confirm 前调用
+// 不！能！获取组件实例 this
+// 因为当守卫执行前，组件实例还没被创建
+},
+beforeRouteUpdate(to, from, next) {
+// 在当前路由改变，但是该组件被复用时调用
+// 举例来说，对于一个带有动态参数的路径 /foo/:id，在 /foo/1 和 /foo/2 之间跳转的时候，
+// 由于会渲染同样的 Foo 组件，因此组件实例会被复用。而这个钩子就会在这个情况下被调用。
+// 可以访问组件实例 this
+},
+beforeRouteLeave(to, from, next) {
+// 导航离开该组件的对应路由时调用
+// 可以访问组件实例 this
+}
+```
+
+调试结果：
+
+我们在`src/pages/About.vue`这个组件内使用组件内路由守卫
+
+观察发现组件内路由守卫的to永远是本路由组件
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230418152453576.png" alt="image-20230418152453576" style="zoom:50%;" />
+
+`beforeRouteEnter`守卫**不能访问this**，因为**守卫在导航确认前被调用**，因次即将登场的新组建还没被创建
+
+​	不过，你可以通过传一个[回调](https://so.csdn.net/so/search?q=回调&spm=1001.2101.3001.7020)给 next来访问组件实例。在导航被确认的时候执行回调，并且把组件实例作为回调方法的参数
+
+​	这里的`next`函数接受一个回调函数，在路由完成后执行。回调函数的参数`vm`是当前组件的实例，通过`vm`可以访问到组件的属性和方法。在这个回调函数中可以进行一些需要访问组件实例的操作，例如设置组件的状态、触发组件的方法等。
+
+​	需要注意的是，`beforeRouteEnter`中的回调函数只有在导航被确认时才会被调用，因此这个回调函数中的操作应该尽可能简单，避免阻塞导航过程。
+
+```js
+beforeRouteEnter(to, from, next) {
+  next(vm => {
+    // 在回调函数中访问组件实例
+    console.log(vm.$options.name) // 输出组件名
+  })
+}
+
+```
+
+​	注意 beforeRouteEnter 是支持给 next传递回调的唯一守卫。对于 beforeRouteUpdate和beforeRouteLeave 来说，this 已经可用了，所以不支持传递回调，因为没有必要了
+
+```js
+beforeRouteUpdate (to, from, next) {
+  this.name = to.params.name
+  next(
+}
+```
+
+​	这个离开守卫通常用来禁止用户在还未保存修改前突然离开。该导航可以通过next(false)来取消
+
+```js
+beforeRouteLeave (to, from, next) {
+  const answer = window.confirm('你真的要离开吗？你还没有保存！')
+  if (answer) {
+    next()
+  } else {
+    next(false)
+  }
+}
+```
+

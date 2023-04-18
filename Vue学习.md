@@ -10968,3 +10968,204 @@ const router = createRouter({
 
 https://router.vuejs.org/zh/guide/advanced/scroll-behavior.html
 
+## 7. Vue UI组件库
+
+## 7.1 移动端常用UI组件库
+
+* Vant https://youzan.github.io/vant
+* Cube UI https://didi.github.io/cube-ui
+* Mint UI http://mint-ui.github.io/
+
+## 7.2 PC端常用UI组件库
+
+* Element UI https://element.eleme.cn
+
+* IView UI https://www.iviewui.com
+
+### 7.2.1 ElementUI的基本使用
+
+​	参考官方文档 https://element.eleme.cn/#/zh-CN
+
+`src/main.js`
+
+```js
+// 引入Vue
+import Vue from 'vue';
+// 引入App
+import App from './App'
+// 引入ElementUI组件库
+import ElementUI from 'element-ui';
+// 引入ElementUI的全部样式
+import 'element-ui/lib/theme-chalk/index.css';
+
+
+// 关闭Vue的生产提示
+Vue.config.productionTip = false
+
+// 应用ElementUI
+Vue.use(ElementUI)
+
+// 创建vm
+new Vue({
+    el: '#app',
+    render(h) {
+        return h(App)
+    },
+    // mounted() {
+    //     console.log(this);
+    // },
+})
+```
+
+`src/App.vue`
+
+```vue
+<template>
+  <div>
+    <button>原生的按钮</button>
+    <input type="text" />
+    <br/>
+    <el-row>
+      <el-button>默认按钮</el-button>
+      <el-button type="primary">主要按钮</el-button>
+      <el-button type="success">成功按钮</el-button>
+      <el-button type="info">信息按钮</el-button>
+      <el-button type="warning">警告按钮</el-button>
+      <el-button type="danger">危险按钮</el-button>
+    </el-row>
+    <br/>
+    <el-date-picker
+      type="date"
+      placeholder="选择日期">
+    </el-date-picker>
+    <br/>
+    <el-row>
+      <el-button icon="el-icon-search" circle></el-button>
+      <el-button type="primary" icon="el-icon-edit" circle></el-button>
+      <el-button type="success" icon="el-icon-check" circle></el-button>
+      <el-button type="info" icon="el-icon-message" circle></el-button>
+      <el-button type="warning" icon="el-icon-star-off" circle></el-button>
+      <el-button type="danger" icon="el-icon-delete" circle></el-button>
+</el-row>
+  </div>
+</template>
+
+<script>
+export default {
+  name: "App",
+};
+</script>
+
+<style>
+</style>
+```
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230418191009876.png" alt="image-20230418191009876" style="zoom:50%;" />
+
+### 7.2.2 按需引入 
+
+参考官方文档 修改babel.config、main.js（ui组件库不适合写笔记）
+
+`src/babel.config.js`
+
+```js
+module.exports = {
+  presets: [
+    '@vue/cli-plugin-babel/preset',
+    ['@babel/preset-env', { 'modules': false }],
+  ],
+  plugins: [
+    [
+      "component",
+      {
+        "libraryName": "element-ui",
+        "styleLibraryName": "theme-chalk"
+      }
+    ]
+  ]
+}
+
+```
+
+`src/index.js`
+
+```
+// 引入Vue
+import Vue from 'vue';
+// 引入App
+import App from './App'
+// 完整引入
+// 引入ElementUI组件库
+// import ElementUI from 'element-ui';
+// 引入ElementUI的全部样式
+// import 'element-ui/lib/theme-chalk/index.css';
+
+// 按需引入
+import { Button, Row, DatePicker } from 'element-ui'
+
+
+// 关闭Vue的生产提示
+Vue.config.productionTip = false
+
+// 应用ElementUI
+// Vue.use(ElementUI)
+Vue.component('czq-button', Button)
+Vue.component('czq-row', Row)
+Vue.component('czq-date-picker', DatePicker)
+
+// 创建vm
+new Vue({
+    el: '#app',
+    render(h) {
+        return h(App)
+    },
+    // mounted() {
+    //     console.log(this);
+    // },
+})
+```
+
+`src/App.vue`
+
+```vue
+<template>
+  <div>
+    <button>原生的按钮</button>
+    <input type="text" />
+    <br/>
+    <czq-row>
+      <czq-button>默认按钮</czq-button>
+      <czq-button type="primary">主要按钮</czq-button>
+      <czq-button type="success">成功按钮</czq-button>
+      <czq-button type="info">信息按钮</czq-button>
+      <czq-button type="warning">警告按钮</czq-button>
+      <czq-button type="danger">危险按钮</czq-button>
+    </czq-row>
+    <br/>
+    <czq-date-picker
+      type="date"
+      placeholder="选择日期">
+    </czq-date-picker>
+    <br/>
+    <czq-row>
+      <czq-button icon="el-icon-search" circle></czq-button>
+      <czq-button type="primary" icon="el-icon-edit" circle></czq-button>
+      <czq-button type="success" icon="el-icon-check" circle></czq-button>
+      <czq-button type="info" icon="el-icon-message" circle></czq-button>
+      <czq-button type="warning" icon="el-icon-star-off" circle></czq-button>
+      <czq-button type="danger" icon="el-icon-delete" circle></czq-button>
+</czq-row>
+  </div>
+</template>
+
+<script>
+export default {
+  name: "App",
+};
+</script>
+
+<style>
+</style>
+```
+
+![image-20230418193230523](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230418193230523.png)

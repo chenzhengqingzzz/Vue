@@ -10772,3 +10772,9 @@ beforeRouteLeave (to, from, next) {
 }
 ```
 
+​	和前面activate/deactivate两个钩子相比
+
+`beforeRouterEnter`用于路由拦截，可以根据业务需求在进入某个路由前进行权限校验或其他处理。
+
+`beforeRouterLeave`用于离开当前路由前的处理，例如保存表单数据、弹出确认提示等。
+`activate`和`deactivate`钩子可以在组件被激活或停用时进行相应的处理，例如获取数据、初始化组件等

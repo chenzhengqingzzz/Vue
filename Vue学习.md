@@ -10917,3 +10917,54 @@ app.use(express.static(__dirname + '/static'))
 
 ​	这样就可以完美解决history模式刷新404的问题
 
+## 5.5 监听路由
+
+**复用组件时，想对路由参数的变化作出响应的话，你可以简单地 watch（监测变化） $route 对象**
+
+最佳方法：我们每次进行新的搜索时，我们的query和params参数中的部分内容肯定会改变，而且这两个参数是路由的属性。我们可以通过监听路由信息的变化来动态发起搜索请求。
+
+如下图所示，$route是组件的属性，所以watch是可以监听的（watch可以监听组件data中所有的属性） **注意**：组件中data的属![e4eb26a314c29055d2c5015b83f104c3559051f0](https://i0.hdslb.com/bfs/album/e4eb26a314c29055d2c5015b83f104c3559051f0.png)性包括：自己定义的、系统自带的（如 $route)、父组件向子组件传递的等等
+
+```js
+watch:{
+      $route(newValue,oldValue){
+ 		// 对路由变化作出响应...
+        Object.assign(this.searchParams,this.$route.query,this.$route.params)
+        this.searchInfo()
+        //如果下一次搜索时只有params参数，拷贝后会发现searchParams会保留上一次的query参数
+        //所以每次请求结束后将相应参数制空
+        this.searchParams.category1Id = '';
+        this.searchParams.category2Id = '';
+        this.searchParams.category3Id = '';
+        this.$route.params.keyword = '';
+      }
+    },
+
+```
+
+## 5.6 滚动行为
+
+使用前端路由，当切换到新路由时，想要页面滚到顶部，或者是保持原先的滚动位置，就像重新加载页面那样。 vue-router 能做到，而且更好，它让你可以自定义路由切换时页面如何滚动
+
+**注意: 这个功能只在支持 history.pushState 的浏览器中可用。**
+
+当创建一个 Router 实例，你可以提供一个 `scrollBehavior` 方法：
+
+```js
+const router = createRouter({
+  history: createWebHashHistory(),
+  routes: [...],
+  //设置滚动条的位置
+  scrollBehavior (to, from, savedPosition) {
+        //滚动行为这个函数,需要有返回值,返回值为一个对象。
+        //经常可以设置滚动条x|y位置 [x|y数值的设置一般最小是零]
+        return { top: 0 };
+  }
+})
+
+```
+
+`scrollBehavior` 函数接收 `to`和` from` 路由对象，如 [Navigation Guardsopen in new window](https://router.vuejs.org/zh/guide/advanced/navigation-guards.html)。第三个参数 `savedPosition`，只有当这是一个 `popstate` 导航时才可用（由浏览器的后退/前进按钮触发）
+
+https://router.vuejs.org/zh/guide/advanced/scroll-behavior.html
+

@@ -11169,3 +11169,8 @@ export default {
 ```
 
 ![image-20230418193230523](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230418193230523.png)
+
+**尚硅谷Vue2完结！**
+
+
+

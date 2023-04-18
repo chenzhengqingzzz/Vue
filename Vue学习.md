@@ -10545,6 +10545,26 @@ export default router
 * next:Function：钩子函数，里面定义参数，确认下一步路由要做什么
   * next(’/’)或者 next({ path: ‘/’ }): 跳转到一个不同的地址。当前的导航被中断，然后进行一个新的导航。你可以向 next 传递任意位置对象，next({name: ‘home’}) 
 
+**扩展：next函数的3种调用方式**
+
+![3a356d9ec1d5d92081e9f4a70e5643d3cf365203](https://i0.hdslb.com/bfs/album/3a356d9ec1d5d92081e9f4a70e5643d3cf365203.png)
+
+* 当前用户拥有后台主页的访问权限，直接放行：next()
+
+* 当前用户没有后台主页的访问权限，强制其跳转到登录页面：next('/login')
+
+* 当前用户没有后台主页的访问权限，不允许跳转到后台主页：next(false)
+
+一般应用在用户未能验证身份时重定向到 /login ：
+
+```js
+router.beforeEach((to, from, next) => {
+  if (to.name !== 'Login' && !isAuthenticated) next({ name: 'Login' })
+  else next()
+})
+
+```
+
 调试结果：
 
 ![image-20230417182515947](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230417182515947.png)
@@ -10778,3 +10798,122 @@ beforeRouteLeave (to, from, next) {
 
 `beforeRouterLeave`用于离开当前路由前的处理，例如保存表单数据、弹出确认提示等。
 `activate`和`deactivate`钩子可以在组件被激活或停用时进行相应的处理，例如获取数据、初始化组件等
+
+**总结**
+
+​	完整的导航解析流程 导航被触发。 在失活的组件里调用`beforeRouteLeave`守卫。 调用全局的 `beforeEach `守卫。 在重用的组件里调用`beforeRouteUpdate`守卫 (2.2+)。 在路由配置里调用 `beforeEnter`。 解析异步路由组件。 在被激活的组件里调用 `beforeRouteEnter`。 调用全局的 `beforeResolve` 守卫 (2.5+)。 导航被确认。 调用全局的 `afterEach `钩子。 触发 DOM 更新。 调用 `beforeRouteEnter `守卫中传给 next 的回调函数，创建好的组件实例会作为回调函数的参数传入
+
+## 5.4 路由器的两种工作模式以及前端项目部署
+
+	1. 对于一个url来说，什么是哈希值？ ————`#`极其后面内容就是hash值
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230418174322363.png" alt="image-20230418174322363" style="zoom:50%;" />
+
+2. hash值不会包含在HTTP请求中，即：**hash值在发送请求时不会带给服务器**
+3. hash模式：
+   * 地址中永远带着`#`号，不美观
+   * 若以后将地址通过第三方手机app分享，若app校验严格，则地址会被标记为不合法
+   * 兼容性较好
+4. history模式：
+   * 地址干净，美观
+   * 兼容性和hash模式相比略差
+   * 应用部署上线时需要后端人员支持，解决刷新页面服务端404的问题
+
+我们如果切换history/hash工作模式，则需要在`src/router/index.js`的router配置项中制定mode
+
+```js
+// 创建一个路由器
+const router = new VueRouter({
+    // 更改路由器工作模式为history，默认为hash
+     mode: 'history',
+    routes: [...]
+})
+```
+
+而且两种路由工作方式对项目的部署也有影响
+
+​	将写好的代码打包部署：
+
+```shell
+npm run serve
+```
+
+生成的dist目录下的文件则是浏览器看得懂的HTML、css、js代码
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230418175353356.png" alt="image-20230418175353356" style="zoom:50%;" />
+
+我们将使用express框架搭建一个简单的node服务器来模拟部署项目
+
+创建一个新文件夹名字为`server_demo`
+
+cd进入文件夹 后执行代码，使其成为一个合法的npm项目
+
+```shell
+npm init 
+```
+
+`server_demo/server.js`
+
+```js
+const express = require('express')
+const history = require('connect-history-api-fallback');
+
+const app = express()
+
+// 在静态资源生效前使用解决404的中间件
+app.use(history())
+// 让服务器读取我们存放在static的index.html
+app.use(express.static(__dirname + '/static'))
+
+app.get('/person', (request, response) => {
+    response.send(
+        {name: 'tom', age: 18}
+    )
+})
+
+app.listen(5005, (err) => {
+    if(!err) console.log('服务器启动成功！');
+})
+```
+
+在`server_demo`目录下创建static文件夹用来存放我们打包好的静态文件
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230418175751779.png" alt="image-20230418175751779" style="zoom:50%;" />
+
+
+
+在文件夹终端键入命令`node server.js`就可以让我们的服务器跑起来了
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230418180125751.png" alt="image-20230418180125751" style="zoom:50%;" />
+
+​	浏览器地址打开我们对应的服务器端口则可以看到我们开发的页面成功部署
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230418180224569.png" alt="image-20230418180224569" style="zoom:50%;" />
+
+有一个问题：当我们的路由使用history工作模式的时候，我们在路由组件中如果刷新页面则会导致404的问题
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230418180628182.png" alt="image-20230418180628182" style="zoom:50%;" />
+
+这是因为我们在击路由的时候，浏览器路径发生了变化，当我们刷新，路由器把整个地址都发送给了服务器，服务器里面没有匹配项自然会报404错误
+
+​	有3种解决方法：
+
+	1. 直接使用不会将`#`后面路径传给服务器的hash路由工作模式
+	1. 联系后端人员，结合前端的路由路径一步一步匹配后端路由的路径
+	1. 安装专门用于解决history模式刷新404问题的中间件——`connect-history-api-fallback`
+
+```shell
+npm i connect-history-api-fallback
+```
+
+```js
+// 引入中间件
+const history = require('connect-history-api-fallback');
+// 在静态资源生效前使用解决404的中间件
+app.use(history())
+// 让服务器读取我们存放在static的index.html
+app.use(express.static(__dirname + '/static'))
+```
+
+​	这样就可以完美解决history模式刷新404的问题
+

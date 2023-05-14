@@ -14,11 +14,12 @@
 
 1. 采用**组件化**模式，提高代码复用率、且让代码更好的维护
 
-![image-20230225112828963](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230225112828963.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230225112828963.png" alt="image-20230225112828963" />
+
 
 2. **声明式**编码，让编码人员无需直接操作DOM，提高开发效率
 
-![image-20230225113156793](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230225113156793.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230225113156793.png" alt="image-20230225113156793" />
 
 3. 使用**虚拟DOM**+优秀的**Diffing算法**，尽量复用DOM节点
 
@@ -71,7 +72,7 @@ ES6语法规范、ES6模块化、包管理器、原型，原型链、数组常�
 </html>
 ```
 
-![image-20230228194722006](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230228194722006.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230228194722006.png" alt="image-20230228194722006" />
 
 ​	注意区分js表达式和js代码（语句）
 
@@ -145,8 +146,8 @@ ES6语法规范、ES6模块化、包管理器、原型，原型链、数组常�
 </body>
 </html>
 ```
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230228210057056.png" alt="image-20230228210057056" />
 
-![image-20230228210057056](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230228210057056.png)
 
 ## 1.7 数据绑定
 
@@ -408,7 +409,7 @@ descriptor
         console.log(person);
 ```
 
-![image-20230303193347292](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230303193347292.png)	
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230303193347292.png" alt="image-20230303193347292" />
 
 ​	遍历出来的数组中没有名为`age`的元素 证明此属性未参与遍历
 
@@ -572,9 +573,10 @@ descriptor
 
     在getter/setter内部去操作（读/写）data中对应的属性
 
-    ![image-20230303211232696](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230303211232696.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230303211232696.png" alt="image-20230303211232696" />
 
-​	![image-20230303203955212](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230303203955212.png)
+    
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230303203955212.png" alt="image-20230303203955212" />
 
  这里要知道 我们Vue实例对象中的`data`和控制台里面的`_data`是一样的
 
@@ -593,8 +595,7 @@ descriptor
         })
         
 ```
-
-![image-20230303205747989](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230303205747989.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230303205747989.png" alt="image-20230303205747989" />
 
 ​	这可以证明我们操作的data可以被Vue的getter和setter调用
 
@@ -836,8 +837,8 @@ descriptor
 </body>
 </html>
 ```
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230306185814130.png" alt="image-20230306185814130" />
 
-![image-20230306185814130](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230306185814130.png)
 
 ## 1.12 计算属性
 
@@ -883,8 +884,8 @@ descriptor
 </body>
 </html>
 ```
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230306202717232.png" alt="image-20230306202717232" />
 
-![image-20230306202717232](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230306202717232.png)
 
 2. 用methods实现
 
@@ -973,8 +974,8 @@ descriptor
 </body>
 </html>
 ```
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230306203022576.png" alt="image-20230306203022576" />
 
-![image-20230306203022576](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230306203022576.png)
 
 ​	**注意：当我们的计算属性不需要进行修改，而只是展示在页面上时，则可以触发简写方式，将计算属性直接当成其`getter()`使用**
 
@@ -1321,8 +1322,7 @@ watch{
 ```
 
 ​	这里的代码是用监视属性watch实现的，监视属性可以进行一些异步操作（如设置定时器），但是我们必须知道定时器的回调函数（下图的红色框）由`window`所管理，它不隶属Vue管理
-
-![image-20230307194816493](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230307194816493.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230307194816493.png" alt="image-20230307194816493" />
 
 ​	如果我们将定时器的回调函数写成普通函数，那么下面语句中的`this`将不再是`vm`，下面的语句就无法顺利执行
 
@@ -1341,8 +1341,7 @@ watch{
 ```
 
 调试结果：
-
-![image-20230307195057284](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230307195057284.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230307195057284.png" alt="image-20230307195057284" />
 
 如果我们写成箭头函数，由于箭头函数没有自己的`this`，它会往外查找`firstName`这个函数所对应的this指向，而`firstName`的指向为`vm`，我们才能在下面的`this.fullName`中拿到`data`里面的相关属性
 
@@ -1535,8 +1534,7 @@ data里面的配置项：
                     backgroundColor: 'orange'
                 }
 ```
-
-![image-20230309185901264](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230309185901264.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230309185901264.png" alt="image-20230309185901264" />
 
 ​	由此可见，两个存在data里的对象全部生效
 
@@ -1999,7 +1997,7 @@ str: 'hello'
 
 由于用户操作的是真实DOM，当用户在页面上留下信息的时候，信息就会残留在真实DOM上，而在渲染页面的时候，Vue会在中间生成虚拟DOM，页面更新时，Vue会根据`diffing算法`对比更新前后的每个节点来决定是否复用更新前的元素用以提升效率，当我们用`index`作为Vue要使用的`key`时
 
-​	![image-20230310201259891](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230310201259891.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230310201259891.png" alt="image-20230310201259891" />
 
 ​	Vue会对比两个`key`相同的元素以及里面的子节点，这里面新增的老刘`key`为0，初始的虚拟DOM中`key`也为0的是张三，根据`diffing算法`这部分需要重新生成并渲染到页面中。后面`key`为1的张三完全可以在初始虚拟DOM找到，这会导致严重的效率问题
 
@@ -2157,7 +2155,7 @@ Vue会根据`key`进行新旧虚拟DOM的比较，无论我们把老刘放在哪
 
 <img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230311180526348.png" alt="image-20230311180526348" style="zoom:50%;" />
 
-![image-20230311180543872](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230311180543872.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230311180543872.png" alt="image-20230311180543872" />
 
 **用computed计算keyWord实现：**
 
@@ -2359,11 +2357,11 @@ console.log(numbers2);
 
 点击更新马冬梅的信息，马冬梅的数据并没有发生改变。
 
-![image-20230313152729229](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230313152729229.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230313152729229.png" alt="image-20230313152729229" />
 
 我们来看看控制台：
 
-![image-20230313152813061](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230313152813061.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230313152813061.png" alt="image-20230313152813061" />
 
 控制台上的数据发生了改变，说明，这个更改的数据并没有被 vue 监测到。
 
@@ -2402,7 +2400,7 @@ console.log(numbers2);
 
 ```
 
-![image-20230313152845241](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230313152845241.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230313152845241.png" alt="image-20230313152845241" />
 
 ```
 讲一下解析模板后面的操作→ 调用 set 方法时，就会去解析模板----->生成新的虚拟 DOM----->新旧DOM 对比 -----> 更新页面
@@ -2444,7 +2442,7 @@ console.log(numbers2);
 
 ```
 
-![image-20230313152909619](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230313152909619.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230313152909619.png" alt="image-20230313152909619" />
 
 ### 1.16.6 Vue.set的使用
 
@@ -2827,10 +2825,9 @@ Vue监视数据的原理：
 ```
 
 调试结果：
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230315205820436.png" alt="image-20230315205820436" />
 
-![image-20230315205820436](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230315205820436.png)
-
-![image-20230315205916128](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230315205916128.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230315205916128.png" alt="image-20230315205916128" />
 
 最后使用了json里面的解析字符串方法`stringify()`
 
@@ -2961,7 +2958,7 @@ Vue监视数据的原理：
 
 ​	相比较下，插值语法的使用则灵活得多，因为一旦在标签中使用`v-text`，则标签体写什么已经没有了意义，而且也无法为我们解析模板
 
-![image-20230316184705525](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230316184705525.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230316184705525.png" alt="image-20230316184705525" />
 
 **v-html指令：**
 
@@ -2986,9 +2983,9 @@ Vue监视数据的原理：
 
 ​	cookie的大致原理如图所示：
 
-![image-20230316193336599](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230316193336599.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230316193336599.png" alt="image-20230316193336599" />
 
-![image-20230316193413894](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230316193413894.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230316193413894.png" alt="image-20230316193413894" />
 
 使用v-html解析并获取用户cookie的代码示例：
 
@@ -3080,11 +3077,11 @@ Vue监视数据的原理：
 
 5s结束之前：
 
-![image-20230316200201025](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230316200201025.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230316200201025.png" alt="image-20230316200201025" />
 
 5s结束之后：
 
-![image-20230316200245472](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230316200245472.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230316200245472.png" alt="image-20230316200245472" />
 
 由此可见，页面上有{{name}}这个内容，只不过被display:none了 后来vue接管后，瞬间删除了v-cloak并重新解析了模板
 
@@ -3122,7 +3119,7 @@ Vue监视数据的原理：
 </html>
 ```
 
-![image-20230316201348533](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230316201348533.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230316201348533.png" alt="image-20230316201348533" />
 
 **v-pre指令：**
 
@@ -3158,7 +3155,7 @@ Vue监视数据的原理：
 </html>
 ```
 
-![image-20230316201859628](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230316201859628.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230316201859628.png" alt="image-20230316201859628" />
 
 由此可见，加入了v-pre指令的标签将不会被Vue解析
 
@@ -3204,7 +3201,7 @@ Vue监视数据的原理：
             }
 ```
 
-![image-20230316205012372](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230316205012372.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230316205012372.png" alt="image-20230316205012372" />
 
 ​	我们要想实现这个需求，主要重点关注value 由于我们在html使用这个指令的的时候 v-big="n"，这里读取的value就是1
 
@@ -3226,7 +3223,7 @@ Vue监视数据的原理：
     })
 ```
 
-![image-20230316205223278](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230316205223278.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230316205223278.png" alt="image-20230316205223278" />
 
 ​	需求2：定义一个`v-fbnd`指令，和`v-bind`功能类似，但可以让其所绑定的input元素默认获取焦点
 
@@ -3306,7 +3303,7 @@ Vue监视数据的原理：
                 },
 ```
 
-![image-20230317164657544](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230317164657544.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230317164657544.png" alt="image-20230317164657544" />
 
 ## 1.21 生命周期
 
@@ -3376,7 +3373,7 @@ Vue监视数据的原理：
 
 要想知道生命周期的作用以及具体发生的事情，必须知道这个图：
 
-![生命周期](/Users/chenzhengqing/Desktop/尚硅谷vue/资料（含课件）/02_原理图/生命周期.png)
+![生命周期](/资料（含课件）/02_原理图/生命周期.png)
 
 ```html
     <div id="root">
@@ -3464,15 +3461,15 @@ Vue监视数据的原理：
 
 操作DOM之前：
 
-![image-20230317200754378](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230317200754378.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230317200754378.png" alt="image-20230317200754378" />
 
 操作DOM之后：
 
-![image-20230317200821603](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230317200821603.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230317200821603.png" alt="image-20230317200821603" />
 
 放行程序之后：
 
-![image-20230317200849324](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230317200849324.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230317200849324.png" alt="image-20230317200849324" />
 
 ​	所以我们在这里操作DOM是徒劳无功的（其实用了Vue本来就不提倡我们操作真实DOM）
 
@@ -3480,7 +3477,7 @@ Vue监视数据的原理：
 
 ​	此时页面中呈现的都是**经过Vue编译**的DOM，我们对DOM的操作均有效（但是我们应当避免操作真实DOM）。至此初始化过程结束，一般在此进行：开启定时器、发送网络请求、订阅消息、绑定自定义事件等**初始化操作**
 
-![image-20230317201150265](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230317201150265.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230317201150265.png" alt="image-20230317201150265" />
 
 此时发现Vue已经将真实DOM成功挂载到了页面中
 
@@ -3496,7 +3493,7 @@ Vue监视数据的原理：
             },
 ```
 
-![image-20230317201625448](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230317201625448.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230317201625448.png" alt="image-20230317201625448" />
 
 当我们点n+1时，数据会进行更新，但页面中的数据不会变
 
@@ -3514,7 +3511,7 @@ Vue监视数据的原理：
             },
 ```
 
-![image-20230317201955000](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230317201955000.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230317201955000.png" alt="image-20230317201955000" />
 
 可以看到，此时数据和页面中的数据一致。
 
@@ -3540,7 +3537,7 @@ Vue监视数据的原理：
             },
 ```
 
-![image-20230317203206059](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230317203206059.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230317203206059.png" alt="image-20230317203206059" />
 
 完整代码：
 
@@ -3641,9 +3638,9 @@ Vue监视数据的原理：
 
 ## 2.1 模块与组件、模块化与组件化
 
-![image-20230318155127288](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230318155127288.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230318155127288.png" alt="image-20230318155127288" />
 
-![image-20230318155222336](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230318155222336.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230318155222336.png" alt="image-20230318155222336" />
 
 **模块**
 
@@ -3815,9 +3812,9 @@ Vue监视数据的原理：
 
 ​	其中school和stduent组件是隶属于于vm1的局部组件，应用于vm1。hello是全局组件，应用于vm1和vm2。整个文件包含多个组件，我们称为非单文件组件
 
-![image-20230318171133185](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230318171133185.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230318171133185.png" alt="image-20230318171133185" />
 
-![image-20230318171152112](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230318171152112.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230318171152112.png" alt="image-20230318171152112" />
 
 **思考：为什么我们在使用组件的时候配置的data只能定义为一个返回值为对象的回调函数，而不直接是对象？**
 
@@ -4040,9 +4037,9 @@ Vue监视数据的原理：
 
 调试结果：
 
-![image-20230318192917687](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230318192917687.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230318192917687.png" alt="image-20230318192917687" />
 
-![image-20230318192948534](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230318192948534.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230318192948534.png" alt="image-20230318192948534" />
 
 ### 2.2.4 VueComponent构造函数
 
@@ -4192,7 +4189,7 @@ Vue构造函数缔造了**vm**，VueComponent构造函数缔造了**vc**，所�
 
 **VueComponent.prototype.__proto__ === Vue.prototype**
 
-![image-20230320172546242](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230320172546242.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230320172546242.png" alt="image-20230320172546242" />
 
 ```html
 <!DOCTYPE html>
@@ -4268,7 +4265,7 @@ Vue.prototype.x = 100
 
 <img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230320180608923.png" alt="image-20230320180608923" style="zoom:50%;" />
 
-![image-20230320181403557](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230320181403557.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230320181403557.png" alt="image-20230320181403557" />
 
 我们读取到了被Vue更改的那条原型链，如果在vc上读取x，将也会读出x的值
 
@@ -4643,7 +4640,7 @@ createApp(App).mount('#app')
 
 ```
 
-![image-20230320211103034](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230320211103034.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230320211103034.png" alt="image-20230320211103034" />
 
 ### 3.1.4 main.js中的render函数
 
@@ -7311,7 +7308,8 @@ export default {
 
 在main.js中，在Vue实例对象上放入了一个对象x，这样全部组件都可以读取到
 
-![image-20230329210020511](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230329210020511.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230329210020511.png" alt="image-20230329210020511" />
+
 
 **现在我们着手实现第二个要求：**
 
@@ -7412,9 +7410,9 @@ export default {
 
 调试结果：
 
-![image-20230329215224886](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230329215224886.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230329215224886.png" alt="image-20230329215224886" />
 
-![image-20230329215254709](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230329215254709.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230329215254709.png" alt="image-20230329215254709" />
 
 **用全局事件总线完善TodoList案例：**
 
@@ -7797,7 +7795,9 @@ App.vue
   },
 ```
 
-调试结果：![image-20230330200638858](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230330200638858.png)
+调试结果：
+
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230330200638858.png" alt="image-20230330200638858" />
 
 ## 3.13 过渡与动画效果
 
@@ -7907,7 +7907,7 @@ h1 {
 </template>
 ```
 
-![image-20230331162747168](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230331162747168.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230331162747168.png" alt="image-20230331162747168" />
 
 ### 3.13.4 集成第三方动画
 
@@ -7952,7 +7952,7 @@ import 'animate.css';
 
  1. 作用：在插入、更新或移除DOM元素时，在合适的时候给元素添加样式类名
 
- 2. 图示：![image-20230331164813825](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230331164813825.png)
+ 2. 图示：<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230331164813825.png" alt="image-20230331164813825" />
 
  3. 写法：
 
@@ -8102,7 +8102,7 @@ export default {
 
 ​	如果不设置跨域，就会发现有错误，原因是我们的客户端和服务器的端口不一样，浏览器接收到服务器返回的数据，发现我们和服务器不是同源，就不把数据给我们
 
-![image-20230331195340436](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230331195340436.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230331195340436.png" alt="image-20230331195340436" />
 
 ​	当我们在服务器里配置了跨域的请求头，下面的线就走通了
 
@@ -8113,11 +8113,12 @@ export default {
     response.setHeader('Access-Control-Allow-Headers', "*")
 ```
 
-![image-20230331195531962](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230331195531962.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230331195531962.png" alt="image-20230331195531962" />
 
 ​	这是我们借助axios来发送Ajax请求，其实我们还可以配置代理服务器来为我们发送Ajax请求，由于服务器之间不受同源策略的限制，所以我们需要代理服务器跟我们同源，跟目标服务器不同源即可。
 
-![image-20230331200006157](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230331200006157.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230331200006157.png" alt="image-20230331200006157" />
+
 
 ​	配置代理服务器的方法，图里面有两种：1. nginx服务器 2. vue-cli脚手架代理
 
@@ -8270,7 +8271,7 @@ server2中的输出
 
 ### 3.15.1 效果
 
-![image-20230403144710081](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230403144710081.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230403144710081.png" alt="image-20230403144710081" />
 
 ### 3.15.2 静态页面的搭建
 
@@ -8585,7 +8586,7 @@ Search中所决定的数据类型：
 
 <img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230403185624780.png" alt="image-20230403185624780" style="zoom:50%;" />
 
-![image-20230403185652188](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230403185652188.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230403185652188.png" alt="image-20230403185652188" />
 
 <img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230403185733036.png" alt="image-20230403185733036" style="zoom:50%;" />
 
@@ -8766,7 +8767,7 @@ App.vue
 
 ​	值得注意的是 如果被操作的标签是template，我们在标签上的插槽标记应该写成`v-slot:xxx`形式
 
-![image-20230404165752384](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230404165752384.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230404165752384.png" alt="image-20230404165752384" />
 
 ### 3.16.3 作用域插槽
 
@@ -8954,7 +8955,7 @@ button {
 
 调试结果：
 
-![image-20230404201951594](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230404201951594.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230404201951594.png" alt="image-20230404201951594" />
 
 ## 4.3 Vuex原理图
 
@@ -9241,7 +9242,7 @@ button {
 </style>
 ```
 
-![image-20230405212601308](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230405212601308.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230405212601308.png" alt="image-20230405212601308" />
 
 ## 4.5 Vue开发者工具的使用
 
@@ -9281,7 +9282,7 @@ Count组件中：
 
 调试结果：
 
-![image-20230410195847953](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230410195847953.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230410195847953.png" alt="image-20230410195847953" />
 
 <img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230410195916362.png" alt="image-20230410195916362" style="zoom:50%;" />
 
@@ -10567,7 +10568,7 @@ router.beforeEach((to, from, next) => {
 
 调试结果：
 
-![image-20230417182515947](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230417182515947.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230417182515947.png" alt="image-20230417182515947" />
 
 ​	上面的写法判断鉴权我们有更简便的写法（如果判断的路径多的话）：
 
@@ -11168,7 +11169,7 @@ export default {
 </style>
 ```
 
-![image-20230418193230523](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230418193230523.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230418193230523.png" alt="image-20230418193230523" />
 
 **尚硅谷Vue2完结！**
 

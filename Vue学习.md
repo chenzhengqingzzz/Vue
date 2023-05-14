@@ -4,11 +4,11 @@
 
 ​	Vue是一套用于**构建用户页面**的**渐进式**JavaScript框架
 
-​	![image-20230225111825583](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230225111825583.png)
+​	<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230225111825583.png" alt="image-20230225111825583"/>
 
 ## 1.2 谁开发的
 
-![image-20230225112521513](/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230225112521513.png)
+<img src="/Users/chenzhengqing/Library/Application Support/typora-user-images/image-20230225112521513.png" alt="image-20230225112521513" />
 
 ## 1.3 Vue的特点
 
